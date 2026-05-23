@@ -5,7 +5,12 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Segoe UI', 'Courier New', monospace;
+    overflow: hidden;
+}
+
+/* Главная страница */
+body.main-page {
     background-image: url('images/fon.jpg');
     background-size: cover;
     background-position: center;
@@ -13,16 +18,784 @@ body {
     background-repeat: no-repeat;
 }
 
-
-.location-nav a {
-    padding: 5px;
-    background-color: rgb(255, 236, 154);
-    color: #cc008b; 
-    text-decoration: none; 
-
+.game-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
 }
 
-.location-nav a:hover{
-    color: #73004f; 
-    text-decoration: none; 
- }
+.game-title {
+    font-size: 64px;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    text-shadow: 6px 6px 0px rgba(0, 0, 0, 0.5);
+    color: #ffff00;
+    text-align: center;
+    margin-bottom: 80px;
+    letter-spacing: 4px;
+    image-rendering: pixelated;
+}
+
+.menu-buttons {
+    display: flex;
+    gap: 50px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.menu-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 4px solid #ffffff;
+    border-radius: 0px;
+    padding: 20px 30px;
+    cursor: pointer;
+    transition: all 0.05s linear;
+    min-width: 140px;
+    box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.3);
+}
+
+.menu-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.menu-btn:active {
+    transform: translate(4px, 4px);
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.3);
+}
+
+.menu-icon {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.3));
+}
+
+.menu-btn span {
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: bold;
+    text-shadow: 3px 3px 0px #000000;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+}
+
+.shutdown-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: #ff4444;
+    border: 5px solid #ffcccc;
+    width: 90px;
+    height: 90px;
+    cursor: pointer;
+    transition: all 0.05s linear;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    box-shadow: 8px 8px 0px #880000;
+}
+
+.shutdown-btn:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 11px 11px 0px #880000;
+    background: #ff6666;
+}
+
+.shutdown-btn:active {
+    transform: translate(5px, 5px);
+    box-shadow: 3px 3px 0px #880000;
+}
+
+.shutdown-icon {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+    filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.5));
+}
+
+/* ===== РАБОЧИЙ СТОЛ (Windows 11 стиль) ===== */
+.desktop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #1a3d1a;
+    z-index: 100;
+    display: none;
+}
+
+.desktop-wallpaper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('images/fon.jpg');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.85;
+}
+
+/* Иконки рабочего стола */
+.desktop-icons {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    z-index: 110;
+}
+
+.icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 8px;
+    transition: all 0.1s;
+    width: 85px;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(5px);
+}
+
+.icon:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.icon-emoji {
+    font-size: 42px;
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
+}
+
+.icon-label {
+    color: white;
+    font-size: 11px;
+    margin-top: 5px;
+    text-shadow: 1px 1px 0 black;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* ===== ПАНЕЛЬ ЗАДАЧ WINDOWS 11 ===== */
+.taskbar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 48px;
+    background: rgba(32, 32, 32, 0.95);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    z-index: 200;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.taskbar-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.start-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: white;
+    transition: all 0.1s;
+}
+
+.start-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.start-icon {
+    font-size: 20px;
+}
+
+.taskbar-icons {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 8px;
+}
+
+.taskbar-app-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.1s;
+    font-size: 20px;
+}
+
+.taskbar-app-icon:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.taskbar-app-icon.active {
+    background: rgba(255, 255, 255, 0.15);
+    border-bottom: 2px solid #ffaa44;
+}
+
+.taskbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.notification-area {
+    position: relative;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    transition: background 0.1s;
+}
+
+.notification-area:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.notification-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    background: #ff4444;
+    border-radius: 50%;
+    display: none;
+}
+
+.notification-badge.has-notification {
+    display: block;
+}
+
+.taskbar-time {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding: 4px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.taskbar-time:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.taskbar-time .time {
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.taskbar-time .date {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 10px;
+}
+
+/* Панель уведомлений */
+.notification-panel {
+    position: absolute;
+    bottom: 50px;
+    right: 12px;
+    width: 320px;
+    max-height: 400px;
+    background: rgba(32, 32, 32, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: none;
+    flex-direction: column;
+    z-index: 250;
+    overflow: hidden;
+}
+
+.notification-panel.active {
+    display: flex;
+}
+
+.notification-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    font-weight: bold;
+}
+
+.notification-list {
+    flex: 1;
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: white;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.1s;
+}
+
+.notification-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.notification-item.unread {
+    background: rgba(255, 170, 68, 0.15);
+    border-left: 3px solid #ffaa44;
+}
+
+.notification-time {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 4px;
+}
+
+/* Меню Пуск (Windows 11 стиль) */
+.start-menu {
+    position: absolute;
+    bottom: 52px;
+    left: 12px;
+    width: 400px;
+    background: rgba(32, 32, 32, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: none;
+    flex-direction: column;
+    z-index: 210;
+    overflow: hidden;
+}
+
+.start-menu.active {
+    display: flex;
+}
+
+.start-menu-header {
+    padding: 20px 20px 12px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.start-menu-avatar {
+    width: 48px;
+    height: 48px;
+    background: #ffaa44;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.start-menu-user {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.start-menu-search {
+    margin: 8px 16px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    border: none;
+    color: white;
+    font-size: 14px;
+}
+
+.start-menu-search::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.start-menu-pinned {
+    padding: 12px 16px;
+    color: white;
+    font-size: 12px;
+    text-transform: uppercase;
+    opacity: 0.7;
+}
+
+.start-menu-items {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 0 16px 16px;
+}
+
+.start-menu-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.1s;
+    color: white;
+    font-size: 11px;
+}
+
+.start-menu-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.start-menu-item-icon {
+    font-size: 24px;
+}
+
+.start-menu-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 8px 16px;
+}
+
+.start-menu-power {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+}
+
+.power-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: white;
+    transition: background 0.1s;
+}
+
+.power-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* ===== МОДАЛЬНЫЕ ОКНА (РЫЖИЙ ПИКСЕЛЬНЫЙ СТИЛЬ) ===== */
+.window-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 300;
+}
+
+.window-modal.active {
+    display: flex;
+}
+
+.browser-window {
+    width: 1000px;
+    max-width: 90vw;
+    height: 700px;
+    max-height: 85vh;
+    background: #ffdd99;
+    border: 8px solid #ffaa44;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 16px 16px 0px rgba(0, 0, 0, 0.3);
+    image-rendering: pixelated;
+}
+
+.browser-bar {
+    background: #ffaa44;
+    padding: 8px 8px 0 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 4px solid #ff8800;
+}
+
+.window-controls {
+    display: flex;
+    gap: 6px;
+    order: 1;
+}
+
+.window-controls button {
+    background: #ff6644;
+    border: none;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: bold;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.05s linear;
+    clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
+    box-shadow: inset -2px -2px 0 #aa3311, inset 2px 2px 0 #ffaa88;
+}
+
+.window-controls button:hover {
+    background: #ff8866;
+    transform: scale(1.02);
+}
+
+.browser-tabs {
+    display: flex;
+    gap: 6px;
+    flex: 1;
+    overflow-x: auto;
+}
+
+.tab-btn {
+    background: #ffcc77;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    cursor: pointer;
+    color: #442200;
+    white-space: nowrap;
+    transition: all 0.05s linear;
+    clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
+    box-shadow: inset -3px -3px 0 #aa7733, inset 3px 3px 0 #ffeedd;
+}
+
+.tab-btn:hover {
+    background: #ffdd99;
+    transform: translateY(-2px);
+}
+
+.tab-btn.active {
+    background: #ffffee;
+    color: #331100;
+    margin-bottom: -2px;
+    padding-bottom: 12px;
+    box-shadow: inset -2px -2px 0 #ccaa66, inset 2px 2px 0 #ffffff;
+}
+
+.browser-iframe {
+    width: 100%;
+    flex: 1;
+    border: none;
+    background: #fff8f0;
+}
+
+.browser-statusbar {
+    background: #ddbb77;
+    padding: 4px 10px;
+    font-size: 11px;
+    color: #442200;
+    font-family: monospace;
+    border-top: 2px solid #ccaa66;
+}
+
+/* ===== DEEPSEEK ЧАТ ===== */
+.deepseek-chat {
+    position: fixed;
+    bottom: 60px;
+    right: 20px;
+    width: 320px;
+    background: #1a1a2e;
+    border: 2px solid #ffaa44;
+    border-radius: 10px;
+    display: none;
+    z-index: 250;
+    flex-direction: column;
+}
+
+.deepseek-chat.active {
+    display: flex;
+}
+
+.deepseek-header {
+    background: #2d2d4a;
+    padding: 10px;
+    color: #ffaa44;
+    display: flex;
+    justify-content: space-between;
+    border-radius: 8px 8px 0 0;
+    font-weight: bold;
+}
+
+.deepseek-close {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.deepseek-content {
+    padding: 15px;
+    color: #ccc;
+    font-size: 13px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.deepseek-advice {
+    background: #0a0a1a;
+    padding: 10px;
+    border-radius: 8px;
+    border-left: 3px solid #ffaa44;
+}
+
+/* ===== СТАТИСТИКА ===== */
+.stats-panel {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.85);
+    padding: 10px 15px;
+    border-radius: 8px;
+    z-index: 150;
+    min-width: 200px;
+    backdrop-filter: blur(5px);
+    border: 1px solid #ffaa44;
+}
+
+.stat-item {
+    margin: 5px 0;
+}
+
+.stat-label {
+    color: white;
+    font-size: 12px;
+    margin-right: 10px;
+}
+
+.stat-value {
+    color: #ffaa44;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.stat-bar {
+    width: 100%;
+    height: 6px;
+    background: #333;
+    border-radius: 3px;
+    margin-top: 3px;
+    overflow: hidden;
+}
+
+.stat-fill {
+    height: 100%;
+    background: #ffaa44;
+    transition: width 0.3s;
+    border-radius: 3px;
+}
+
+/* ===== БАБЛЫ ===== */
+.bubble-container {
+    position: fixed;
+    bottom: 60px;
+    left: 20px;
+    z-index: 250;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.bubble {
+    background: white;
+    padding: 12px 18px;
+    border-radius: 18px;
+    max-width: 350px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    animation: slideIn 0.3s ease-out;
+}
+
+.bubble.system {
+    background: #ff9800;
+    color: white;
+}
+
+.bubble.user {
+    background: #4caf50;
+    color: white;
+}
+
+.bubble.character {
+    background: #2196f3;
+    color: white;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* ===== ЭКРАН ЗАГРУЗКИ (для выключения) ===== */
+.shutdown-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    z-index: 2000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s;
+}
+
+.shutdown-overlay.active {
+    display: flex;
+}
+
+.shutdown-text {
+    color: white;
+    font-size: 24px;
+    font-family: monospace;
+    animation: blink 1s infinite;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}

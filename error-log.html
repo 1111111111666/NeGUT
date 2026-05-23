@@ -2,39 +2,247 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    
     <title>Журнал ошибок</title>
-    <link rel="stylesheet" href="style.css">
-    
     <style>
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #00ff00;
+            padding: 20px;
+        }
+        
+        .log-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .log-header {
+            border-bottom: 2px solid #00ff00;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .log-entry {
+            padding: 8px;
+            border-bottom: 1px solid #333;
+            font-size: 12px;
+            font-family: monospace;
+        }
+        
+        .log-entry.error {
+            color: #ff6666;
+        }
+        
+        .log-entry.warning {
+            color: #ffaa44;
+        }
+        
+        .log-entry.info {
+            color: #44ff44;
+        }
+        
+        .log-time {
+            color: #888;
+            margin-right: 15px;
+        }
+        
+        .log-day {
+            background: #1a1a2e;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-right: 10px;
+        }
+        
+        .filter-bar {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            background: #1a1a1a;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 5px 12px;
+            cursor: pointer;
+            font-family: monospace;
+        }
+        
+        .filter-btn.active {
+            background: #00ff00;
+            color: #0a0a0a;
+        }
+        
+        .stats {
+            background: #1a1a2e;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+        
+        .clear-btn {
+            background: #ff4444;
+            border: none;
+            color: white;
+            padding: 5px 12px;
+            cursor: pointer;
+            font-family: monospace;
+        }
+        
+        .clear-btn:hover {
+            background: #cc0000;
+        }
     </style>
 </head>
 <body>
-    <!-- Шапка игры (прогресс, счет, инвентарь) -->
-    <header class="game-header">
-
-    </header>
-
-    <!-- Основной контент локации -->
-    <main class="game-main">
-
-    </main>
-
-    <!-- Навигация между локациями -->
-    <nav class="location-nav">
-        <a href="index.html">Главная</a>
-        <a href="user.html">Пользователи</a>
-        <a href="admin.html">Админ</a>
-        <a href="archive.html">Архив</a>
-        <a href="error-log.html">Ошибки</a>
-    </nav>
-
-    <!-- Подключение JavaScript -->
-    <script src="game.js"></script>
+    <div class="log-container">
+        <div class="log-header">
+            <h2>⚠️ SYSLOG: ЖУРНАЛ ОШИБОК</h2>
+            <div>
+                <button id="clearLogBtn" class="clear-btn">🗑️ Очистить</button>
+            </div>
+        </div>
+        
+        <div class="stats" id="statsPanel"></div>
+        
+        <div class="filter-bar">
+            <button class="filter-btn active" data-filter="all">Все</button>
+            <button class="filter-btn" data-filter="error">🔴 Ошибки</button>
+            <button class="filter-btn" data-filter="warning">🟡 Предупреждения</button>
+            <button class="filter-btn" data-filter="info">🟢 Инфо</button>
+        </div>
+        
+        <div id="logList"></div>
+    </div>
+    
     <script>
-
+        let currentFilter = 'all';
+        
+        function getGameData() {
+            return window.parent.getGameData ? window.parent.getGameData() : null;
+        }
+        
+        function getSystemLogs() {
+            const gameData = getGameData();
+            const errors = gameData?.errorLog || [];
+            const completedDays = gameData?.completedDays || [];
+            
+            const systemLogs = [];
+            
+            if (gameData?.day >= 1) {
+                systemLogs.push({ type: 'error', day: 1, time: '14:00:23', message: 'ERR_UPLOAD_404: Файл не найден в очереди загрузки' });
+                systemLogs.push({ type: 'warning', day: 1, time: '14:15:47', message: 'WARN: Сессия пользователя истекла' });
+                
+                if (completedDays.includes(1)) {
+                    systemLogs.push({ type: 'info', day: 1, time: '14:30:12', message: 'INFO: Проблема с очередью решена' });
+                }
+            }
+            
+            if (gameData?.day >= 2) {
+                systemLogs.push({ type: 'error', day: 2, time: '09:30:12', message: 'ERR_502: API /grades не отвечает (таймаут 30с)' });
+                systemLogs.push({ type: 'warning', day: 2, time: '09:45:33', message: 'WARN: Шлюз перегружен, очередь запросов 150+' });
+                
+                if (completedDays.includes(2)) {
+                    systemLogs.push({ type: 'info', day: 2, time: '10:15:22', message: 'INFO: API шлюз перезапущен, статус OK' });
+                }
+            }
+            
+            if (gameData?.day >= 3) {
+                systemLogs.push({ type: 'error', day: 3, time: '08:20:05', message: 'ERR_CACHE: Инвалидация кеша не удалась' });
+                systemLogs.push({ type: 'warning', day: 3, time: '08:22:18', message: 'WARN: TTL кеша истек некорректно (30 дней)' });
+                
+                if (completedDays.includes(3)) {
+                    systemLogs.push({ type: 'info', day: 3, time: '09:05:33', message: 'INFO: Кеш сброшен, данные обновлены' });
+                }
+            }
+            
+            if (gameData?.day >= 4) {
+                systemLogs.push({ type: 'warning', day: 4, time: '10:05:42', message: 'WARN: Обнаружены исходящие запросы к Telegram API' });
+                systemLogs.push({ type: 'warning', day: 4, time: '10:05:44', message: 'WARN: Обнаружены исходящие запросы к YouTube API' });
+                
+                if (completedDays.includes(4)) {
+                    systemLogs.push({ type: 'info', day: 4, time: '11:20:15', message: 'INFO: Проверка VPN отключена, ошибки 403 устранены' });
+                }
+            }
+            
+            if (gameData?.day >= 5) {
+                systemLogs.push({ type: 'warning', day: 5, time: '09:00:00', message: 'WARN: Административный риск - критический' });
+                systemLogs.push({ type: 'alert', day: 5, time: '09:15:30', message: 'ALERT: Требуется отчёт о причине сбоев' });
+            }
+            
+            return [...systemLogs, ...errors.map(e => ({
+                type: e.result === 'исправлена' ? 'info' : 'error',
+                day: e.day,
+                time: e.timestamp,
+                message: `[${e.action}] ${e.message}`
+            }))];
+        }
+        
+        function renderLogs() {
+            const logs = getSystemLogs();
+            const filteredLogs = currentFilter === 'all' ? logs : logs.filter(l => l.type === currentFilter);
+            
+            const logDiv = document.getElementById('logList');
+            const statsPanel = document.getElementById('statsPanel');
+            
+            const errorCount = logs.filter(l => l.type === 'error').length;
+            const warningCount = logs.filter(l => l.type === 'warning').length;
+            const infoCount = logs.filter(l => l.type === 'info').length;
+            
+            if (statsPanel) {
+                statsPanel.innerHTML = `📊 СТАТИСТИКА | 🔴 Ошибок: ${errorCount} | 🟡 Предупреждений: ${warningCount} | 🟢 Событий: ${infoCount} | 📝 Всего записей: ${logs.length}`;
+            }
+            
+            if (!logDiv) return;
+            
+            if (filteredLogs.length === 0) {
+                logDiv.innerHTML = '<div class="log-entry">Нет записей, соответствующих фильтру</div>';
+                return;
+            }
+            
+            logDiv.innerHTML = filteredLogs.map(log => `
+                <div class="log-entry ${log.type}">
+                    <span class="log-time">[${log.time || '--:--:--'}]</span>
+                    <span class="log-day">День ${log.day}</span>
+                    <span>${log.message}</span>
+                </div>
+            `).join('');
+        }
+        
+        function clearLogs() {
+            if (confirm('Очистить локальный журнал? (игровой прогресс не пострадает)')) {
+                const container = document.getElementById('logList');
+                if (container) {
+                    container.innerHTML = '<div class="log-entry">Журнал очищен</div>';
+                }
+            }
+        }
+        
+        function init() {
+            renderLogs();
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentFilter = btn.dataset.filter;
+                    renderLogs();
+                });
+            });
+            
+            document.getElementById('clearLogBtn')?.addEventListener('click', clearLogs);
+            
+            setInterval(renderLogs, 3000);
+        }
+        
+        init();
     </script>
 </body>
 </html>
