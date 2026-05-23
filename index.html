@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>СПБ не ГУТ — Главный экран</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="main-page">
+    <main class="game-main">
+        <h1 class="game-title">СПБ не ГУТ</h1>
+        
+        <div class="menu-buttons">
+            <button id="newGameBtn" class="menu-btn">
+                <img src="images/start.png" alt="Начать новую игру" class="menu-icon" onerror="this.src='https://placehold.co/80x80/ffaa44/442200?text=🚀'">
+                <span>Начать новую игру</span>
+            </button>
+            <button id="continueBtn" class="menu-btn">
+                <img src="images/cont.png" alt="Продолжить" class="menu-icon" onerror="this.src='https://placehold.co/80x80/ffaa44/442200?text=📁'">
+                <span>Продолжить</span>
+            </button>
+            <button id="resetBtn" class="menu-btn">
+                <img src="images/reset.png" alt="Сбросить прогресс" class="menu-icon" onerror="this.src='https://placehold.co/80x80/ffaa44/442200?text=🗑️'">
+                <span>Сбросить прогресс</span>
+            </button>
+        </div>
+    </main>
+
+    <footer>
+        <button id="shutdownBtn" class="shutdown-btn">
+            <img src="images/turn-off.png" alt="Выключить" class="shutdown-icon" onerror="this.src='https://placehold.co/70x70/ff4444/white?text=⏻'">
+        </button>
+    </footer>
+
+    <!-- РАБОЧИЙ СТОЛ (изначально скрыт) -->
+    <div id="desktop" class="desktop" style="display: none;">
+        <div class="desktop-wallpaper"></div>
+        
+        <!-- Иконки -->
+        <div class="desktop-icons">
+            <div class="icon" data-app="browser">
+                <div class="icon-emoji">🌐</div>
+                <div class="icon-label">Браузер</div>
+            </div>
+            <div class="icon" id="deepseekIcon" style="display: none;">
+                <div class="icon-emoji">🤖</div>
+                <div class="icon-label">DeepSeek</div>
+            </div>
+        </div>
+
+        <!-- Панель задач Windows 11 -->
+        <div class="taskbar">
+            <div class="taskbar-left">
+                <div class="start-button">
+                    <span class="start-icon">犯</span>
+                    <span>Пуск</span>
+                </div>
+                <div class="taskbar-icons">
+                    <div class="taskbar-app-icon" data-app="browser">🌐</div>
+                </div>
+            </div>
+            <div class="taskbar-right">
+                <div class="notification-area">
+                    <span>🔔</span>
+                    <div class="notification-badge"></div>
+                </div>
+                <div class="taskbar-time">
+                    <span class="time" id="currentTime">--:--</span>
+                    <span class="date" id="currentDate">--.--</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Меню Пуск -->
+        <div id="startMenu" class="start-menu">
+            <div class="start-menu-header">
+                <div class="start-menu-avatar">👨‍💻</div>
+                <div class="start-menu-user">Коля Иванов</div>
+            </div>
+            <input type="text" class="start-menu-search" placeholder="Поиск..." readonly>
+            <div class="start-menu-pinned">Закрепленные</div>
+            <div class="start-menu-items">
+                <div class="start-menu-item" data-app="browser">
+                    <div class="start-menu-item-icon">🌐</div>
+                    <span>Браузер</span>
+                </div>
+                <div class="start-menu-item" id="startDeepseekBtn" style="display: none;">
+                    <div class="start-menu-item-icon">🤖</div>
+                    <span>DeepSeek</span>
+                </div>
+            </div>
+            <div class="start-menu-divider"></div>
+            <div class="start-menu-power">
+                <div class="power-option" id="startRebootBtn">
+                    <span>🔄</span> Перезагрузка
+                </div>
+                <div class="power-option" id="startShutdownBtn">
+                    <span>⏻</span> Выключение
+                </div>
+            </div>
+        </div>
+
+        <!-- Панель уведомлений -->
+        <div id="notificationPanel" class="notification-panel">
+            <div class="notification-header">Уведомления</div>
+            <div class="notification-list" id="notificationList"></div>
+        </div>
+
+        <!-- Окно браузера -->
+        <div id="browserModal" class="window-modal">
+            <div class="browser-window">
+                <div class="browser-bar">
+                    <div class="window-controls">
+                        <button id="browserMinBtn">—</button>
+                        <button id="closeBrowserBtn">✖</button>
+                    </div>
+                    <div class="browser-tabs">
+                        <button class="tab-btn active" data-page="user.html">👤 Личный кабинет</button>
+                        <button class="tab-btn" data-page="admin.html">🛠️ Панель администратора</button>
+                        <button class="tab-btn" data-page="archive.html">📚 Архив данных</button>
+                        <button class="tab-btn" data-page="error-log.html">⚠️ Журнал ошибок</button>
+                    </div>
+                </div>
+                <iframe id="browserIframe" class="browser-iframe" src="user.html"></iframe>
+                <div class="browser-statusbar">
+                    <span>Готово</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- DeepSeek чат -->
+        <div id="deepseekChat" class="deepseek-chat">
+            <div class="deepseek-header">
+                <span>🤖 DeepSeek Assistant</span>
+                <button class="deepseek-close">✖</button>
+            </div>
+            <div class="deepseek-content">
+                <div class="deepseek-message">
+                    Привет! Я помогу тебе разобраться с ошибками в системе.
+                </div>
+                <div class="deepseek-advice" id="deepseekAdvice">
+                    <!-- Подсказки будут здесь -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Панель статистики -->
+        <div class="stats-panel">
+            <div class="stat-item">
+                <span class="stat-label">❤️ Доверие:</span>
+                <span class="stat-value" id="trustValue">70</span>
+                <div class="stat-bar">
+                    <div class="stat-fill" id="trustFill" style="width: 70%"></div>
+                </div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">🧠 Интеллект:</span>
+                <span class="stat-value" id="intellectValue">0</span>
+                <div class="stat-bar">
+                    <div class="stat-fill" id="intellectFill" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Контейнер для уведомлений-баблов -->
+        <div id="bubbleContainer" class="bubble-container"></div>
+        
+        <!-- Оверлей выключения -->
+        <div id="shutdownOverlay" class="shutdown-overlay">
+            <div class="shutdown-text">Выключение...</div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

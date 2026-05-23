@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Панель администратора</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+        }
+        
+        .admin-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .dashboard {
+            background: #0a0a0a;
+            border: 2px solid #00ff00;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .status {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #333;
+            flex-wrap: wrap;
+        }
+        
+        .status-badge {
+            padding: 5px 10px;
+            background: #1a1a1a;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+        
+        .status-badge.online {
+            color: #00ff00;
+        }
+        
+        .status-badge.offline {
+            color: #ff4444;
+        }
+        
+        .status-badge.warning {
+            color: #ffaa44;
+        }
+        
+        .cli-section {
+            background: #0a0a0a;
+            border: 1px solid #333;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .cli-title {
+            color: #00ff00;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .cli-option {
+            background: #1a1a1a;
+            padding: 12px;
+            margin: 8px 0;
+            cursor: pointer;
+            transition: all 0.1s;
+            border-left: 3px solid #00ff00;
+            border-radius: 4px;
+        }
+        
+        .cli-option:hover {
+            background: #2a2a2a;
+            transform: translateX(5px);
+        }
+        
+        .cli-option:active {
+            background: #3a3a3a;
+        }
+        
+        .cli-option-name {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .cli-option-desc {
+            font-size: 11px;
+            color: #888;
+        }
+        
+        .error-log {
+            background: #0a0a0a;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .error-entry {
+            padding: 8px;
+            border-bottom: 1px solid #333;
+            font-size: 12px;
+        }
+        
+        .error-time {
+            color: #888;
+            margin-right: 10px;
+        }
+        
+        .prompt {
+            color: #00ff00;
+            margin: 10px 0;
+            font-size: 12px;
+        }
+        
+        h2 {
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        hr {
+            border-color: #333;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="dashboard">
+            <h2>🛠️ PANEL: ADMIN CONSOLE v2.0</h2>
+            <div class="status">
+                <div class="status-badge online" id="apiGatewayStatus">🟢 API Gateway: ONLINE</div>
+                <div class="status-badge" id="queueStatus">📦 Очередь: 0</div>
+                <div class="status-badge" id="cacheStatus">💾 Кеш: OK</div>
+                <div class="status-badge" id="vpnStatus">🌐 VPN check: ON</div>
+            </div>
+            
+            <div class="cli-section">
+                <div class="cli-title">$> Доступные команды (кликните для выполнения):</div>
+                
+                <!-- День 1: Очередь -->
+                <div class="cli-option" data-action="checkQueue">
+                    <div class="cli-option-name">> system.queue.check()</div>
+                    <div class="cli-option-desc">Проверить очередь загрузки файлов</div>
+                </div>
+                
+                <div class="cli-option" data-action="restartAuth">
+                    <div class="cli-option-name">> auth.service.restart()</div>
+                    <div class="cli-option-desc">Перезапустить сервис аутентификации</div>
+                </div>
+                
+                <div class="cli-option" data-action="checkBackups">
+                    <div class="cli-option-name">> backup.files.list()</div>
+                    <div class="cli-option-desc">Посмотреть бэкапы отправленных файлов</div>
+                </div>
+                
+                <hr>
+                
+                <!-- День 2: API -->
+                <div class="cli-option" data-action="restartGateway">
+                    <div class="cli-option-name">> api.gateway.restart()</div>
+                    <div class="cli-option-desc">Перезапустить API-шлюз /grades</div>
+                </div>
+                
+                <div class="cli-option" data-action="increaseTimeout">
+                    <div class="cli-option-name">> api.timeout.set(60000)</div>
+                    <div class="cli-option-desc">Увеличить таймаут до 60 секунд</div>
+                </div>
+                
+                <div class="cli-option" data-action="checkCurl">
+                    <div class="cli-option-name">> curl -X GET /grades</div>
+                    <div class="cli-option-desc">Проверить эндпоинт /grades вручную</div>
+                </div>
+                
+                <hr>
+                
+                <!-- День 3: Кеш -->
+                <div class="cli-option" data-action="resetCache">
+                    <div class="cli-option-name">> cache.flush()</div>
+                    <div class="cli-option-desc">Сбросить кеш вручную</div>
+                </div>
+                
+                <div class="cli-option" data-action="rebootServer">
+                    <div class="cli-option-name">> system.reboot()</div>
+                    <div class="cli-option-desc">Перезагрузить сервер целиком</div>
+                </div>
+                
+                <div class="cli-option" data-action="configureTTL">
+                    <div class="cli-option-name">> cache.ttl.set(300)</div>
+                    <div class="cli-option-desc">Настроить TTL кеша на 5 минут</div>
+                </div>
+                
+                <hr>
+                
+                <!-- День 4: VPN -->
+                <div class="cli-option" data-action="disableVPN">
+                    <div class="cli-option-name">> vpn.check.disable()</div>
+                    <div class="cli-option-desc">Отключить проверку VPN в конфиге</div>
+                </div>
+                
+                <div class="cli-option" data-action="keepVPN">
+                    <div class="cli-option-name">> vpn.check.keep()</div>
+                    <div class="cli-option-desc">Оставить как есть — пусть проверяет</div>
+                </div>
+                
+                <div class="cli-option" data-action="localFlag">
+                    <div class="cli-option-name">> vpn.check.migrate.local()</div>
+                    <div class="cli-option-desc">Заменить проверку VPN на локальный флаг</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="error-log">
+            <div class="prompt">$> tail -f /var/log/system.log</div>
+            <div id="actionLog">
+                <div class="error-entry"><span class="error-time">[SYSTEM]</span> Панель администратора загружена</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function getGameData() {
+            return window.parent.getGameData ? window.parent.getGameData() : null;
+        }
+        
+        function addToLog(message, isError = false) {
+            const logDiv = document.getElementById('actionLog');
+            if (logDiv) {
+                const entry = document.createElement('div');
+                entry.className = 'error-entry';
+                const time = new Date().toLocaleTimeString();
+                entry.innerHTML = `<span class="error-time">[${time}]</span> ${message}`;
+                if (isError) entry.style.color = '#ff8888';
+                logDiv.insertBefore(entry, logDiv.firstChild);
+                
+                while (logDiv.children.length > 30) {
+                    logDiv.removeChild(logDiv.lastChild);
+                }
+            }
+        }
+        
+        function updateStatus() {
+            const gameData = getGameData();
+            if (!gameData) return;
+            
+            const apiStatus = document.getElementById('apiGatewayStatus');
+            const queueStatus = document.getElementById('queueStatus');
+            const cacheStatus = document.getElementById('cacheStatus');
+            const vpnStatus = document.getElementById('vpnStatus');
+            
+            const completedDays = gameData.completedDays || [];
+            
+            if (gameData.day === 1 && !completedDays.includes(1)) {
+                if (apiStatus) apiStatus.innerHTML = '🟡 API Gateway: DEGRADED';
+                if (queueStatus) queueStatus.innerHTML = '📦 Очередь: ПЕРЕПОЛНЕНА';
+                if (cacheStatus) cacheStatus.innerHTML = '💾 Кеш: OK';
+            } else if (gameData.day === 2 && !completedDays.includes(2)) {
+                if (apiStatus) apiStatus.innerHTML = '🔴 API Gateway: OFFLINE (502)';
+                if (queueStatus) queueStatus.innerHTML = '📦 Очередь: 12';
+                if (cacheStatus) cacheStatus.innerHTML = '💾 Кеш: OK';
+            } else if (gameData.day === 3 && !completedDays.includes(3)) {
+                if (apiStatus) apiStatus.innerHTML = '🟢 API Gateway: ONLINE';
+                if (queueStatus) queueStatus.innerHTML = '📦 Очередь: 3';
+                if (cacheStatus) cacheStatus.innerHTML = '⚠️ Кеш: УСТАРЕЛ';
+            } else if (gameData.day === 4 && !completedDays.includes(4)) {
+                if (vpnStatus) vpnStatus.innerHTML = '🌐 VPN check: АКТИВЕН (запросы к внешним API)';
+                if (apiStatus) apiStatus.innerHTML = '🟡 API Gateway: НЕСТАБИЛЕН';
+            } else {
+                if (apiStatus) apiStatus.innerHTML = '🟢 API Gateway: ONLINE';
+                if (queueStatus) queueStatus.innerHTML = '📦 Очередь: 0';
+                if (cacheStatus) cacheStatus.innerHTML = '💾 Кеш: OK';
+                if (vpnStatus) vpnStatus.innerHTML = '🌐 VPN check: OFF';
+            }
+        }
+        
+        function executeAction(action) {
+            const gameData = getGameData();
+            if (!gameData) {
+                addToLog('❌ Ошибка: данные игры не загружены', true);
+                return;
+            }
+            
+            addToLog(`🚀 Выполняется: ${action}`);
+            
+            if (window.parent.executeAdminAction) {
+                window.parent.executeAdminAction(action);
+            } else {
+                addToLog('⚠️ Функция executeAdminAction не найдена', true);
+            }
+            
+            setTimeout(updateStatus, 100);
+        }
+        
+        document.querySelectorAll('.cli-option').forEach(option => {
+            option.addEventListener('click', () => {
+                const action = option.dataset.action;
+                if (action) executeAction(action);
+            });
+        });
+        
+        function init() {
+            updateStatus();
+            setInterval(updateStatus, 2000);
+            addToLog('💻 Панель администратора готова к работе');
+        }
+        
+        init();
+    </script>
+</body>
+</html>

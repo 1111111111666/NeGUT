@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Архив данных</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif;
+            padding: 20px;
+            background: #fff8f0;
+        }
+        
+        .archive-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .clue-card {
+            background: white;
+            border: 2px solid #ffaa44;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: 3px 3px 0 #ffdd99;
+        }
+        
+        .clue-card h4 {
+            color: #442200;
+            margin-bottom: 8px;
+        }
+        
+        .timeline {
+            background: #ffaa44;
+            color: #442200;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .timeline h3 {
+            margin-bottom: 10px;
+        }
+        
+        .timeline-item {
+            padding: 10px;
+            border-left: 3px solid #442200;
+            margin: 10px 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 4px;
+        }
+        
+        hr {
+            margin: 20px 0;
+            border-color: #ffdd99;
+        }
+        
+        .report-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 20px 0;
+            border-radius: 8px;
+            width: 100%;
+            font-weight: bold;
+        }
+        
+        .report-btn:hover {
+            background: #c0392b;
+        }
+        
+        .report-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        h2, h3 {
+            color: #442200;
+        }
+    </style>
+</head>
+<body>
+    <div class="archive-container">
+        <h2>📚 Архив данных / Хранилище ошибок</h2>
+        
+        <div class="timeline">
+            <h3>📅 Таймлайн расследования</h3>
+            <div id="timelineContent"></div>
+        </div>
+        
+        <h3>🔍 Собранные улики</h3>
+        <div id="cluesList"></div>
+        
+        <hr>
+        
+        <h3>⚠️ Журнал ошибок системы</h3>
+        <div id="errorLogList"></div>
+        
+        <button id="prepareReportBtn" class="report-btn">📄 Подготовить отчёт для преподавателя</button>
+    </div>
+    
+    <script>
+        function getGameData() {
+            return window.parent.getGameData ? window.parent.getGameData() : null;
+        }
+        
+        function updateGameData(data) {
+            if (window.parent.updateGameData) {
+                window.parent.updateGameData(data);
+            }
+        }
+        
+        function showBubble(text, type) {
+            if (window.parent.showBubble) {
+                window.parent.showBubble(text, type);
+            }
+        }
+        
+        function renderClues() {
+            const gameData = getGameData();
+            const cluesDiv = document.getElementById('cluesList');
+            if (!cluesDiv) return;
+            
+            const clues = gameData?.clues || [];
+            if (clues.length === 0) {
+                cluesDiv.innerHTML = '<div class="clue-card"><p>🔍 Пока нет собранных улик. Используйте панель администратора для диагностики.</p></div>';
+                return;
+            }
+            
+            cluesDiv.innerHTML = clues.map(clue => `
+                <div class="clue-card">
+                    <h4>🔍 Улика</h4>
+                    <p>${clue}</p>
+                </div>
+            `).join('');
+        }
+        
+        function renderTimeline() {
+            const gameData = getGameData();
+            const timelineDiv = document.getElementById('timelineContent');
+            if (!timelineDiv) return;
+            
+            const completedDays = gameData?.completedDays || [];
+            const dayNames = {
+                1: '📁 День 1: Пропажа отправленного файла',
+                2: '🔌 День 2: API оценивания не работает',
+                3: '💾 День 3: Интерфейс показывает старые данные',
+                4: '🌐 День 4: Проверка VPN через API',
+                5: '📋 День 5: Угроза отчисления'
+            };
+            
+            if (completedDays.length === 0) {
+                timelineDiv.innerHTML = '<div class="timeline-item">Расследование ещё не начато</div>';
+                return;
+            }
+            
+            timelineDiv.innerHTML = completedDays.sort((a,b) => a-b).map(day => `
+                <div class="timeline-item">
+                    <strong>${dayNames[day] || `День ${day}`}</strong> - ✅ Решено
+                </div>
+            `).join('');
+        }
+        
+        function renderErrorLog() {
+            const gameData = getGameData();
+            const logDiv = document.getElementById('errorLogList');
+            if (!logDiv) return;
+            
+            const errors = gameData?.errorLog || [];
+            if (errors.length === 0) {
+                logDiv.innerHTML = '<div class="clue-card"><p>Журнал ошибок пуст</p></div>';
+                return;
+            }
+            
+            logDiv.innerHTML = errors.slice(0, 15).map(err => `
+                <div class="clue-card">
+                    <h4>⚠️ [День ${err.day}] ${err.timestamp || ''}</h4>
+                    <p>📌 Действие: ${err.action}</p>
+                    <p>📊 Результат: ${err.result}</p>
+                    <p>💬 ${err.message}</p>
+                </div>
+            `).join('');
+        }
+        
+        function prepareReport() {
+            const gameData = getGameData();
+            if (!gameData) return;
+            
+            if (gameData.day < 5) {
+                showBubble('Сначала нужно решить проблему дня 5!', 'system');
+                return;
+            }
+            
+            if (gameData.completedDays && gameData.completedDays.length >= 4) {
+                showBubble('📋 Отчёт подготовлен! Угроза отчисления снята.', 'system');
+                
+                if (!gameData.completedDays.includes(5)) {
+                    gameData.completedDays.push(5);
+                    updateGameData(gameData);
+                }
+                
+                if (window.parent.modifyTrust) window.parent.modifyTrust(20);
+                if (window.parent.modifyIntellect) window.parent.modifyIntellect(10);
+                
+                showBubble('✅ Преподаватель доволен отчётом! Переходите к финальному расследованию.', 'character');
+            } else {
+                showBubble('❌ Недостаточно улик для отчёта. Продолжайте расследование!', 'system');
+            }
+        }
+        
+        function init() {
+            renderClues();
+            renderTimeline();
+            renderErrorLog();
+            
+            const reportBtn = document.getElementById('prepareReportBtn');
+            if (reportBtn) {
+                reportBtn.addEventListener('click', prepareReport);
+            }
+            
+            setInterval(() => {
+                renderClues();
+                renderTimeline();
+                renderErrorLog();
+            }, 3000);
+        }
+        
+        init();
+    </script>
+</body>
+</html>

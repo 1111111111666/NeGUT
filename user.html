@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Личный кабинет</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif;
+            padding: 20px;
+            background: #fff8f0;
+        }
+        
+        .diary-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .warning-banner {
+            background: #ff9800;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+            font-family: monospace;
+        }
+        
+        .grades-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .grades-table th, .grades-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .grades-table th {
+            background: #ffaa44;
+            color: #442200;
+        }
+        
+        .grade-2 {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .grade-5 {
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .schedule-section {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .schedule-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #442200;
+            border-left: 4px solid #ffaa44;
+            padding-left: 12px;
+        }
+        
+        .schedule-item {
+            background: #fff8f0;
+            margin: 10px 0;
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #ffdd99;
+        }
+        
+        .schedule-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .schedule-name {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .schedule-time {
+            font-size: 11px;
+            color: #888;
+        }
+        
+        .mark-btn {
+            background: #ffaa44;
+            color: #442200;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.1s;
+        }
+        
+        .mark-btn:hover {
+            background: #ffcc66;
+            transform: scale(1.02);
+        }
+        
+        .mark-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .mark-btn.marked {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .message-area {
+            margin-top: 20px;
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .message-area h3 {
+            margin-bottom: 10px;
+            color: #856404;
+        }
+        
+        .system-message {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 13px;
+        }
+        
+        .intellect-tip {
+            background: #e8f4fd;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #31708f;
+        }
+        
+        h2 {
+            color: #442200;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="diary-container">
+        <div class="warning-banner" id="warningBanner">
+            ⚠️ ВНИМАНИЕ! Обнаружены проблемы с загрузкой файлов!
+        </div>
+        
+        <h2>📊 Дневник успеваемости</h2>
+        <table class="grades-table">
+            <thead>
+                <tr><th>Предмет</th><th>Оценка</th><th>Статус</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Математика</td><td>4</td><td>✅</td></tr>
+                <tr><td>Программирование</td><td>5</td><td>✅</td></tr>
+                <tr><td>Базы данных</td><td>4</td><td>✅</td></tr>
+                <tr id="lastWorkRow"><td>Курсовая работа</td><td id="lastWorkGrade">2</td><td id="lastWorkStatus">⏳ Проверяется</td></tr>
+            </tbody>
+        </table>
+        
+        <div class="schedule-section">
+            <div class="schedule-title">📅 Расписание на сегодня</div>
+            <div id="scheduleList"></div>
+            <div class="intellect-tip" id="intellectTip">
+                💡 Посещай пары, чтобы повышать интеллект! Интеллект открывает доступ к подсказкам DeepSeek.
+            </div>
+        </div>
+        
+        <div class="message-area">
+            <h3>💬 Сообщения</h3>
+            <div class="system-message" id="sentFilesMessage">
+                📁 Отправленные файлы: <span id="filesStatus">загрузка...</span>
+            </div>
+            <div class="system-message" id="teacherMessage">
+                💬 Сообщение от преподавателя: <span id="teacherMessageText">—</span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let markedLessons = [];
+        
+        function getGameData() {
+            return window.parent.getGameData ? window.parent.getGameData() : null;
+        }
+        
+        function updateGameData(data) {
+            if (window.parent.updateGameData) {
+                window.parent.updateGameData(data);
+            }
+        }
+        
+        function showBubble(text, type) {
+            if (window.parent.showBubble) {
+                window.parent.showBubble(text, type);
+            }
+        }
+        
+        function markAttendance(lessonName, reward) {
+            if (markedLessons.includes(lessonName)) return;
+            
+            markedLessons.push(lessonName);
+            localStorage.setItem('markedLessons', JSON.stringify(markedLessons));
+            
+            const gameData = getGameData();
+            if (gameData) {
+                gameData.intellect = (gameData.intellect || 0) + reward;
+                updateGameData(gameData);
+            }
+            
+            showBubble(`✅ Отмечено на "${lessonName}"! +${reward} интеллекта`, 'character');
+            updateScheduleUI();
+        }
+        
+        function getTodaySchedule() {
+            const gameData = getGameData();
+            const day = gameData?.day || 1;
+            
+            const schedules = {
+                1: [
+                    { name: "Программирование", time: "10:00-11:30", reward: 10 },
+                    { name: "Математика", time: "12:00-13:30", reward: 8 },
+                    { name: "Английский язык", time: "14:00-15:30", reward: 5 }
+                ],
+                2: [
+                    { name: "Базы данных", time: "10:00-11:30", reward: 10 },
+                    { name: "Веб-разработка", time: "12:00-13:30", reward: 12 },
+                    { name: "Физика", time: "14:00-15:30", reward: 5 }
+                ],
+                3: [
+                    { name: "Операционные системы", time: "10:00-11:30", reward: 12 },
+                    { name: "Компьютерные сети", time: "12:00-13:30", reward: 10 }
+                ],
+                4: [
+                    { name: "Тестирование ПО", time: "10:00-11:30", reward: 8 },
+                    { name: "Английский язык", time: "13:00-14:30", reward: 5 },
+                    { name: "Математика", time: "15:00-16:30", reward: 8 }
+                ],
+                5: [
+                    { name: "Дипломное проектирование", time: "10:00-11:30", reward: 15 },
+                    { name: "Карьера в IT", time: "12:00-13:30", reward: 10 }
+                ],
+                6: [
+                    { name: "Защита курсовой", time: "10:00-12:00", reward: 20 }
+                ]
+            };
+            
+            return schedules[day] || schedules[1];
+        }
+        
+        function updateScheduleUI() {
+            const container = document.getElementById('scheduleList');
+            if (!container) return;
+            
+            const savedMarked = localStorage.getItem('markedLessons');
+            if (savedMarked) markedLessons = JSON.parse(savedMarked);
+            
+            const schedule = getTodaySchedule();
+            
+            if (schedule.length === 0) {
+                container.innerHTML = '<p>Сегодня пар нет. Отдохни или займись расследованием!</p>';
+                return;
+            }
+            
+            container.innerHTML = schedule.map(lesson => `
+                <div class="schedule-item">
+                    <div class="schedule-info">
+                        <span class="schedule-name">📖 ${lesson.name}</span>
+                        <span class="schedule-time">🕐 ${lesson.time}</span>
+                        <span class="schedule-time">✨ +${lesson.reward} интеллекта</span>
+                    </div>
+                    <button class="mark-btn ${markedLessons.includes(lesson.name) ? 'marked' : ''}" 
+                            onclick="markAttendance('${lesson.name}', ${lesson.reward})"
+                            ${markedLessons.includes(lesson.name) ? 'disabled' : ''}>
+                        ${markedLessons.includes(lesson.name) ? '✓ Отмечено' : '✎ Отметиться'}
+                    </button>
+                </div>
+            `).join('');
+        }
+        
+        function updateUI() {
+            const gameData = getGameData();
+            if (!gameData) return;
+            
+            // Обновляем оценку
+            const gradeSpan = document.getElementById('lastWorkGrade');
+            const filesStatus = document.getElementById('filesStatus');
+            const warningBanner = document.getElementById('warningBanner');
+            const teacherMessageSpan = document.getElementById('teacherMessageText');
+            
+            if (gameData.day === 1 && !gameData.completedDays?.includes(1)) {
+                if (gradeSpan) gradeSpan.textContent = '2';
+                if (filesStatus) filesStatus.textContent = 'пусто (ошибка загрузки)';
+                if (warningBanner) warningBanner.innerHTML = '⚠️ ОШИБКА: Файл не найден в очереди загрузки!';
+                if (teacherMessageSpan) teacherMessageSpan.innerHTML = 'Коля, работа не загрузилась! Почему у меня 2?';
+            } else if (gameData.day >= 2 && gameData.completedDays?.includes(1)) {
+                if (gradeSpan) gradeSpan.innerHTML = '2 <span style="font-size:10px">(ожидает API)</span>';
+                if (filesStatus) filesStatus.innerHTML = '✅ Курсовая_работа.pdf (отправлено)';
+                if (warningBanner) warningBanner.innerHTML = '⚠️ API ОЦЕНИВАНИЯ НЕ ОТВЕЧАЕТ (502)';
+                if (teacherMessageSpan) teacherMessageSpan.innerHTML = 'Учитель поставил 5, но в дневнике всё ещё 2!';
+            }
+            
+            if (gameData.day >= 3 && gameData.completedDays?.includes(2)) {
+                if (warningBanner) warningBanner.innerHTML = '⚠️ КЕШ НЕ СИНХРОНИЗИРОВАН! Данные устарели.';
+                if (teacherMessageSpan) teacherMessageSpan.innerHTML = 'Вижу старые оценки! Где моё текущее расписание?';
+            }
+            
+            if (gameData.day >= 4 && gameData.completedDays?.includes(3)) {
+                if (warningBanner) warningBanner.innerHTML = '⚠️ ОБНАРУЖЕНЫ ПОДОЗРИТЕЛЬНЫЕ ЗАПРОСЫ К API!';
+                if (teacherMessageSpan) teacherMessageSpan.innerHTML = 'Странно, иногда файлы загружаются, иногда нет...';
+            }
+            
+            if (gameData.day >= 5 && gameData.completedDays?.includes(4)) {
+                if (warningBanner) warningBanner.innerHTML = '🔴 КРИТИЧЕСКОЕ ПРЕДУПРЕЖДЕНИЕ! До отчисления 1 день!';
+                if (teacherMessageSpan) teacherMessageSpan.innerHTML = 'Если завтра не будет отчёта о причинах сбоев — отчисление!';
+            }
+            
+            if (gameData.day >= 6) {
+                if (warningBanner) warningBanner.innerHTML = '✅ Система стабильна. Ожидается финальное решение.';
+            }
+            
+            // Обновляем интеллект-подсказку
+            const intellectTip = document.getElementById('intellectTip');
+            if (intellectTip && gameData.intellect >= 30) {
+                intellectTip.innerHTML = '🤖 DeepSeek доступен! Нажми на иконку на рабочем столе для подсказок.';
+                intellectTip.style.background = '#e8f5e9';
+                intellectTip.style.color = '#2e7d32';
+            }
+        }
+        
+        function init() {
+            updateScheduleUI();
+            updateUI();
+            
+            setInterval(() => {
+                updateUI();
+                updateScheduleUI();
+            }, 2000);
+            
+            // Слушаем сообщения от родителя
+            window.addEventListener('message', (e) => {
+                if (e.data.type === 'updateSchedule') {
+                    updateScheduleUI();
+                }
+            });
+        }
+        
+        init();
+    </script>
+</body>
+</html>
