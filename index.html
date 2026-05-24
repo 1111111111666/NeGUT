@@ -39,11 +39,13 @@
         <!-- Иконки -->
         <div class="desktop-icons">
             <div class="icon" data-app="browser">
-                <div class="icon-emoji">🌐</div>
+                <div class="icon-emoji">
+                    <img src="images/browser.png" alt="Браузер" style="width: 48px; height: 48px; object-fit: contain;">
+                </div>
                 <div class="icon-label">Браузер</div>
             </div>
             <div class="icon" id="deepseekIcon" style="display: none;">
-                <div class="icon-emoji">🤖</div>
+                <div class="icon-emoji">✪</div>
                 <div class="icon-label">DeepSeek</div>
             </div>
         </div>
@@ -52,16 +54,16 @@
         <div class="taskbar">
             <div class="taskbar-left">
                 <div class="start-button">
-                    <span class="start-icon">犯</span>
+                    <span class="start-icon">⊞</span>
                     <span>Пуск</span>
                 </div>
                 <div class="taskbar-icons">
-                    <div class="taskbar-app-icon" data-app="browser">🌐</div>
+                    <div class="taskbar-app-icon" data-app="browser">◍</div>
                 </div>
             </div>
             <div class="taskbar-right">
                 <div class="notification-area">
-                    <span>🔔</span>
+                    <span>✉</span>
                     <div class="notification-badge"></div>
                 </div>
                 <div class="taskbar-time">
@@ -74,28 +76,25 @@
         <!-- Меню Пуск -->
         <div id="startMenu" class="start-menu">
             <div class="start-menu-header">
-                <div class="start-menu-avatar">👨‍💻</div>
+                <div class="start-menu-avatar">☺</div>
                 <div class="start-menu-user">Коля Иванов</div>
             </div>
-            <input type="text" class="start-menu-search" placeholder="Поиск..." readonly>
-            <div class="start-menu-pinned">Закрепленные</div>
             <div class="start-menu-items">
                 <div class="start-menu-item" data-app="browser">
-                    <div class="start-menu-item-icon">🌐</div>
+                    <div class="start-menu-item-icon">◍</div>
                     <span>Браузер</span>
                 </div>
                 <div class="start-menu-item" id="startDeepseekBtn" style="display: none;">
-                    <div class="start-menu-item-icon">🤖</div>
+                    <div class="start-menu-item-icon">✪</div>
                     <span>DeepSeek</span>
                 </div>
             </div>
-            <div class="start-menu-divider"></div>
             <div class="start-menu-power">
                 <div class="power-option" id="startRebootBtn">
-                    <span>🔄</span> Перезагрузка
+                    <span>⭯</span> Перезагрузка
                 </div>
                 <div class="power-option" id="startShutdownBtn">
-                    <span>⏻</span> Выключение
+                    <span>☒</span> Выключение
                 </div>
             </div>
         </div>
@@ -115,10 +114,10 @@
                         <button id="closeBrowserBtn">✖</button>
                     </div>
                     <div class="browser-tabs">
-                        <button class="tab-btn active" data-page="user.html">👤 Личный кабинет</button>
-                        <button class="tab-btn" data-page="admin.html">🛠️ Панель администратора</button>
-                        <button class="tab-btn" data-page="archive.html">📚 Архив данных</button>
-                        <button class="tab-btn" data-page="error-log.html">⚠️ Журнал ошибок</button>
+                        <button class="tab-btn active" data-page="user.html">웃 Личный кабинет</button>
+                        <button class="tab-btn" data-page="admin.html">✎ Панель администратора</button>
+                        <button class="tab-btn" data-page="archive.html">⬇ Архив данных</button>
+                        <button class="tab-btn" data-page="error-log.html">[!] Журнал ошибок</button>
                     </div>
                 </div>
                 <iframe id="browserIframe" class="browser-iframe" src="user.html"></iframe>
@@ -131,7 +130,7 @@
         <!-- DeepSeek чат -->
         <div id="deepseekChat" class="deepseek-chat">
             <div class="deepseek-header">
-                <span>🤖 DeepSeek Assistant</span>
+                <span>✪ DeepSeek Assistant</span>
                 <button class="deepseek-close">✖</button>
             </div>
             <div class="deepseek-content">
@@ -147,14 +146,14 @@
         <!-- Панель статистики -->
         <div class="stats-panel">
             <div class="stat-item">
-                <span class="stat-label">❤️ Доверие:</span>
+                <span class="stat-label">♥ Доверие:</span>
                 <span class="stat-value" id="trustValue">70</span>
                 <div class="stat-bar">
                     <div class="stat-fill" id="trustFill" style="width: 70%"></div>
                 </div>
             </div>
             <div class="stat-item">
-                <span class="stat-label">🧠 Интеллект:</span>
+                <span class="stat-label">★ Интеллект:</span>
                 <span class="stat-value" id="intellectValue">0</span>
                 <div class="stat-bar">
                     <div class="stat-fill" id="intellectFill" style="width: 0%"></div>

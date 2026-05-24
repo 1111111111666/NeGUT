@@ -132,7 +132,7 @@
 <body>
     <div class="admin-container">
         <div class="dashboard">
-            <h2>🛠️ PANEL: ADMIN CONSOLE v2.0</h2>
+            <h2>PANEL: ADMIN CONSOLE v2.0</h2>
             <div class="status">
                 <div class="status-badge online" id="apiGatewayStatus">🟢 API Gateway: ONLINE</div>
                 <div class="status-badge" id="queueStatus">📦 Очередь: 0</div>
@@ -310,6 +310,8 @@
         }
         
         init();
+        // Экспортируем функцию для обновления статуса
+    window.updateStatus = updateStatus;
     </script>
 </body>
 </html>

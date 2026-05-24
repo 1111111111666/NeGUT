@@ -15,65 +15,60 @@ let gameData = {
 // Расписание пар по дням
 const scheduleByDay = {
     1: [
-        { name: "Программирование (10:00-11:30)", time: "10:00", intellectReward: 10 },
-        { name: "Математика (12:00-13:30)", time: "12:00", intellectReward: 8 },
-        { name: "Английский язык (14:00-15:30)", time: "14:00", intellectReward: 5 }
+        { name: "Программирование", time: "10:00-11:30", reward: 10 },
+        { name: "Математика", time: "12:00-13:30", reward: 8 },
+        { name: "Английский язык", time: "14:00-15:30", reward: 5 }
     ],
     2: [
-        { name: "Базы данных (10:00-11:30)", time: "10:00", intellectReward: 10 },
-        { name: "Веб-разработка (12:00-13:30)", time: "12:00", intellectReward: 12 },
-        { name: "Физика (14:00-15:30)", time: "14:00", intellectReward: 5 }
+        { name: "Базы данных", time: "10:00-11:30", reward: 10 },
+        { name: "Веб-разработка", time: "12:00-13:30", reward: 12 },
+        { name: "Физика", time: "14:00-15:30", reward: 5 }
     ],
     3: [
-        { name: "Операционные системы (10:00-11:30)", time: "10:00", intellectReward: 12 },
-        { name: "Компьютерные сети (12:00-13:30)", time: "12:00", intellectReward: 10 }
+        { name: "Операционные системы", time: "10:00-11:30", reward: 12 },
+        { name: "Компьютерные сети", time: "12:00-13:30", reward: 10 }
     ],
     4: [
-        { name: "Тестирование ПО (10:00-11:30)", time: "10:00", intellectReward: 8 },
-        { name: "Английский язык (13:00-14:30)", time: "13:00", intellectReward: 5 },
-        { name: "Математика (15:00-16:30)", time: "15:00", intellectReward: 8 }
+        { name: "Тестирование ПО", time: "10:00-11:30", reward: 8 },
+        { name: "Английский язык", time: "13:00-14:30", reward: 5 },
+        { name: "Математика", time: "15:00-16:30", reward: 8 }
     ],
     5: [
-        { name: "Дипломное проектирование (10:00-11:30)", time: "10:00", intellectReward: 15 },
-        { name: "Карьера в IT (12:00-13:30)", time: "12:00", intellectReward: 10 }
+        { name: "Дипломное проектирование", time: "10:00-11:30", reward: 15 },
+        { name: "Карьера в IT", time: "12:00-13:30", reward: 10 }
     ],
     6: [
-        { name: "Защита курсовой (10:00-12:00)", time: "10:00", intellectReward: 20 }
+        { name: "Защита курсовой", time: "10:00-12:00", reward: 20 }
     ]
 };
 
 // Подсказки DeepSeek по дням
 const deepseekAdvice = {
-    1: "🔍 Обнаружена ошибка загрузки файла. Рекомендую проверить очередь загрузки файлов в панели администратора.",
-    2: "⚠️ API оценивания не отвечает. Попробуй перезапустить API-шлюз.",
-    3: "🔄 Кеш показывает старые данные. Сбрось кеш вручную в админке.",
-    4: "🌐 Замечены странные запросы к внешним API. Отключи проверку VPN в конфиге.",
+    1: "⌕ Обнаружена ошибка загрузки файла. Рекомендую проверить очередь загрузки файлов в панели администратора.",
+    2: "⚠ API оценивания не отвечает. Попробуй перезапустить API-шлюз.",
+    3: "⭯ Кеш показывает старые данные. Сбрось кеш вручную в админке.",
+    4: "◍ Замечены странные запросы к внешним API. Отключи проверку VPN в конфиге.",
     5: "📋 Администрация требует отчёт. Собери все улики в архиве и подготовь отчёт."
 };
 
-// Сообщения для уведомлений
+// Сообщения для уведомлений (только важные)
 const notificationMessages = {
     1: [
-        { text: "🤔 Странно... Вчера же отправлял курсовую работу, а в отправленных пусто.", type: "thought" },
-        { text: "💭 Может, система зависла? Нужно проверить очередь загрузки.", type: "thought" },
-        { text: "⚠️ Пользователь пишет: 'Коля, у меня 2! Почему?'", type: "alert" }
+        { text: "[?] Странно... Вчера же отправлял курсовую работу, а в отправленных пусто.", type: "thought" },
+        { text: "⚠ Пользователь: 'Коля, у меня 2! Почему?'", type: "alert" }
     ],
     2: [
         { text: "💭 Учитель сказал, что поставил 5, но в дневнике всё ещё 2...", type: "thought" },
-        { text: "🔧 API оценивания, похоже, не работает. Нужно перезапустить шлюз.", type: "thought" },
-        { text: "⚠️ Система: 'API /grades возвращает 502'", type: "alert" }
+        { text: "⚠ Система: 'API /grades возвращает 502'", type: "alert" }
     ],
     3: [
-        { text: "💭 Почему я вижу оценки за прошлый семестр? Кеш не обновился?", type: "thought" },
-        { text: "🔄 Нужно сбросить кеш вручную, TTL настроен неправильно.", type: "thought" }
+        { text: "💭 Почему я вижу оценки за прошлый семестр? Кеш не обновился?", type: "thought" }
     ],
     4: [
-        { text: "🤔 Что за запросы к Telegram API? Зачем нашему серверу ютуб?", type: "thought" },
-        { text: "💡 А, это проверка VPN! Но зачем она здесь? Нужно отключить.", type: "thought" }
+        { text: "[?] Что за запросы к Telegram API? Зачем нашему серверу YouTube?", type: "thought" }
     ],
     5: [
-        { text: "😰 Завтра отчисление, если не предоставлю отчёт!", type: "alert" },
-        { text: "📝 Нужно собрать все улики и подготовить таймлайн.", type: "thought" }
+        { text: "[⁉] Завтра отчисление, если не предоставлю отчёт!", type: "alert" }
     ]
 };
 
@@ -87,11 +82,16 @@ let rebootRequired = false;
 function loadGame() {
     const saved = localStorage.getItem("spbGameSave");
     if (saved) {
-        gameData = JSON.parse(saved);
+        try {
+            const parsed = JSON.parse(saved);
+            gameData = { ...gameData, ...parsed };
+        } catch(e) { console.error("Ошибка загрузки", e); }
     }
     const savedMarked = localStorage.getItem("markedLessons");
     if (savedMarked) {
-        markedLessons = JSON.parse(savedMarked);
+        try {
+            markedLessons = JSON.parse(savedMarked);
+        } catch(e) { console.error("Ошибка загрузки отметок", e); }
     }
     updateStatsDisplay();
 }
@@ -122,17 +122,27 @@ function updateStatsDisplay() {
     
     // Обновляем DeepSeek совет
     updateDeepseekAdvice();
+    
+    // Обновляем статус в админке через iframe
+    updateAdminStatus();
 }
 
 function updateDeepseekAdvice() {
     const adviceDiv = document.getElementById('deepseekAdvice');
     if (adviceDiv && gameData.intellect >= 30) {
         const advice = deepseekAdvice[gameData.day] || "Продолжай расследование, используй панель администратора для диагностики проблем.";
-        adviceDiv.innerHTML = `<strong>💡 Совет:</strong><br>${advice}`;
+        adviceDiv.innerHTML = `<strong>☄ Совет:</strong><br>${advice}`;
     }
 }
 
-// Уведомления
+function updateAdminStatus() {
+    const iframe = document.getElementById('browserIframe');
+    if (iframe && iframe.contentWindow && iframe.contentWindow.updateStatus) {
+        iframe.contentWindow.updateStatus();
+    }
+}
+
+// Уведомления (только важные)
 function addNotification(text, type = "thought") {
     const newNotif = {
         id: Date.now(),
@@ -142,7 +152,7 @@ function addNotification(text, type = "thought") {
         read: false
     };
     gameData.notifications.unshift(newNotif);
-    if (gameData.notifications.length > 20) gameData.notifications.pop();
+    if (gameData.notifications.length > 15) gameData.notifications.pop();
     saveGame();
     updateNotificationBadge();
 }
@@ -163,7 +173,6 @@ function renderNotifications() {
     const list = document.getElementById('notificationList');
     if (!list) return;
     
-    const unreadNotifs = gameData.notifications.filter(n => !n.read);
     const allNotifs = gameData.notifications.slice(0, 15);
     
     if (allNotifs.length === 0) {
@@ -201,7 +210,7 @@ function generateDayNotifications() {
     }
 }
 
-// БАБЛЫ
+// БАБЛЫ (только для важных событий)
 function showBubble(text, type = 'system') {
     const container = document.getElementById('bubbleContainer');
     if (!container) return;
@@ -218,11 +227,14 @@ function showBubble(text, type = 'system') {
     }, 4000);
 }
 
-// Изменение статистики
+// Изменение статистики (без лишних уведомлений)
 function modifyTrust(delta) {
     gameData.trust = Math.min(100, Math.max(0, gameData.trust + delta));
     saveGame();
-    showBubble(delta > 0 ? `❤️ Доверие +${delta}` : `❤️ Доверие ${delta}`, 'system');
+    // Уведомление только для важных изменений
+    if (Math.abs(delta) >= 10) {
+        showBubble(delta > 0 ? `♥ Доверие +${delta}` : `♥ Доверие ${delta}`, 'system');
+    }
     if (gameData.trust <= 0) {
         showBubble('❌ Доверие потеряно! Игра окончена. Начните заново.', 'system');
         setTimeout(() => resetProgress(), 3000);
@@ -232,14 +244,18 @@ function modifyTrust(delta) {
 function modifyIntellect(delta) {
     gameData.intellect = Math.min(100, Math.max(0, gameData.intellect + delta));
     saveGame();
-    showBubble(`🧠 Интеллект +${delta}`, 'system');
+    // Уведомление только для важных изменений
+    if (Math.abs(delta) >= 10) {
+        showBubble(`★ Интеллект +${delta}`, 'system');
+    }
+    updateStatsDisplay();
 }
 
 // Добавление улики
 function addClue(clue) {
     if (!gameData.clues.includes(clue)) {
         gameData.clues.push(clue);
-        showBubble(`🔍 Улика: ${clue}`, 'system');
+        showBubble(`⌕ Улика: ${clue}`, 'system');
         saveGame();
     }
 }
@@ -294,6 +310,12 @@ function executeAdminAction(actionId) {
         }
     };
     
+    // Для дня 5 (угроза отчисления) - не нужны действия в админке
+    if (gameData.day === 5) {
+        showBubble("На 5 день нужно подготовить отчёт в Архиве данных!", "system");
+        return;
+    }
+    
     const actions = dayActions[gameData.day];
     if (!actions) {
         showBubble("Сначала реши проблему текущего дня!", "system");
@@ -318,25 +340,22 @@ function executeAdminAction(actionId) {
         if (gameData.day < 5) {
             gameData.day++;
             saveGame();
+            updateStatsDisplay();
             showBubble(`📅 День ${gameData.day} начался. Откройте Личный кабинет для новых задач.`, 'character');
             generateDayNotifications();
         } else if (gameData.day === 5) {
-            gameData.day = 6;
-            saveGame();
-            showFinalChoice();
+            // Переход к дню 6 после подготовки отчёта в архиве
+            // Не увеличиваем день автоматически - ждём отчёт
         }
-    } else if (actionId === 'rebootServer') {
-        showBubble("🔄 Сервер перезагружен. Некоторые проблемы могут решиться.", "system");
-        rebootRequired = false;
     }
 }
 
-// Финальный выбор
+// Финальный выбор (день 6)
 function showFinalChoice() {
-    showBubble("🔍 Расследование завершено! Выберите главную причину сбоя.", "system");
+    showBubble("⌕ Расследование завершено! Выберите главную причину сбоя.", "system");
     
     setTimeout(() => {
-        const choice = confirm('🔍 ВЫБЕРИТЕ ГЛАВНУЮ ПРИЧИНУ:\n\n"OK" - Техническая причина (сломанный API)\n"Отмена" - Сюжетный твист');
+        const choice = confirm('⌕ ВЫБЕРИТЕ ГЛАВНУЮ ПРИЧИНУ:\n\n"OK" - Техническая причина (сломанный API)\n"Отмена" - Сюжетный твист');
         
         if (choice === false) {
             if (gameData.intellect >= 50) {
@@ -363,24 +382,38 @@ function markAttendance(lessonName, reward) {
     
     markedLessons.push(lessonName);
     modifyIntellect(reward);
-    showBubble(`✅ Отмечено на паре "${lessonName}"! +${reward} интеллекта`, 'character');
+    showBubble(`✅ Отмечено на "${lessonName}"! +${reward} интеллекта`, 'character');
     saveGame();
     
     // Обновляем iframe
     const iframe = document.getElementById('browserIframe');
-    if (iframe && iframe.src.includes('user.html')) {
+    if (iframe && iframe.contentWindow && iframe.src.includes('user.html')) {
         iframe.contentWindow.postMessage({ type: 'updateSchedule' }, '*');
+        // Также обновляем UI в iframe
+        if (iframe.contentWindow.updateUI) iframe.contentWindow.updateUI();
     }
 }
 
 // Перезагрузка компьютера
 function rebootComputer() {
-    showBubble("🔄 Перезагрузка компьютера...", "system");
-    setTimeout(() => {
-        showBubble("✅ Компьютер перезагружен. Система работает стабильнее.", "system");
-        rebootRequired = false;
-        modifyTrust(5);
-    }, 2000);
+    const rebootOverlay = document.getElementById('shutdownOverlay');
+    if (rebootOverlay) {
+        rebootOverlay.classList.add('active');
+        rebootOverlay.querySelector('.shutdown-text').textContent = 'Перезагрузка...';
+        setTimeout(() => {
+            rebootOverlay.classList.remove('active');
+            rebootOverlay.querySelector('.shutdown-text').textContent = 'Выключение...';
+            showBubble("⭯ Компьютер перезагружен. Система работает стабильнее.", "system");
+            rebootRequired = false;
+            modifyTrust(5);
+            
+            // Обновляем iframe после перезагрузки
+            const iframe = document.getElementById('browserIframe');
+            if (iframe && iframe.contentWindow && iframe.contentWindow.updateStatus) {
+                setTimeout(() => iframe.contentWindow.updateStatus(), 500);
+            }
+        }, 2000);
+    }
 }
 
 // Выключение компьютера (возврат на главный экран)
@@ -403,22 +436,23 @@ function powerOnDesktop() {
     if (desktopElem) {
         desktopElem.style.display = 'block';
         updateStatsDisplay();
-        generateDayNotifications();
         
         if (!gameData.hasActiveGame) {
             gameData.hasActiveGame = true;
             saveGame();
             showBubble("👋 Привет! Ты — Коля, первокурсник.", "character");
             showBubble("📁 Открой Браузер и зайди в Личный кабинет, чтобы начать расследование.", "system");
+            generateDayNotifications();
         } else {
             showBubble(`📅 День ${gameData.day}. Продолжаем расследование!`, "character");
+            generateDayNotifications();
         }
     }
 }
 
 // Сброс прогресса
 function resetProgress() {
-    if (confirm("⚠️ ВЫ УВЕРЕНЫ? Весь прогресс будет потерян!")) {
+    if (confirm("⚠ ВЫ УВЕРЕНЫ? Весь прогресс будет потерян!")) {
         gameData = {
             hasActiveGame: false,
             day: 1,
@@ -433,11 +467,49 @@ function resetProgress() {
         };
         markedLessons = [];
         saveGame();
-        showBubble("🔄 Прогресс сброшен.", "system");
+        showBubble("⭯ Прогресс сброшен.", "system");
         
         const desktopElem = document.getElementById('desktop');
         if (desktopElem) desktopElem.style.display = 'none';
+        
+        // Перезагружаем iframe
+        const iframe = document.getElementById('browserIframe');
+        if (iframe) iframe.src = 'user.html';
     }
+}
+
+// Подготовка отчёта (вызывается из archive.html)
+function prepareReportFromArchive() {
+    if (gameData.day < 5) {
+        showBubble('Сначала нужно решить проблему дня 5!', 'system');
+        return false;
+    }
+    
+    if (!gameData.completedDays.includes(4)) {
+        showBubble('Сначала нужно решить все предыдущие дни!', 'system');
+        return false;
+    }
+    
+    if (gameData.clues.length < 2) {
+        showBubble('❌ Недостаточно улик для отчёта. Продолжайте расследование!', 'system');
+        return false;
+    }
+    
+    if (!gameData.completedDays.includes(5)) {
+        gameData.completedDays.push(5);
+        modifyTrust(20);
+        modifyIntellect(10);
+        showBubble('📋 Отчёт подготовлен! Угроза отчисления снята.', 'system');
+        showBubble('✅ Преподаватель доволен отчётом! Переходите к финальному расследованию.', 'character');
+        
+        // Переход к дню 6
+        gameData.day = 6;
+        saveGame();
+        showFinalChoice();
+        return true;
+    }
+    
+    return true;
 }
 
 // ИНИЦИАЛИЗАЦИЯ
@@ -488,7 +560,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('.icon[data-app="browser"]')?.addEventListener('click', () => {
         browserModal?.classList.add('active');
         const iframe = document.getElementById('browserIframe');
-        if (iframe && !iframe.src) {
+        if (iframe && (!iframe.src || iframe.src === 'about:blank')) {
             iframe.src = 'user.html';
         }
     });
@@ -530,10 +602,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // Меню пуск - кнопки
     document.getElementById('startShutdownBtn')?.addEventListener('click', shutdownComputer);
     document.getElementById('startRebootBtn')?.addEventListener('click', rebootComputer);
-    document.getElementById('startBrowserBtn')?.addEventListener('click', () => {
-        startMenu?.classList.remove('active');
-        browserModal?.classList.add('active');
-    });
+    
+    // Кнопка браузера в меню Пуск
+    const startBrowserBtn = document.querySelector('.start-menu-item[data-app="browser"]');
+    if (startBrowserBtn) {
+        startBrowserBtn.addEventListener('click', () => {
+            startMenu?.classList.remove('active');
+            browserModal?.classList.add('active');
+            const iframe = document.getElementById('browserIframe');
+            if (iframe && (!iframe.src || iframe.src === 'about:blank')) {
+                iframe.src = 'user.html';
+            }
+        });
+    }
     
     // Закрытие меню при клике вне
     document.addEventListener('click', (e) => {
@@ -563,3 +644,20 @@ document.addEventListener('DOMContentLoaded', () => {
         desktop.style.display = 'block';
     }
 });
+
+// Экспортируем функции для доступа из iframe
+window.executeAdminAction = executeAdminAction;
+window.modifyTrust = modifyTrust;
+window.modifyIntellect = modifyIntellect;
+window.showBubble = showBubble;
+window.getGameData = () => gameData;
+window.updateGameData = (data) => {
+    if (data) {
+        Object.assign(gameData, data);
+        saveGame();
+    }
+};
+window.prepareReportFromArchive = prepareReportFromArchive;
+window.markAttendance = markAttendance;
+window.rebootComputer = rebootComputer;
+window.shutdownComputer = shutdownComputer;

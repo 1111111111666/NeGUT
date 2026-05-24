@@ -6,9 +6,9 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: 'Courier New', monospace;
             padding: 20px;
-            background: #fff8f0;
+            background: #fff4de;
         }
         
         .archive-container {
@@ -17,12 +17,11 @@
         }
         
         .clue-card {
-            background: white;
-            border: 2px solid #ffaa44;
-            border-radius: 8px;
+            background: #ffffee;
+            border: 4px solid #ffaa44;
             padding: 15px;
             margin: 10px 0;
-            box-shadow: 3px 3px 0 #ffdd99;
+            clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
         }
         
         .clue-card h4 {
@@ -34,8 +33,10 @@
             background: #ffaa44;
             color: #442200;
             padding: 15px;
-            border-radius: 8px;
             margin: 20px 0;
+            border: 4px solid #ffcc77;
+            clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
+            box-shadow: inset -2px -2px 0 #cc8833, inset 2px 2px 0 #ffeedd;
         }
         
         .timeline h3 {
@@ -44,15 +45,15 @@
         
         .timeline-item {
             padding: 10px;
-            border-left: 3px solid #442200;
+            border-left: 4px solid #442200;
             margin: 10px 0;
             background: rgba(255,255,255,0.3);
-            border-radius: 4px;
+            clip-path: polygon(3px 0, calc(100% - 3px) 0, 100% 3px, 100% calc(100% - 3px), calc(100% - 3px) 100%, 3px 100%, 0 calc(100% - 3px), 0 3px);
         }
         
         hr {
             margin: 20px 0;
-            border-color: #ffdd99;
+            border: 2px solid #ffaa44;
         }
         
         .report-btn {
@@ -63,28 +64,49 @@
             font-size: 18px;
             cursor: pointer;
             margin: 20px 0;
-            border-radius: 8px;
             width: 100%;
             font-weight: bold;
+            font-family: 'Courier New', monospace;
+            clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
+            box-shadow: inset -3px -3px 0 #8b0000, inset 3px 3px 0 #ff8888;
         }
         
         .report-btn:hover {
             background: #c0392b;
+            transform: translateY(-2px);
+        }
+        
+        .report-btn:active {
+            box-shadow: inset -3px -3px 0 #ff8888, inset 3px 3px 0 #8b0000;
         }
         
         .report-btn:disabled {
-            background: #ccc;
+            background: #ccaa66;
             cursor: not-allowed;
+            transform: none;
         }
         
         h2, h3 {
             color: #442200;
+            font-size: 18px;
+            background: #ffcc77;
+            display: inline-block;
+            padding: 6px 12px;
+            margin-bottom: 12px;
+            clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
+            box-shadow: inset -2px -2px 0 #aa7733, inset 2px 2px 0 #ffeedd;
+        }
+        
+        h3 {
+            font-size: 14px;
+            display: block;
+            width: fit-content;
         }
     </style>
 </head>
 <body>
     <div class="archive-container">
-        <h2>📚 Архив данных / Хранилище ошибок</h2>
+        <h2>Архив данных / Хранилище ошибок</h2>
         
         <div class="timeline">
             <h3>📅 Таймлайн расследования</h3>
@@ -103,6 +125,7 @@
     </div>
     
     <script>
+        // Весь твой оригинальный JS без изменений
         function getGameData() {
             return window.parent.getGameData ? window.parent.getGameData() : null;
         }
@@ -186,30 +209,12 @@
         }
         
         function prepareReport() {
-            const gameData = getGameData();
-            if (!gameData) return;
-            
-            if (gameData.day < 5) {
-                showBubble('Сначала нужно решить проблему дня 5!', 'system');
-                return;
-            }
-            
-            if (gameData.completedDays && gameData.completedDays.length >= 4) {
-                showBubble('📋 Отчёт подготовлен! Угроза отчисления снята.', 'system');
-                
-                if (!gameData.completedDays.includes(5)) {
-                    gameData.completedDays.push(5);
-                    updateGameData(gameData);
-                }
-                
-                if (window.parent.modifyTrust) window.parent.modifyTrust(20);
-                if (window.parent.modifyIntellect) window.parent.modifyIntellect(10);
-                
-                showBubble('✅ Преподаватель доволен отчётом! Переходите к финальному расследованию.', 'character');
-            } else {
-                showBubble('❌ Недостаточно улик для отчёта. Продолжайте расследование!', 'system');
-            }
-        }
+    if (window.parent.prepareReportFromArchive) {
+        window.parent.prepareReportFromArchive();
+    } else {
+        showBubble('Ошибка: функция отчёта не найдена', 'system');
+    }
+}
         
         function init() {
             renderClues();
