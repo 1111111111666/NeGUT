@@ -394,7 +394,31 @@
                 }
             });
         }
-        
+window.addEventListener('message', (e) => {
+    if (e.data.type === 'updateSchedule') {
+        updateScheduleUI();
+    }
+    if (e.data.type === 'vpnToggle') {
+        const gameData = getGameData();
+        if (gameData && gameData.day >= 4 && !gameData.completedDays?.includes(4)) {
+            if (e.data.enabled) {
+                showBubble("🌐 VPN включён. Личный кабинет может быть недоступен!", "system");
+                // Здесь можно показать ошибку 403
+            } else {
+                showBubble("🌐 VPN выключен. Личный кабинет работает.", "system");
+            }
+        }
+    }
+});
+
+// Функция для проверки доступности ЛК
+function isLKAccessible() {
+    const gameData = getGameData();
+    if (gameData && gameData.day >= 4 && !gameData.completedDays?.includes(4)) {
+        return !gameData.vpnEnabled;
+    }
+    return true;
+}
         init();
     </script>
 </body>

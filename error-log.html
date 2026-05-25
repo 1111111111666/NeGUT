@@ -87,27 +87,15 @@
             font-size: 12px;
         }
         
-        .clear-btn {
-            background: #ff4444;
-            border: none;
-            color: white;
-            padding: 5px 12px;
-            cursor: pointer;
-            font-family: monospace;
-        }
-        
-        .clear-btn:hover {
-            background: #cc0000;
+        h2 {
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
     <div class="log-container">
         <div class="log-header">
-            <h2>SYSLOG: ЖУРНАЛ ОШИБОК</h2>
-            <div>
-                <button id="clearLogBtn" class="clear-btn">🗑️ Очистить</button>
-            </div>
+            <h2>⚠️ SYSLOG: ЖУРНАЛ ОШИБОК</h2>
         </div>
         
         <div class="stats" id="statsPanel"></div>
@@ -136,45 +124,41 @@
             
             const systemLogs = [];
             
+            // Системные логи в зависимости от прогресса
             if (gameData?.day >= 1) {
                 systemLogs.push({ type: 'error', day: 1, time: '14:00:23', message: 'ERR_UPLOAD_404: Файл не найден в очереди загрузки' });
-                systemLogs.push({ type: 'warning', day: 1, time: '14:15:47', message: 'WARN: Сессия пользователя истекла' });
-                
                 if (completedDays.includes(1)) {
                     systemLogs.push({ type: 'info', day: 1, time: '14:30:12', message: 'INFO: Проблема с очередью решена' });
                 }
             }
             
             if (gameData?.day >= 2) {
-                systemLogs.push({ type: 'error', day: 2, time: '09:30:12', message: 'ERR_502: API /grades не отвечает (таймаут 30с)' });
-                systemLogs.push({ type: 'warning', day: 2, time: '09:45:33', message: 'WARN: Шлюз перегружен, очередь запросов 150+' });
-                
+                systemLogs.push({ type: 'error', day: 2, time: '09:30:12', message: 'ERR_502: API /grades не отвечает' });
                 if (completedDays.includes(2)) {
-                    systemLogs.push({ type: 'info', day: 2, time: '10:15:22', message: 'INFO: API шлюз перезапущен, статус OK' });
+                    systemLogs.push({ type: 'info', day: 2, time: '10:15:22', message: 'INFO: API шлюз перезапущен' });
                 }
             }
             
             if (gameData?.day >= 3) {
                 systemLogs.push({ type: 'error', day: 3, time: '08:20:05', message: 'ERR_CACHE: Инвалидация кеша не удалась' });
-                systemLogs.push({ type: 'warning', day: 3, time: '08:22:18', message: 'WARN: TTL кеша истек некорректно (30 дней)' });
-                
                 if (completedDays.includes(3)) {
-                    systemLogs.push({ type: 'info', day: 3, time: '09:05:33', message: 'INFO: Кеш сброшен, данные обновлены' });
+                    systemLogs.push({ type: 'info', day: 3, time: '09:05:33', message: 'INFO: Кеш сброшен' });
                 }
             }
             
             if (gameData?.day >= 4) {
-                systemLogs.push({ type: 'warning', day: 4, time: '10:05:42', message: 'WARN: Обнаружены исходящие запросы к Telegram API' });
-                systemLogs.push({ type: 'warning', day: 4, time: '10:05:44', message: 'WARN: Обнаружены исходящие запросы к YouTube API' });
-                
+                systemLogs.push({ type: 'warning', day: 4, time: '10:05:42', message: 'WARN: Запросы к Telegram/YouTube API' });
                 if (completedDays.includes(4)) {
-                    systemLogs.push({ type: 'info', day: 4, time: '11:20:15', message: 'INFO: Проверка VPN отключена, ошибки 403 устранены' });
+                    systemLogs.push({ type: 'info', day: 4, time: '11:20:15', message: 'INFO: Проверка VPN отключена' });
                 }
             }
             
-            if (gameData?.day >= 5) {
+            if (gameData?.day >= 5 && !completedDays.includes(5)) {
                 systemLogs.push({ type: 'warning', day: 5, time: '09:00:00', message: 'WARN: Административный риск - критический' });
-                systemLogs.push({ type: 'alert', day: 5, time: '09:15:30', message: 'ALERT: Требуется отчёт о причине сбоев' });
+            }
+            
+            if (completedDays.includes(5)) {
+                systemLogs.push({ type: 'info', day: 5, time: '09:30:00', message: 'INFO: Отчёт принят, угроза снята' });
             }
             
             return [...systemLogs, ...errors.map(e => ({
@@ -197,13 +181,13 @@
             const infoCount = logs.filter(l => l.type === 'info').length;
             
             if (statsPanel) {
-                statsPanel.innerHTML = `📊 СТАТИСТИКА | 🔴 Ошибок: ${errorCount} | 🟡 Предупреждений: ${warningCount} | 🟢 Событий: ${infoCount} | 📝 Всего записей: ${logs.length}`;
+                statsPanel.innerHTML = `📊 СТАТИСТИКА | 🔴 Ошибок: ${errorCount} | 🟡 Предупреждений: ${warningCount} | 🟢 Событий: ${infoCount}`;
             }
             
             if (!logDiv) return;
             
             if (filteredLogs.length === 0) {
-                logDiv.innerHTML = '<div class="log-entry">Нет записей, соответствующих фильтру</div>';
+                logDiv.innerHTML = '<div class="log-entry">Нет записей</div>';
                 return;
             }
             
@@ -214,15 +198,6 @@
                     <span>${log.message}</span>
                 </div>
             `).join('');
-        }
-        
-        function clearLogs() {
-            if (confirm('Очистить локальный журнал? (игровой прогресс не пострадает)')) {
-                const container = document.getElementById('logList');
-                if (container) {
-                    container.innerHTML = '<div class="log-entry">Журнал очищен</div>';
-                }
-            }
         }
         
         function init() {
@@ -237,9 +212,7 @@
                 });
             });
             
-            document.getElementById('clearLogBtn')?.addEventListener('click', clearLogs);
-            
-            setInterval(renderLogs, 3000);
+            setInterval(renderLogs, 2000);
         }
         
         init();

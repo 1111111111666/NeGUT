@@ -36,11 +36,6 @@
             margin: 20px 0;
             border: 4px solid #ffcc77;
             clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
-            box-shadow: inset -2px -2px 0 #cc8833, inset 2px 2px 0 #ffeedd;
-        }
-        
-        .timeline h3 {
-            margin-bottom: 10px;
         }
         
         .timeline-item {
@@ -48,7 +43,11 @@
             border-left: 4px solid #442200;
             margin: 10px 0;
             background: rgba(255,255,255,0.3);
-            clip-path: polygon(3px 0, calc(100% - 3px) 0, 100% 3px, 100% calc(100% - 3px), calc(100% - 3px) 100%, 3px 100%, 0 calc(100% - 3px), 0 3px);
+        }
+        
+        .timeline-item.resolved {
+            background: rgba(0,100,0,0.3);
+            border-left-color: #00aa00;
         }
         
         hr {
@@ -68,45 +67,41 @@
             font-weight: bold;
             font-family: 'Courier New', monospace;
             clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
-            box-shadow: inset -3px -3px 0 #8b0000, inset 3px 3px 0 #ff8888;
         }
         
         .report-btn:hover {
             background: #c0392b;
-            transform: translateY(-2px);
-        }
-        
-        .report-btn:active {
-            box-shadow: inset -3px -3px 0 #ff8888, inset 3px 3px 0 #8b0000;
         }
         
         .report-btn:disabled {
             background: #ccaa66;
             cursor: not-allowed;
-            transform: none;
         }
         
         h2, h3 {
             color: #442200;
-            font-size: 18px;
             background: #ffcc77;
             display: inline-block;
             padding: 6px 12px;
             margin-bottom: 12px;
             clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
-            box-shadow: inset -2px -2px 0 #aa7733, inset 2px 2px 0 #ffeedd;
         }
         
-        h3 {
-            font-size: 14px;
-            display: block;
-            width: fit-content;
+        .stats-badge {
+            background: #ffcc77;
+            padding: 10px;
+            margin-bottom: 15px;
+            clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
         }
     </style>
 </head>
 <body>
     <div class="archive-container">
-        <h2>Архив данных / Хранилище ошибок</h2>
+        <h2>📚 Архив данных / Хранилище ошибок</h2>
+        
+        <div class="stats-badge" id="statsBadge">
+            <!-- Статистика будет здесь -->
+        </div>
         
         <div class="timeline">
             <h3>📅 Таймлайн расследования</h3>
@@ -125,7 +120,6 @@
     </div>
     
     <script>
-        // Весь твой оригинальный JS без изменений
         function getGameData() {
             return window.parent.getGameData ? window.parent.getGameData() : null;
         }
@@ -142,6 +136,18 @@
             }
         }
         
+        function renderStats() {
+            const gameData = getGameData();
+            const statsDiv = document.getElementById('statsBadge');
+            if (!statsDiv || !gameData) return;
+            
+            statsDiv.innerHTML = `
+                📊 ТЕКУЩАЯ СТАТИСТИКА:<br>
+                ❤️ Доверие: ${gameData.trust}% | 🧠 Интеллект: ${gameData.intellect}<br>
+                📅 Текущий день: ${gameData.day} | ✅ Решено дней: ${gameData.completedDays?.length || 0}/5
+            `;
+        }
+        
         function renderClues() {
             const gameData = getGameData();
             const cluesDiv = document.getElementById('cluesList');
@@ -149,7 +155,7 @@
             
             const clues = gameData?.clues || [];
             if (clues.length === 0) {
-                cluesDiv.innerHTML = '<div class="clue-card"><p>🔍 Пока нет собранных улик. Используйте панель администратора для диагностики.</p></div>';
+                cluesDiv.innerHTML = '<div class="clue-card"><p>🔍 Пока нет собранных улик. Используйте терминал в панели администратора.</p></div>';
                 return;
             }
             
@@ -175,14 +181,12 @@
                 5: '📋 День 5: Угроза отчисления'
             };
             
-            if (completedDays.length === 0) {
-                timelineDiv.innerHTML = '<div class="timeline-item">Расследование ещё не начато</div>';
-                return;
-            }
+            const allDays = [1, 2, 3, 4, 5];
             
-            timelineDiv.innerHTML = completedDays.sort((a,b) => a-b).map(day => `
-                <div class="timeline-item">
-                    <strong>${dayNames[day] || `День ${day}`}</strong> - ✅ Решено
+            timelineDiv.innerHTML = allDays.map(day => `
+                <div class="timeline-item ${completedDays.includes(day) ? 'resolved' : ''}">
+                    <strong>${dayNames[day] || `День ${day}`}</strong>
+                    ${completedDays.includes(day) ? ' - ✅ РЕШЕНО' : ' - ⏳ ОЖИДАЕТ РЕШЕНИЯ'}
                 </div>
             `).join('');
         }
@@ -194,29 +198,47 @@
             
             const errors = gameData?.errorLog || [];
             if (errors.length === 0) {
-                logDiv.innerHTML = '<div class="clue-card"><p>Журнал ошибок пуст</p></div>';
+                logDiv.innerHTML = '<div class="clue-card"><p>Журнал ошибок пуст. Выполните команды в терминале.</p></div>';
                 return;
             }
             
-            logDiv.innerHTML = errors.slice(0, 15).map(err => `
+            logDiv.innerHTML = errors.slice(0, 20).map(err => `
                 <div class="clue-card">
                     <h4>⚠️ [День ${err.day}] ${err.timestamp || ''}</h4>
-                    <p>📌 Действие: ${err.action}</p>
-                    <p>📊 Результат: ${err.result}</p>
+                    <p>📌 Команда: ${err.action}</p>
+                    <p>📊 Результат: ${err.result === 'исправлена' ? '✅ ' + err.result : '❌ ' + err.result}</p>
                     <p>💬 ${err.message}</p>
                 </div>
             `).join('');
         }
         
         function prepareReport() {
-    if (window.parent.prepareReportFromArchive) {
-        window.parent.prepareReportFromArchive();
-    } else {
-        showBubble('Ошибка: функция отчёта не найдена', 'system');
-    }
-}
+            const gameData = getGameData();
+            if (!gameData) return;
+            
+            if (gameData.day < 5 && !gameData.completedDays.includes(4)) {
+                showBubble('❌ Сначала решите все проблемы дней 1-4!', 'system');
+                return;
+            }
+            
+            if (!gameData.completedDays.includes(4)) {
+                showBubble('❌ Сначала решите проблему дня 4!', 'system');
+                return;
+            }
+            
+            if (gameData.completedDays.includes(5)) {
+                showBubble('📋 Отчёт уже подготовлен!', 'system');
+                return;
+            }
+            
+            // Выполняем команду report.generate
+            if (window.parent.executeCommand) {
+                window.parent.executeCommand('report.generate');
+            }
+        }
         
         function init() {
+            renderStats();
             renderClues();
             renderTimeline();
             renderErrorLog();
@@ -227,10 +249,11 @@
             }
             
             setInterval(() => {
+                renderStats();
                 renderClues();
                 renderTimeline();
                 renderErrorLog();
-            }, 3000);
+            }, 2000);
         }
         
         init();
