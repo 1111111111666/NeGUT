@@ -44,6 +44,49 @@
         .status-badge.offline { color: #ff4444; }
         .status-badge.warning { color: #ffaa44; }
         
+        /* Команды - как кнопки */
+        .commands-section {
+            background: #0a0a0a;
+            border: 1px solid #333;
+            margin: 15px 0;
+            padding: 15px;
+        }
+        
+        .commands-title {
+            color: #00ff00;
+            margin-bottom: 15px;
+            font-size: 14px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 8px;
+        }
+        
+        .command-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .cmd-btn {
+            background: #1a1a1a;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            transition: all 0.1s;
+        }
+        
+        .cmd-btn:hover {
+            background: #2a2a2a;
+            transform: translateY(-2px);
+        }
+        
+        .cmd-btn:active {
+            transform: translateY(1px);
+        }
+        
         .terminal {
             background: #0a0a0a;
             border: 2px solid #00ff00;
@@ -55,11 +98,10 @@
             padding: 10px;
             border-bottom: 1px solid #333;
             font-size: 12px;
-            background: #0a0a0a;
         }
         
         .terminal-output {
-            height: 400px;
+            height: 350px;
             overflow-y: auto;
             font-size: 12px;
             padding: 10px;
@@ -75,6 +117,7 @@
         }
         
         .terminal-line.error { color: #ff6666; }
+        .terminal-line.success { color: #44ff44; }
         .terminal-prompt { color: #00ff00; margin-right: 10px; }
         
         .terminal-input-line {
@@ -83,7 +126,6 @@
             gap: 10px;
             border-top: 1px solid #333;
             padding: 10px;
-            background: #0a0a0a;
         }
         
         .terminal-input-line span { color: #00ff00; font-weight: bold; }
@@ -118,7 +160,14 @@
         
         h2 { margin-bottom: 15px; font-size: 16px; }
         .status-info { font-size: 11px; color: #888; margin-top: 5px; }
-        .command-hint { background: #1a1a1a; padding: 8px; margin-top: 10px; font-size: 11px; color: #888; border-left: 3px solid #00ff00; }
+        
+        .day-info-box {
+            background: #1a1a1a;
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 3px solid #00ff00;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
@@ -133,66 +182,121 @@
             </div>
             <div class="status-info" id="dayInfo">День 1 | Ожидание решения</div>
             
+            <!-- Кнопки быстрых команд -->
+            <div class="commands-section">
+                <div class="commands-title">📟 БЫСТРЫЕ КОМАНДЫ (кликните для выполнения)</div>
+                <div class="command-buttons" id="commandButtons">
+                    <!-- Кнопки будут динамически добавляться в зависимости от дня -->
+                </div>
+            </div>
+            
             <div class="terminal">
                 <div class="terminal-header">
-                    ⚡ SYSTEM TERMINAL v2.0 | Введите "help" для списка команд
+                    ⚡ SYSTEM TERMINAL | Введите команду или используйте кнопки выше
                 </div>
                 <div class="terminal-output" id="terminalOutput">
-                    <div class="terminal-line"><span class="terminal-prompt">$></span> Терминал готов. Введите "help"</div>
+                    <div class="terminal-line"><span class="terminal-prompt">$></span> Терминал готов.</div>
+                    <div class="terminal-line"><span class="terminal-prompt">$></span> Используйте кнопки команд или введите "help"</div>
                 </div>
                 <div class="terminal-input-line">
                     <span>$></span>
                     <input type="text" id="terminalInput" class="terminal-input" placeholder="Введите команду..." autocomplete="off">
-                    <button id="terminalSendBtn" class="terminal-send">ENTER</button>
+                    <button id="terminalSendBtn" class="terminal-send">ВЫПОЛНИТЬ</button>
                 </div>
             </div>
             
-            <div class="command-hint">
-                💡 Подсказка: введите "help" чтобы увидеть все доступные команды для текущего дня
+            <div class="day-info-box" id="dayInfoBox">
+                💡 Подсказка: используйте кнопки команд выше для решения проблем текущего дня
             </div>
         </div>
     </div>
     
     <script>
-        // Функция для добавления текста в терминал
-        function addToTerminal(text, isError) {
+        // Команды по дням
+        const dayCommands = {
+            1: [
+                { cmd: "system.queue.check", desc: "✅ Проверить очередь загрузки файлов (правильное решение)" },
+                { cmd: "auth.service.restart", desc: "❌ Перезапустить сервис аутентификации" },
+                { cmd: "backup.files.list", desc: "🔍 Посмотреть бэкапы файлов" }
+            ],
+            2: [
+                { cmd: "api.gateway.restart", desc: "✅ Перезапустить API-шлюз (правильное решение)" },
+                { cmd: "api.timeout.set(60000)", desc: "❌ Увеличить таймаут до 60 секунд" },
+                { cmd: "curl -X GET /grades", desc: "🔍 Проверить эндпоинт /grades" }
+            ],
+            3: [
+                { cmd: "cache.flush", desc: "✅ Сбросить кеш вручную (правильное решение)" },
+                { cmd: "system.reboot", desc: "❌ Перезагрузить сервер целиком" },
+                { cmd: "cache.ttl.set(300)", desc: "🔍 Настроить TTL кеша на 5 минут" }
+            ],
+            4: [
+                { cmd: "vpn.check.disable", desc: "✅ Отключить проверку VPN (правильное решение)" },
+                { cmd: "vpn.check.keep", desc: "❌ Оставить проверку VPN" },
+                { cmd: "vpn.check.migrate.local", desc: "🔍 Локальная проверка VPN" }
+            ],
+            5: [
+                { cmd: "report.generate", desc: "✅ Сгенерировать отчёт (правильное решение)" }
+            ]
+        };
+        
+        let currentDay = 1;
+        
+        function addToTerminal(text, isError, isSuccess) {
             const terminal = document.getElementById('terminalOutput');
             if (!terminal) return;
             
             const line = document.createElement('div');
-            line.className = 'terminal-line' + (isError ? ' error' : '');
+            if (isError) line.className = 'terminal-line error';
+            else if (isSuccess) line.className = 'terminal-line success';
+            else line.className = 'terminal-line';
             line.innerHTML = `<span class="terminal-prompt">$></span> ${text}`;
             terminal.appendChild(line);
             line.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
         
-        // Функция для отправки команды в родительское окно
-        function sendCommand() {
-            const input = document.getElementById('terminalInput');
-            const command = input.value.trim();
+        function updateCommandButtons() {
+            const container = document.getElementById('commandButtons');
+            if (!container) return;
             
-            if (!command) return;
+            const gameData = window.parent.getGameData ? window.parent.getGameData() : null;
+            const day = gameData ? gameData.day : 1;
+            currentDay = day;
             
+            const commands = dayCommands[day] || dayCommands[1];
+            
+            container.innerHTML = commands.map(cmd => `
+                <button class="cmd-btn" data-cmd="${cmd.cmd}">
+                    ${cmd.desc}<br><span style="font-size: 10px; opacity: 0.7;">${cmd.cmd}</span>
+                </button>
+            `).join('');
+            
+            // Добавляем обработчики
+            document.querySelectorAll('.cmd-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const cmd = btn.dataset.cmd;
+                    executeCommand(cmd);
+                });
+            });
+        }
+        
+        function executeCommand(command) {
             // Добавляем команду в терминал
-            addToTerminal(command, false);
+            addToTerminal(command, false, false);
             
             // Отправляем команду в родительское окно
-            if (window.parent && window.parent.postMessage) {
+            if (window.parent && window.parent.executeCommand) {
+                window.parent.executeCommand(command);
+            } else if (window.parent && window.parent.postMessage) {
                 window.parent.postMessage({
                     type: 'terminalCommand',
                     command: command
                 }, '*');
-                console.log("Command sent:", command);
             } else {
-                addToTerminal('❌ Ошибка: не удалось отправить команду', true);
+                addToTerminal('❌ Ошибка: не удалось выполнить команду', true, false);
             }
-            
-            input.value = '';
         }
         
-        // Обновление статуса
         function updateStatus() {
-            // Запрашиваем данные у родителя
             if (window.parent && window.parent.getGameData) {
                 const gameData = window.parent.getGameData();
                 if (gameData) {
@@ -201,30 +305,37 @@
                     const queueStatus = document.getElementById('queueStatus');
                     const cacheStatus = document.getElementById('cacheStatus');
                     const vpnStatus = document.getElementById('vpnStatus');
+                    const dayInfoBox = document.getElementById('dayInfoBox');
                     
                     const completedDays = gameData.completedDays || [];
                     
-                    dayInfo.innerHTML = `День ${gameData.day} | Решено дней: ${completedDays.length}/5 | ❤️ Доверие: ${gameData.trust} | 🧠 Интеллект: ${gameData.intellect}`;
+                    dayInfo.innerHTML = `📅 День ${gameData.day} | ✅ Решено: ${completedDays.length}/5 | ❤️ Доверие: ${gameData.trust} | 🧠 Интеллект: ${gameData.intellect}`;
                     
                     if (gameData.day === 1 && !completedDays.includes(1)) {
                         apiStatus.innerHTML = '🟡 API Gateway: DEGRADED';
                         apiStatus.className = 'status-badge warning';
                         queueStatus.innerHTML = '📦 Очередь: ПЕРЕПОЛНЕНА';
                         queueStatus.className = 'status-badge warning';
+                        dayInfoBox.innerHTML = '💡 День 1: Проблема с отправкой файлов. Попробуйте "system.queue.check"';
                     } else if (gameData.day === 2 && !completedDays.includes(2)) {
                         apiStatus.innerHTML = '🔴 API Gateway: OFFLINE (502)';
                         apiStatus.className = 'status-badge offline';
                         queueStatus.innerHTML = '📦 Очередь: 15';
+                        dayInfoBox.innerHTML = '💡 День 2: API оценивания не отвечает. Попробуйте "api.gateway.restart"';
                     } else if (gameData.day === 3 && !completedDays.includes(3)) {
                         apiStatus.innerHTML = '🟢 API Gateway: ONLINE';
                         apiStatus.className = 'status-badge online';
                         cacheStatus.innerHTML = '⚠️ Кеш: УСТАРЕЛ';
                         cacheStatus.className = 'status-badge warning';
+                        dayInfoBox.innerHTML = '💡 День 3: Данные устарели. Попробуйте "cache.flush"';
                     } else if (gameData.day === 4 && !completedDays.includes(4)) {
                         apiStatus.innerHTML = '🟡 API Gateway: НЕСТАБИЛЕН';
                         apiStatus.className = 'status-badge warning';
                         vpnStatus.innerHTML = '🌐 VPN check: АКТИВЕН';
                         vpnStatus.className = 'status-badge warning';
+                        dayInfoBox.innerHTML = '💡 День 4: Странные запросы к API. Попробуйте "vpn.check.disable"';
+                    } else if (gameData.day === 5 && !completedDays.includes(5)) {
+                        dayInfoBox.innerHTML = '💡 День 5: Угроза отчисления! Подготовьте отчёт командой "report.generate"';
                     } else {
                         apiStatus.innerHTML = '🟢 API Gateway: ONLINE';
                         apiStatus.className = 'status-badge online';
@@ -235,35 +346,42 @@
                         vpnStatus.innerHTML = '🌐 VPN check: OFF';
                         vpnStatus.className = 'status-badge online';
                     }
+                    
+                    // Обновляем кнопки при смене дня
+                    if (currentDay !== gameData.day) {
+                        updateCommandButtons();
+                    }
                 }
             }
         }
         
-        // Слушаем ответы от родителя
-        window.addEventListener('message', function(event) {
-            if (event.data && event.data.type === 'terminalResponse') {
-                addToTerminal(event.data.text, event.data.isError);
-            }
-        });
+        function sendManualCommand() {
+            const input = document.getElementById('terminalInput');
+            const command = input.value.trim();
+            if (!command) return;
+            executeCommand(command);
+            input.value = '';
+        }
         
-        // Инициализация
         function init() {
+            updateCommandButtons();
             updateStatus();
             setInterval(updateStatus, 1000);
             
             const sendBtn = document.getElementById('terminalSendBtn');
             const input = document.getElementById('terminalInput');
             
-            if (sendBtn) sendBtn.addEventListener('click', sendCommand);
-            if (input) input.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') sendCommand();
+            if (sendBtn) sendBtn.addEventListener('click', sendManualCommand);
+            if (input) input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendManualCommand();
             });
         }
         
         init();
         
-        // Экспортируем функцию для внешнего использования
+        // Экспорт
         window.addToTerminal = addToTerminal;
+        window.updateCommandButtons = updateCommandButtons;
     </script>
 </body>
 </html>

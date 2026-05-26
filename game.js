@@ -19,30 +19,22 @@ let gameData = {
 // Расписание пар по дням
 let scheduleByDay = {};
 
-// Правильные решения по дням
-const correctActions = {
-    1: "system.queue.check",
-    2: "api.gateway.restart",
-    3: "cache.flush",
-    4: "vpn.check.disable"
-};
-
-// Команды терминала
+// Команды терминала и их результаты
 const terminalCommands = {
     "help": { description: "Показать список доступных команд" },
-    "system.queue.check": { description: "Проверить очередь загрузки файлов", day: 1, success: true, trust: 10, clue: "Очередь переполнена с 14:00 вчера", message: "✅ Файл восстановлен!" },
-    "auth.service.restart": { description: "Перезапустить сервис аутентификации", day: 1, success: false, trust: -5, message: "❌ Ошибка осталась." },
-    "backup.files.list": { description: "Посмотреть бэкапы файлов", day: 1, success: false, trust: 0, intellect: 5, clue: "Бэкапы не создавались 3 дня", message: "🔍 Улика найдена." },
+    "system.queue.check": { description: "Проверить очередь загрузки", day: 1, success: true, trust: 10, clue: "Очередь переполнена с 14:00 вчера", message: "✅ Файл восстановлен! Проблема решена." },
+    "auth.service.restart": { description: "Перезапустить аутентификацию", day: 1, success: false, trust: -5, message: "❌ Ошибка осталась." },
+    "backup.files.list": { description: "Посмотреть бэкапы", day: 1, success: false, trust: 0, intellect: 5, clue: "Бэкапы не создавались 3 дня", message: "🔍 Улика найдена." },
     "api.gateway.restart": { description: "Перезапустить API-шлюз", day: 2, success: true, trust: 15, clue: "Шлюз не отвечал 2 часа", message: "✅ Оценка обновилась на 5!" },
-    "api.timeout.set(60000)": { description: "Увеличить таймаут до 60 секунд", day: 2, success: false, trust: -10, message: "❌ Ошибка осталась." },
-    "curl -X GET /grades": { description: "Проверить эндпоинт /grades", day: 2, success: false, trust: 0, intellect: 10, clue: "Эндпоинт возвращает пустой массив", message: "🔍 Диагностика найдена." },
-    "cache.flush": { description: "Сбросить кеш вручную", day: 3, success: true, trust: 10, clue: "Кеш-ключи не обновлялись 7 дней", message: "✅ Данные обновились!" },
+    "api.timeout.set(60000)": { description: "Увеличить таймаут", day: 2, success: false, trust: -10, message: "❌ Ошибка осталась." },
+    "curl -X GET /grades": { description: "Проверить эндпоинт", day: 2, success: false, trust: 0, intellect: 10, clue: "Эндпоинт пустой", message: "🔍 Диагностика найдена." },
+    "cache.flush": { description: "Сбросить кеш", day: 3, success: true, trust: 10, clue: "Кеш не обновлялся 7 дней", message: "✅ Данные обновились!" },
     "system.reboot": { description: "Перезагрузить сервер", day: 3, success: false, trust: -15, message: "❌ Кеш сбросился временно." },
-    "cache.ttl.set(300)": { description: "Настроить TTL кеша", day: 3, success: true, trust: 5, intellect: 5, clue: "TTL был 30 дней", message: "✅ Проблема решена!" },
+    "cache.ttl.set(300)": { description: "Настроить TTL", day: 3, success: true, trust: 5, intellect: 5, clue: "TTL был 30 дней", message: "✅ Проблема решена!" },
     "vpn.check.disable": { description: "Отключить проверку VPN", day: 4, success: true, trust: 10, intellect: 5, clue: "Проверка VPN вызывала задержки", message: "✅ Ошибки 403 исчезли!" },
     "vpn.check.keep": { description: "Оставить проверку VPN", day: 4, success: false, trust: -10, message: "❌ Ошибки 403 остались." },
-    "vpn.check.migrate.local": { description: "Локальная проверка VPN", day: 4, success: true, trust: 5, intellect: 10, clue: "Локальный флаг быстрее", message: "✅ Проблема решена!" },
-    "report.generate": { description: "Сгенерировать отчёт", day: 5, success: true, trust: 20, intellect: 10, message: "✅ Отчёт готов!" }
+    "vpn.check.migrate.local": { description: "Локальная проверка", day: 4, success: true, trust: 5, intellect: 10, clue: "Локальный флаг быстрее", message: "✅ Проблема решена!" },
+    "report.generate": { description: "Сгенерировать отчёт", day: 5, success: true, trust: 20, intellect: 10, message: "✅ Отчёт готов! Угроза отчисления снята." }
 };
 
 // Начальные сообщения для Telegram
@@ -53,7 +45,7 @@ const initialTelegramMessages = [
     { sender: "Зав. кафедрой", text: "Коля, бери ситуацию под контроль. Если не починишь - будут последствия." }
 ];
 
-// Сообщения для Телеграма по дням
+// Сообщения по дням
 const telegramMessagesByDay = {
     1: [
         { sender: "Преподаватель", text: "Коля, работа не загрузилась! Почему у меня 2?" },
@@ -68,7 +60,7 @@ const telegramMessagesByDay = {
         { sender: "Преподаватель", text: "Расписание старое! Студенты путаются!" }
     ],
     4: [
-        { sender: "Сис. администратор", text: "Коля, сервер стучится в Telegram/YouTube API! Это какая-то проверка VPN?" },
+        { sender: "Сис. администратор", text: "Коля, сервер стучится в Telegram/YouTube API! Это проверка VPN?" },
         { sender: "Одногруппница Лена", text: "У меня то загружается файл, то нет... Магия какая-то!" }
     ],
     5: [
@@ -77,6 +69,7 @@ const telegramMessagesByDay = {
     ]
 };
 
+// Инициализация расписания
 function initSchedule() {
     scheduleByDay = {
         1: [
@@ -143,6 +136,7 @@ function makeDraggable(element, handle) {
     }
 }
 
+// Загрузка сохранения
 function loadGame() {
     const saved = localStorage.getItem("spbGameSave");
     if (saved) {
@@ -153,9 +147,11 @@ function loadGame() {
                 const savedDay = localStorage.getItem(`schedule_day_${day}`);
                 if (savedDay) {
                     const takenLessons = JSON.parse(savedDay);
-                    scheduleByDay[day].forEach(lesson => {
-                        lesson.taken = takenLessons.includes(lesson.name);
-                    });
+                    if (scheduleByDay[day]) {
+                        scheduleByDay[day].forEach(lesson => {
+                            lesson.taken = takenLessons.includes(lesson.name);
+                        });
+                    }
                 }
             }
         } catch(e) { console.error("Ошибка загрузки", e); }
@@ -165,6 +161,7 @@ function loadGame() {
     updateStatsDisplay();
 }
 
+// Сохранение
 function saveGame() {
     localStorage.setItem("spbGameSave", JSON.stringify(gameData));
     for (let day in scheduleByDay) {
@@ -174,6 +171,7 @@ function saveGame() {
     updateStatsDisplay();
 }
 
+// Обновление статистики на панели
 function updateStatsDisplay() {
     const trustValue = document.getElementById('trustValue');
     const intellectValue = document.getElementById('intellectValue');
@@ -195,14 +193,22 @@ function updateStatsDisplay() {
     }
 }
 
+// DeepSeek подсказки
 function updateDeepseekAdvice() {
     const adviceDiv = document.getElementById('deepseekAdvice');
     if (!adviceDiv) return;
     
     if (gameData.intellect >= 30) {
         gameData.deepseekUnlocked = true;
-        const advice = terminalCommands[correctActions[gameData.day]]?.description || "Введите 'help' для списка команд";
-        adviceDiv.innerHTML = `<strong>🤖 Совет DeepSeek:</strong><br>Попробуйте команду: ${correctActions[gameData.day] || "help"} - ${advice}`;
+        const dayCommands = {
+            1: "system.queue.check",
+            2: "api.gateway.restart", 
+            3: "cache.flush",
+            4: "vpn.check.disable",
+            5: "report.generate"
+        };
+        const advice = terminalCommands[dayCommands[gameData.day]]?.description || "Введите 'help' для списка команд";
+        adviceDiv.innerHTML = `<strong>🤖 Совет DeepSeek:</strong><br>Попробуйте команду: ${dayCommands[gameData.day] || "help"} - ${advice}`;
         adviceDiv.style.background = "#0a0a1a";
         adviceDiv.style.color = "#00ff00";
     } else {
@@ -213,6 +219,7 @@ function updateDeepseekAdvice() {
     }
 }
 
+// Telegram сообщения
 function addTelegramMessage(sender, text) {
     const newMsg = {
         id: Date.now(),
@@ -238,6 +245,7 @@ function updateTelegramBadge() {
     }
 }
 
+// Проверка доступности Telegram (с учётом VPN)
 function isTelegramAvailable() {
     if (gameData.day >= 4 && !gameData.completedDays.includes(4)) {
         return gameData.vpnEnabled;
@@ -245,18 +253,19 @@ function isTelegramAvailable() {
     return true;
 }
 
+// Отображение сообщений Telegram
 function renderTelegramMessages() {
     const container = document.getElementById('telegramMessagesContainer');
     if (!container) return;
     
     if (!isTelegramAvailable()) {
         container.innerHTML = `
-            <div class="telegram-error">
-                <div class="telegram-error-icon">🔒</div>
-                <div class="telegram-error-title">403 Forbidden</div>
-                <div class="telegram-error-text">Доступ к Telegram заблокирован</div>
-                <div class="telegram-error-text" style="margin-top: 10px;">Для доступа необходимо включить VPN</div>
-                <div class="telegram-error-text" style="margin-top: 5px; font-size: 11px;">Откройте приложение VPN Client</div>
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 40px; text-align: center;">
+                <div style="font-size: 48px; margin-bottom: 20px;">🔒</div>
+                <div style="font-size: 20px; font-weight: bold; color: #e74c3c; margin-bottom: 10px;">403 Forbidden</div>
+                <div style="font-size: 14px; color: #886633;">Доступ к Telegram заблокирован</div>
+                <div style="font-size: 12px; color: #886633; margin-top: 10px;">Для доступа необходимо включить VPN</div>
+                <div style="font-size: 11px; color: #886633;">Откройте приложение VPN Client</div>
             </div>
         `;
         return;
@@ -268,10 +277,10 @@ function renderTelegramMessages() {
     }
     
     container.innerHTML = gameData.telegramMessages.slice(0, 50).map(msg => `
-        <div class="telegram-message ${!msg.read ? 'unread' : ''}" data-id="${msg.id}">
-            <div class="telegram-sender">📨 ${msg.sender}</div>
-            <div class="telegram-text">${msg.text}</div>
-            <div class="telegram-time">${msg.time}</div>
+        <div class="telegram-message" style="background: white; border: 2px solid #ffdd99; padding: 12px; margin-bottom: 12px; border-radius: 8px;">
+            <div style="font-weight: bold; color: #442200; font-size: 13px; margin-bottom: 5px;">📨 ${msg.sender}</div>
+            <div style="font-size: 13px; color: #333; margin-bottom: 5px;">${msg.text}</div>
+            <div style="font-size: 10px; color: #886633; text-align: right;">${msg.time}</div>
         </div>
     `).join('');
     
@@ -280,6 +289,7 @@ function renderTelegramMessages() {
     updateTelegramBadge();
 }
 
+// Генерация сообщений по дням
 function generateTelegramMessages() {
     if (!gameData.hasActiveGame || gameData.telegramMessages.length === 0) {
         setTimeout(() => {
@@ -303,6 +313,7 @@ function generateTelegramMessages() {
     }
 }
 
+// Уведомления
 function addNotification(text, type = "thought") {
     const newNotif = {
         id: Date.now(),
@@ -346,6 +357,7 @@ function renderNotifications() {
     updateNotificationBadge();
 }
 
+// Изменение доверия
 function modifyTrust(delta) {
     let newTrust = gameData.trust + delta;
     if (delta === 5 && gameData.rebootCount >= gameData.day) return;
@@ -356,12 +368,14 @@ function modifyTrust(delta) {
     updateStatsDisplay();
 }
 
+// Изменение интеллекта
 function modifyIntellect(delta) {
     gameData.intellect = Math.min(100, Math.max(0, gameData.intellect + delta));
     saveGame();
     updateStatsDisplay();
 }
 
+// Добавление улики
 function addClue(clue) {
     if (!gameData.clues.includes(clue)) {
         gameData.clues.push(clue);
@@ -370,6 +384,7 @@ function addClue(clue) {
     }
 }
 
+// Добавление в журнал ошибок
 function addToErrorLog(action, result, message, day) {
     gameData.errorLog.unshift({
         id: Date.now(),
@@ -382,107 +397,67 @@ function addToErrorLog(action, result, message, day) {
     saveGame();
 }
 
-// ГЛАВНАЯ ФУНКЦИЯ - ВЫПОЛНЕНИЕ КОМАНД ТЕРМИНАЛА
+// Функция для добавления в терминал (для ответа в admin.html)
+function addToTerminalFromGame(text, isError, isSuccess) {
+    const adminIframe = document.getElementById('browserIframe');
+    if (adminIframe && adminIframe.contentWindow && adminIframe.contentWindow.addToTerminal) {
+        adminIframe.contentWindow.addToTerminal(text, isError, isSuccess);
+    }
+}
+
+// ГЛАВНАЯ ФУНКЦИЯ ВЫПОЛНЕНИЯ КОМАНД
 function executeCommand(command) {
-    console.log("executeCommand called with:", command);
+    console.log("📟 Выполнение команды:", command);
     const cmd = command.toLowerCase().trim();
     
-    const terminal = document.getElementById('terminalOutput');
-    if (!terminal) {
-        console.error("Terminal output element not found!");
-        return;
-    }
-    
-    // Отображаем введённую команду
-    const inputLine = document.createElement('div');
-    inputLine.className = 'terminal-line';
-    inputLine.innerHTML = `<span class="terminal-prompt">$></span> ${command}`;
-    terminal.appendChild(inputLine);
+    addToTerminalFromGame(`> ${command}`, false, false);
     
     if (cmd === "help") {
-        const helpLine = document.createElement('div');
-        helpLine.className = 'terminal-line';
-        helpLine.innerHTML = `<span class="terminal-prompt">$></span> === ДОСТУПНЫЕ КОМАНДЫ ===`;
-        terminal.appendChild(helpLine);
-        
+        addToTerminalFromGame("=== ДОСТУПНЫЕ КОМАНДЫ ===", false, false);
         for (let cmdName in terminalCommands) {
             if (terminalCommands[cmdName].description) {
-                const line = document.createElement('div');
-                line.className = 'terminal-line';
                 const dayInfo = terminalCommands[cmdName].day ? `[День ${terminalCommands[cmdName].day}]` : '';
-                line.innerHTML = `<span class="terminal-prompt">$></span> ${cmdName.padEnd(30)} ${dayInfo.padEnd(10)} - ${terminalCommands[cmdName].description}`;
-                terminal.appendChild(line);
+                addToTerminalFromGame(`${cmdName.padEnd(30)} ${dayInfo.padEnd(10)} - ${terminalCommands[cmdName].description}`, false, false);
             }
         }
-        
-        const infoLine = document.createElement('div');
-        infoLine.className = 'terminal-line';
-        infoLine.innerHTML = `<span class="terminal-prompt">$></span> 📅 День ${gameData.day} | ❤️ Доверие: ${gameData.trust} | 🧠 Интеллект: ${gameData.intellect}`;
-        terminal.appendChild(infoLine);
-        
-        inputLine.scrollIntoView({ behavior: 'smooth', block: 'end' });
-        return;
-    }
-    
-    if (cmd === "clear") {
-        terminal.innerHTML = '';
-        const clearLine = document.createElement('div');
-        clearLine.className = 'terminal-line';
-        clearLine.innerHTML = `<span class="terminal-prompt">$></span> Терминал очищен`;
-        terminal.appendChild(clearLine);
+        addToTerminalFromGame(`📅 Текущий день: ${gameData.day} | ❤️ Доверие: ${gameData.trust} | 🧠 Интеллект: ${gameData.intellect}`, false, false);
         return;
     }
     
     const cmdData = terminalCommands[cmd];
     if (!cmdData) {
-        const errorLine = document.createElement('div');
-        errorLine.className = 'terminal-line error';
-        errorLine.innerHTML = `<span class="terminal-prompt">$></span> ❌ Command not found: ${command}`;
-        terminal.appendChild(errorLine);
-        
-        const hintLine = document.createElement('div');
-        hintLine.className = 'terminal-line';
-        hintLine.innerHTML = `<span class="terminal-prompt">$></span> 💡 Введите 'help' для списка команд`;
-        terminal.appendChild(hintLine);
-        
-        inputLine.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        addToTerminalFromGame(`❌ Команда не найдена: ${command}`, true, false);
+        addToTerminalFromGame(`💡 Введите 'help' для списка команд`, false, false);
         return;
     }
     
     // Проверка дня
     if (cmdData.day && cmdData.day !== gameData.day) {
-        const errorLine = document.createElement('div');
-        errorLine.className = 'terminal-line error';
         if (gameData.day > cmdData.day && gameData.completedDays.includes(cmdData.day)) {
-            errorLine.innerHTML = `<span class="terminal-prompt">$></span> ⚠️ Эта проблема уже решена в день ${cmdData.day}`;
+            addToTerminalFromGame(`⚠️ Эта проблема уже решена в день ${cmdData.day}`, true, false);
         } else {
-            errorLine.innerHTML = `<span class="terminal-prompt">$></span> ❌ Сейчас день ${gameData.day}. Эта команда не актуальна.`;
+            addToTerminalFromGame(`❌ Сейчас день ${gameData.day}. Эта команда не актуальна.`, true, false);
         }
-        terminal.appendChild(errorLine);
-        inputLine.scrollIntoView({ behavior: 'smooth', block: 'end' });
         return;
     }
     
     if (cmdData.day && gameData.completedDays.includes(gameData.day)) {
-        const errorLine = document.createElement('div');
-        errorLine.className = 'terminal-line error';
-        errorLine.innerHTML = `<span class="terminal-prompt">$></span> ⚠️ Проблема дня ${gameData.day} уже решена!`;
-        terminal.appendChild(errorLine);
-        inputLine.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        addToTerminalFromGame(`⚠️ Проблема дня ${gameData.day} уже решена!`, true, false);
         return;
     }
     
-    // Выполнение
+    // Выполнение команды
     if (cmdData.trust) modifyTrust(cmdData.trust);
     if (cmdData.intellect) modifyIntellect(cmdData.intellect);
     if (cmdData.clue) addClue(cmdData.clue);
     
     addToErrorLog(command, cmdData.success ? 'исправлена' : 'не исправлена', cmdData.message, cmdData.day);
     
-    const resultLine = document.createElement('div');
-    resultLine.className = `terminal-line ${cmdData.success ? '' : 'error'}`;
-    resultLine.innerHTML = `<span class="terminal-prompt">$></span> ${cmdData.success ? '✅' : '❌'} ${cmdData.message}`;
-    terminal.appendChild(resultLine);
+    if (cmdData.success) {
+        addToTerminalFromGame(`✅ ${cmdData.message}`, false, true);
+    } else {
+        addToTerminalFromGame(`❌ ${cmdData.message}`, true, false);
+    }
     
     if (cmdData.success && cmdData.day) {
         if (!gameData.completedDays.includes(cmdData.day)) {
@@ -494,11 +469,15 @@ function executeCommand(command) {
                 updateStatsDisplay();
                 addNotification(`📅 День ${gameData.day} начался!`, "info");
                 generateTelegramMessages();
+                addToTerminalFromGame(`📅 НОВЫЙ ДЕНЬ! Теперь день ${gameData.day}. Введите "help" для новых команд.`, false, false);
                 
-                const newDayLine = document.createElement('div');
-                newDayLine.className = 'terminal-line';
-                newDayLine.innerHTML = `<span class="terminal-prompt">$></span> 📅 НОВЫЙ ДЕНЬ! Теперь день ${gameData.day}. Введите "help" для новых команд.`;
-                terminal.appendChild(newDayLine);
+                // Обновляем кнопки в админке
+                const adminIframe = document.getElementById('browserIframe');
+                if (adminIframe && adminIframe.contentWindow && adminIframe.contentWindow.updateCommandButtons) {
+                    setTimeout(() => {
+                        adminIframe.contentWindow.updateCommandButtons();
+                    }, 100);
+                }
             } else if (gameData.day === 5 && cmd === "report.generate") {
                 gameData.day = 6;
                 saveGame();
@@ -506,10 +485,9 @@ function executeCommand(command) {
             }
         }
     }
-    
-    inputLine.scrollIntoView({ behavior: 'smooth', block: 'end' });
 }
 
+// Отметка на паре
 function markAttendance(lessonName, reward) {
     const todaySchedule = scheduleByDay[gameData.day];
     if (!todaySchedule) return false;
@@ -532,6 +510,7 @@ function markAttendance(lessonName, reward) {
     return true;
 }
 
+// VPN логика
 function toggleVPN() {
     gameData.vpnEnabled = !gameData.vpnEnabled;
     saveGame();
@@ -569,6 +548,7 @@ function toggleVPN() {
     }
 }
 
+// Перезагрузка компьютера
 function rebootComputer() {
     const overlay = document.getElementById('shutdownOverlay');
     if (overlay) {
@@ -583,6 +563,7 @@ function rebootComputer() {
     }
 }
 
+// Выключение компьютера
 function shutdownComputer() {
     const overlay = document.getElementById('shutdownOverlay');
     if (overlay) {
@@ -596,6 +577,7 @@ function shutdownComputer() {
     }
 }
 
+// Включение рабочего стола
 function powerOnDesktop() {
     const desktopElem = document.getElementById('desktop');
     if (desktopElem) {
@@ -616,6 +598,7 @@ function powerOnDesktop() {
     }
 }
 
+// Сброс прогресса
 function resetProgress() {
     if (confirm("⚠ ВЫ УВЕРЕНЫ? Весь прогресс будет потерян!")) {
         gameData = {
@@ -646,6 +629,7 @@ function resetProgress() {
     }
 }
 
+// Финальная катсцена
 function showFinalChoice() {
     addNotification("🏆 РАССЛЕДОВАНИЕ ЗАВЕРШЕНО! 🏆", "system");
     
@@ -737,6 +721,7 @@ function showFinalChoice() {
     document.getElementById('closeFinalModal')?.addEventListener('click', () => modal.remove());
 }
 
+// Открытие приложений
 function openApp(appName) {
     const apps = {
         'deepseek': document.getElementById('deepseekChat'),
@@ -751,16 +736,14 @@ function openApp(appName) {
     }
 }
 
-function addToTerminalOutput(text, isError) {
-    const terminal = document.getElementById('terminalOutput');
-    if (!terminal) return;
-    
-    const line = document.createElement('div');
-    line.className = `terminal-line ${isError ? 'error' : ''}`;
-    line.innerHTML = `<span class="terminal-prompt">$></span> ${text}`;
-    terminal.appendChild(line);
-    line.scrollIntoView({ behavior: 'smooth', block: 'end' });
-}
+// Обработка сообщений от iframe (терминал)
+window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'terminalCommand') {
+        const command = event.data.command;
+        console.log("📟 Получена команда из iframe:", command);
+        executeCommand(command);
+    }
+});
 
 // ИНИЦИАЛИЗАЦИЯ
 document.addEventListener('DOMContentLoaded', () => {
@@ -779,9 +762,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const telegram = document.getElementById('telegramChat');
     const vpn = document.getElementById('vpnApp');
     
-    if (deepseek) makeDraggable(deepseek, deepseek.querySelector('.deepseek-header'));
-    if (telegram) makeDraggable(telegram, telegram.querySelector('.telegram-header'));
-    if (vpn) makeDraggable(vpn, vpn.querySelector('.vpn-header'));
+    if (deepseek && deepseek.querySelector('.deepseek-header')) {
+        makeDraggable(deepseek, deepseek.querySelector('.deepseek-header'));
+    }
+    if (telegram && telegram.querySelector('.telegram-header')) {
+        makeDraggable(telegram, telegram.querySelector('.telegram-header'));
+    }
+    if (vpn && vpn.querySelector('.vpn-header')) {
+        makeDraggable(vpn, vpn.querySelector('.vpn-header'));
+    }
     
     // Кнопки главного меню
     document.getElementById('newGameBtn')?.addEventListener('click', () => {
@@ -816,7 +805,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderNotifications();
     });
     
-    // Иконки
+    // Иконки на рабочем столе
     document.querySelector('.icon[data-app="browser"]')?.addEventListener('click', () => {
         browserModal?.classList.add('active');
         const iframe = document.getElementById('browserIframe');
@@ -866,7 +855,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === browserModal) browserModal.classList.remove('active');
     });
     
-    // Вкладки
+    // Вкладки браузера
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const page = btn.dataset.page;
@@ -906,6 +895,7 @@ document.addEventListener('DOMContentLoaded', () => {
         openApp('vpn');
     });
     
+    // Закрытие меню при клике вне
     document.addEventListener('click', (e) => {
         if (startMenu && !startMenu.contains(e.target) && !e.target.closest('.start-button')) {
             startMenu.classList.remove('active');
@@ -915,6 +905,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
+    // Время
     function updateTime() {
         const timeElem = document.getElementById('currentTime');
         const dateElem = document.getElementById('currentDate');
@@ -930,38 +921,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (gameData.hasActiveGame && desktop) {
         desktop.style.display = 'block';
     }
-
-// Обработка сообщений от iframe (терминал)
-window.addEventListener('message', function(event) {
-    if (event.data && event.data.type === 'terminalCommand') {
-        const command = event.data.command;
-        console.log("📟 Получена команда из терминала:", command);
-        
-        // Сохраняем ссылку на источник для ответа
-        const source = event.source;
-        
-        // Временно переопределяем addToTerminalOutput чтобы отправлять ответ в iframe
-        const originalAddToTerminal = window.addToTerminalOutput;
-        window.addToTerminalOutput = function(text, isError) {
-            if (source && source.postMessage) {
-                source.postMessage({
-                    type: 'terminalResponse',
-                    text: text,
-                    isError: isError || false
-                }, '*');
-            }
-            if (originalAddToTerminal) originalAddToTerminal(text, isError);
-        };
-        
-        // Выполняем команду
-        executeCommand(command);
-        
-        // Восстанавливаем оригинальную функцию
-        setTimeout(() => {
-            window.addToTerminalOutput = originalAddToTerminal;
-        }, 100);
-    }
-});
 });
 
 // Экспорт глобальных функций
@@ -978,5 +937,6 @@ window.getTodaySchedule = () => scheduleByDay[gameData.day];
 window.toggleVPN = toggleVPN;
 window.isTelegramAvailable = isTelegramAvailable;
 window.renderTelegramMessages = renderTelegramMessages;
+window.addToTerminalFromGame = addToTerminalFromGame;
 
-console.log("Game.js loaded, executeCommand exported:", typeof window.executeCommand);
+console.log("Game.js loaded, executeCommand exported");
