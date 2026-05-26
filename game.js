@@ -13,7 +13,8 @@ let gameData = {
     lastAction: null,
     rebootCount: 0,
     vpnEnabled: false,
-    deepseekUnlocked: false
+    deepseekUnlocked: false,
+    terminalHistory: []
 };
 
 // Расписание пар по дням
@@ -22,50 +23,54 @@ let scheduleByDay = {};
 // Команды терминала и их результаты
 const terminalCommands = {
     "help": { description: "Показать список доступных команд" },
-    "system.queue.check": { description: "Проверить очередь загрузки", day: 1, success: true, trust: 10, clue: "Очередь переполнена с 14:00 вчера", message: "✅ Файл восстановлен! Проблема решена." },
-    "auth.service.restart": { description: "Перезапустить аутентификацию", day: 1, success: false, trust: -5, message: "❌ Ошибка осталась." },
-    "backup.files.list": { description: "Посмотреть бэкапы", day: 1, success: false, trust: 0, intellect: 5, clue: "Бэкапы не создавались 3 дня", message: "🔍 Улика найдена." },
-    "api.gateway.restart": { description: "Перезапустить API-шлюз", day: 2, success: true, trust: 15, clue: "Шлюз не отвечал 2 часа", message: "✅ Оценка обновилась на 5!" },
-    "api.timeout.set(60000)": { description: "Увеличить таймаут", day: 2, success: false, trust: -10, message: "❌ Ошибка осталась." },
-    "curl -X GET /grades": { description: "Проверить эндпоинт", day: 2, success: false, trust: 0, intellect: 10, clue: "Эндпоинт пустой", message: "🔍 Диагностика найдена." },
-    "cache.flush": { description: "Сбросить кеш", day: 3, success: true, trust: 10, clue: "Кеш не обновлялся 7 дней", message: "✅ Данные обновились!" },
-    "system.reboot": { description: "Перезагрузить сервер", day: 3, success: false, trust: -15, message: "❌ Кеш сбросился временно." },
-    "cache.ttl.set(300)": { description: "Настроить TTL", day: 3, success: true, trust: 5, intellect: 5, clue: "TTL был 30 дней", message: "✅ Проблема решена!" },
-    "vpn.check.disable": { description: "Отключить проверку VPN", day: 4, success: true, trust: 10, intellect: 5, clue: "Проверка VPN вызывала задержки", message: "✅ Ошибки 403 исчезли!" },
-    "vpn.check.keep": { description: "Оставить проверку VPN", day: 4, success: false, trust: -10, message: "❌ Ошибки 403 остались." },
-    "vpn.check.migrate.local": { description: "Локальная проверка", day: 4, success: true, trust: 5, intellect: 10, clue: "Локальный флаг быстрее", message: "✅ Проблема решена!" },
-    "report.generate": { description: "Сгенерировать отчёт", day: 5, success: true, trust: 20, intellect: 10, message: "✅ Отчёт готов! Угроза отчисления снята." }
+    "system.queue.check": { description: "Проверить очередь загрузки", day: 1, success: true, trust: 10, clue: "Очередь переполнена с 14:00 вчера", message: "✅ Файл восстановлен! Проблема решена.", explanation: "Очередь загрузки была переполнена, поэтому ваш файл не попал в систему. После очистки очереди файл успешно загрузился." },
+    "auth.service.restart": { description: "Перезапустить аутентификацию", day: 1, success: false, trust: -5, clue: null, message: "❌ Ошибка осталась.", explanation: "Проблема не в аутентификации — сессия активна, но файл не может пройти через переполненную очередь." },
+    "backup.files.list": { description: "Посмотреть бэкапы", day: 1, success: false, trust: 0, intellect: 5, clue: "Бэкапы не создавались 3 дня", message: "🔍 Улика найдена, но файл не восстановлен.", explanation: "Вы нашли важную улику: бэкапы не создавались 3 дня. Это объясняет, почему файл нельзя восстановить из резервной копии, но не решает проблему с очередью." },
+    "api.gateway.restart": { description: "Перезапустить API-шлюз", day: 2, success: true, trust: 15, clue: "Шлюз не отвечал 2 часа", message: "✅ Оценка обновилась на 5!", explanation: "API-шлюз завис, поэтому оценки не обновлялись. После перезапуска всё заработало." },
+    "api.timeout.set(60000)": { description: "Увеличить таймаут", day: 2, success: false, trust: -10, clue: null, message: "❌ Ошибка осталась.", explanation: "Увеличение таймаута не помогает — проблема не в скорости ответа, а в том, что шлюз полностью завис." },
+    "curl -X GET /grades": { description: "Проверить эндпоинт", day: 2, success: false, trust: 0, intellect: 10, clue: "Эндпоинт возвращает пустой массив", message: "🔍 Диагностика найдена, но не исправлена.", explanation: "Эндпоинт /grades возвращает пустой массив — это подтверждает проблему, но не решает её. Нужно перезапустить шлюз." },
+    "cache.flush": { description: "Сбросить кеш", day: 3, success: true, trust: 10, clue: "Кеш-ключи не обновлялись 7 дней", message: "✅ Данные обновились!", explanation: "Кеш не обновлялся неделю, поэтому пользователи видели старые данные. После сброса кеша всё актуально." },
+    "system.reboot": { description: "Перезагрузить сервер", day: 3, success: false, trust: -15, clue: null, message: "❌ Кеш сбросился временно.", explanation: "Полная перезагрузка сервера — слишком радикальная мера. Кеш сбросился, но скоро вернётся к старым данным." },
+    "cache.ttl.set(300)": { description: "Настроить TTL", day: 3, success: true, trust: 5, intellect: 5, clue: "TTL был 30 дней", message: "✅ Проблема решена!", explanation: "TTL был установлен на 30 дней — слишком много. Установка 5 минут решит проблему устаревших данных." },
+    "vpn.check.disable": { description: "Отключить проверку VPN", day: 4, success: true, trust: 10, intellect: 5, clue: "Проверка VPN вызывала задержки", message: "✅ Ошибки 403 исчезли!", explanation: "Система проверяла VPN через внешние API, что вызывало задержки и ошибки 403. Отключение проверки решило проблему." },
+    "vpn.check.keep": { description: "Оставить проверку VPN", day: 4, success: false, trust: -10, clue: null, message: "❌ Ошибки 403 остались.", explanation: "Оставление проверки VPN не решает проблему — внешние API продолжают блокировать запросы." },
+    "vpn.check.migrate.local": { description: "Локальная проверка", day: 4, success: true, trust: 5, intellect: 10, clue: "Локальный флаг быстрее", message: "✅ Проблема решена!", explanation: "Замена внешней проверки на локальный флаг — хорошее решение, но требует миграции данных." },
+    "report.generate": { description: "Сгенерировать отчёт", day: 5, success: true, trust: 20, intellect: 10, message: "✅ Отчёт готов! Угроза отчисления снята.", explanation: "Отчёт принят. Преподаватель доволен вашим расследованием." }
 };
 
 // Начальные сообщения для Telegram
 const initialTelegramMessages = [
-    { sender: "Преподаватель", text: "Привет, Коля! Ты же на программиста поступил? У нас проблемы с личным кабинетом." },
+    { sender: "Одногруппник Петя", text: "Коля, работа не загрузилась! Почему у меня 2?" },
     { sender: "Классный руководитель", text: "Коля, это ещё что такое?! Почему у тебя 2 за лабораторную работу? Даже файл не отправил!" },
     { sender: "Преподаватель", text: "Студенты жалуются, что не могут сдать работы. Нужно срочно разобраться!" },
     { sender: "Зав. кафедрой", text: "Коля, бери ситуацию под контроль. Если не починишь - будут последствия." }
 ];
 
-// Сообщения по дням
+// Сообщения по дням (каждый день новые)
 const telegramMessagesByDay = {
     1: [
-        { sender: "Преподаватель", text: "Коля, работа не загрузилась! Почему у меня 2?" },
-        { sender: "Одногруппник Петя", text: "Слушай, у меня тоже файлы не отправляются..." }
+        { sender: "Одногруппник Миша", text: "Слушай, у меня тоже файлы вообще не отправляются... Нас отчислят?" },
+        { sender: "Одногруппница Лена", text: "Коля, ты же админ? Почини уже ЛК, а то я не могу лабу сдать!" }
     ],
     2: [
-        { sender: "Преподаватель", text: "Учитель сказал, что поставил 5, но у меня всё ещё 2!" },
-        { sender: "Зав. кафедрой", text: "Коля, срочно почини API оценивания!" }
+        { sender: "Преподаватель", text: "Учитель сказал, что поставил 5, но у меня всё ещё 2! Почини API!" },
+        { sender: "Одногруппник Дима", text: "Коля, оценки не обновляются! Я уже 3 работы отправил, а в дневнике пусто!" },
+        { sender: "Зав. кафедрой", text: "Коля, срочно почини всё это! Звонки от родителей студентов!" }
     ],
     3: [
-        { sender: "Студентка Маша", text: "Коля, я вижу свои прошлогодние оценки!" },
-        { sender: "Преподаватель", text: "Расписание старое! Студенты путаются!" }
+        { sender: "Студентка Маша", text: "Коля, я вижу свои прошлогодние оценки! Это какой-то ужас!" },
+        { sender: "Одногруппник Саша", text: "Коля, расписание старое! Я опоздал на пару из-за этого..." },
+        { sender: "Преподаватель", text: "Коля, студенты путаются в расписании. Срочно разберись с кешем!" }
     ],
     4: [
-        { sender: "Сис. администратор", text: "Коля, сервер стучится в Telegram/YouTube API! Это проверка VPN?" },
-        { sender: "Одногруппница Лена", text: "У меня то загружается файл, то нет... Магия какая-то!" }
+        { sender: "Сис. администратор", text: "Коля, сервер стучится в Telegram/YouTube API! Это проверка VPN? Отключи это!" },
+        { sender: "Одногруппница Лена", text: "Коля, у меня то загружается файл, то нет... Магия какая-то!" },
+        { sender: "Преподаватель", text: "Коля, почему ЛК то работает, то нет? У меня студенты жалуются!" }
     ],
     5: [
-        { sender: "Зам. директора", text: "Завтра последний день. Если не исправишь - отчисление!" },
-        { sender: "Преподаватель", text: "Жду отчёт о причинах сбоев!" }
+        { sender: "Зам. директора", text: "Коля, завтра последний день. Если не исправишь всё - отчисление!" },
+        { sender: "Преподаватель", text: "Коля, жду отчёт о причинах сбоев на столе завтра утром!" },
+        { sender: "Одногруппник Петя", text: "Коля, держись! Мы верим в тебя! Почини этот чёртов ЛК!" }
     ]
 };
 
@@ -143,15 +148,12 @@ function loadGame() {
         try {
             const parsed = JSON.parse(saved);
             gameData = { ...gameData, ...parsed };
+            if (!gameData.terminalHistory) gameData.terminalHistory = [];
+            // Восстанавливаем расписание
             for (let day in scheduleByDay) {
-                const savedDay = localStorage.getItem(`schedule_day_${day}`);
-                if (savedDay) {
-                    const takenLessons = JSON.parse(savedDay);
-                    if (scheduleByDay[day]) {
-                        scheduleByDay[day].forEach(lesson => {
-                            lesson.taken = takenLessons.includes(lesson.name);
-                        });
-                    }
+                for (let lesson of scheduleByDay[day]) {
+                    const savedKey = `marked_${day}_${lesson.name}`;
+                    lesson.taken = localStorage.getItem(savedKey) === 'true';
                 }
             }
         } catch(e) { console.error("Ошибка загрузки", e); }
@@ -164,9 +166,16 @@ function loadGame() {
 // Сохранение
 function saveGame() {
     localStorage.setItem("spbGameSave", JSON.stringify(gameData));
+    // Сохраняем отметки на парах отдельно для каждого дня
     for (let day in scheduleByDay) {
-        const takenLessons = scheduleByDay[day].filter(l => l.taken).map(l => l.name);
-        localStorage.setItem(`schedule_day_${day}`, JSON.stringify(takenLessons));
+        for (let lesson of scheduleByDay[day]) {
+            const savedKey = `marked_${day}_${lesson.name}`;
+            if (lesson.taken) {
+                localStorage.setItem(savedKey, 'true');
+            } else {
+                localStorage.removeItem(savedKey);
+            }
+        }
     }
     updateStatsDisplay();
 }
@@ -245,10 +254,18 @@ function updateTelegramBadge() {
     }
 }
 
-// Проверка доступности Telegram (с учётом VPN)
+// Проверка доступности Telegram (всегда требует VPN после дня 3)
 function isTelegramAvailable() {
     if (gameData.day >= 4 && !gameData.completedDays.includes(4)) {
         return gameData.vpnEnabled;
+    }
+    return gameData.vpnEnabled;
+}
+
+// Проверка доступности ЛК
+function isLKAvailable() {
+    if (gameData.day >= 4 && !gameData.completedDays.includes(4)) {
+        return !gameData.vpnEnabled;
     }
     return true;
 }
@@ -260,12 +277,12 @@ function renderTelegramMessages() {
     
     if (!isTelegramAvailable()) {
         container.innerHTML = `
-            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 40px; text-align: center;">
-                <div style="font-size: 48px; margin-bottom: 20px;">🔒</div>
-                <div style="font-size: 20px; font-weight: bold; color: #e74c3c; margin-bottom: 10px;">403 Forbidden</div>
-                <div style="font-size: 14px; color: #886633;">Доступ к Telegram заблокирован</div>
-                <div style="font-size: 12px; color: #886633; margin-top: 10px;">Для доступа необходимо включить VPN</div>
-                <div style="font-size: 11px; color: #886633;">Откройте приложение VPN Client</div>
+            <div class="telegram-error">
+                <div class="telegram-error-icon">🔒</div>
+                <div class="telegram-error-title">403 Forbidden</div>
+                <div class="telegram-error-text">Доступ к Telegram заблокирован</div>
+                <div class="telegram-error-text" style="margin-top: 10px;">Для доступа необходимо включить VPN</div>
+                <div class="telegram-error-text" style="margin-top: 5px; font-size: 11px;">Откройте приложение VPN Client</div>
             </div>
         `;
         return;
@@ -289,7 +306,7 @@ function renderTelegramMessages() {
     updateTelegramBadge();
 }
 
-// Генерация сообщений по дням
+// Генерация сообщений по дням (каждый день новые)
 function generateTelegramMessages() {
     if (!gameData.hasActiveGame || gameData.telegramMessages.length === 0) {
         setTimeout(() => {
@@ -302,18 +319,23 @@ function generateTelegramMessages() {
     }
     
     const msgs = telegramMessagesByDay[gameData.day];
-    if (msgs && !gameData.completedDays.includes(gameData.day - 1)) {
-        setTimeout(() => {
-            msgs.forEach((msg, index) => {
-                setTimeout(() => {
-                    addTelegramMessage(msg.sender, msg.text);
-                }, index * 3000);
-            });
-        }, 5000);
+    if (msgs) {
+        // Проверяем, не отправляли ли уже сообщения за этот день
+        const todayMessagesKey = `day_${gameData.day}_messages_sent`;
+        if (!localStorage.getItem(todayMessagesKey)) {
+            setTimeout(() => {
+                msgs.forEach((msg, index) => {
+                    setTimeout(() => {
+                        addTelegramMessage(msg.sender, msg.text);
+                    }, index * 3000);
+                });
+                localStorage.setItem(todayMessagesKey, 'true');
+            }, 5000);
+        }
     }
 }
 
-// Уведомления
+// Уведомления (только важные)
 function addNotification(text, type = "thought") {
     const newNotif = {
         id: Date.now(),
@@ -377,7 +399,7 @@ function modifyIntellect(delta) {
 
 // Добавление улики
 function addClue(clue) {
-    if (!gameData.clues.includes(clue)) {
+    if (clue && !gameData.clues.includes(clue)) {
         gameData.clues.push(clue);
         addNotification(`🔍 Улика: ${clue}`, "clue");
         saveGame();
@@ -385,23 +407,39 @@ function addClue(clue) {
 }
 
 // Добавление в журнал ошибок
-function addToErrorLog(action, result, message, day) {
+function addToErrorLog(action, result, message, day, explanation, trustDelta, intellectDelta) {
     gameData.errorLog.unshift({
         id: Date.now(),
         day: day || gameData.day,
         action: action,
         result: result,
         message: message,
-        timestamp: new Date().toLocaleTimeString()
+        explanation: explanation || message,
+        timestamp: new Date().toLocaleTimeString(),
+        trustDelta: trustDelta || 0,
+        intellectDelta: intellectDelta || 0
     });
     saveGame();
 }
 
-// Функция для добавления в терминал (для ответа в admin.html)
+// Функция для добавления в терминал
 function addToTerminalFromGame(text, isError, isSuccess) {
     const adminIframe = document.getElementById('browserIframe');
     if (adminIframe && adminIframe.contentWindow && adminIframe.contentWindow.addToTerminal) {
         adminIframe.contentWindow.addToTerminal(text, isError, isSuccess);
+    }
+    gameData.terminalHistory.push({ text, isError, isSuccess, timestamp: Date.now() });
+    if (gameData.terminalHistory.length > 100) gameData.terminalHistory.shift();
+    saveGame();
+}
+
+// Восстановление истории терминала
+function restoreTerminalHistory() {
+    const adminIframe = document.getElementById('browserIframe');
+    if (adminIframe && adminIframe.contentWindow && adminIframe.contentWindow.addToTerminal && gameData.terminalHistory) {
+        gameData.terminalHistory.forEach(entry => {
+            adminIframe.contentWindow.addToTerminal(entry.text, entry.isError, entry.isSuccess);
+        });
     }
 }
 
@@ -451,54 +489,57 @@ function executeCommand(command) {
     if (cmdData.intellect) modifyIntellect(cmdData.intellect);
     if (cmdData.clue) addClue(cmdData.clue);
     
-    addToErrorLog(command, cmdData.success ? 'исправлена' : 'не исправлена', cmdData.message, cmdData.day);
+    addToErrorLog(command, cmdData.success ? 'исправлена' : 'не исправлена', cmdData.message, cmdData.day, cmdData.explanation, cmdData.trust || 0, cmdData.intellect || 0);
     
     if (cmdData.success) {
         addToTerminalFromGame(`✅ ${cmdData.message}`, false, true);
+        addToTerminalFromGame(`📝 Пояснение: ${cmdData.explanation}`, false, false);
     } else {
         addToTerminalFromGame(`❌ ${cmdData.message}`, true, false);
+        addToTerminalFromGame(`📝 Пояснение: ${cmdData.explanation}`, false, false);
     }
     
-    if (cmdData.success && cmdData.day) {
+    // Если команда успешна и соответствует дню
+    if (cmdData.success && cmdData.day && cmdData.day === gameData.day) {
         if (!gameData.completedDays.includes(cmdData.day)) {
             gameData.completedDays.push(cmdData.day);
-            
-            if (gameData.day < 5) {
-                gameData.day++;
-                saveGame();
-                updateStatsDisplay();
-                addNotification(`📅 День ${gameData.day} начался!`, "info");
-                generateTelegramMessages();
-                addToTerminalFromGame(`📅 НОВЫЙ ДЕНЬ! Теперь день ${gameData.day}. Введите "help" для новых команд.`, false, false);
-                
-                // Обновляем кнопки в админке
-                const adminIframe = document.getElementById('browserIframe');
-                if (adminIframe && adminIframe.contentWindow && adminIframe.contentWindow.updateCommandButtons) {
-                    setTimeout(() => {
-                        adminIframe.contentWindow.updateCommandButtons();
-                    }, 100);
-                }
-            } else if (gameData.day === 5 && cmd === "report.generate") {
-                gameData.day = 6;
-                saveGame();
-                showFinalChoice();
-            }
+            saveGame();
+            addToTerminalFromGame(`📅 День ${gameData.day} решён! Выключите компьютер и нажмите "Продолжить игру".`, false, false);
+            addNotification(`✅ День ${gameData.day} решён! Выключите компьютер и нажмите "Продолжить игру".`, "success");
         }
     }
 }
 
+// Переход на следующий день (вызывается при продолжении игры)
+function advanceToNextDay() {
+    if (gameData.completedDays.includes(gameData.day) && gameData.day < 5) {
+        gameData.day++;
+        saveGame();
+        addNotification(`📅 День ${gameData.day} начался! Решите новую проблему.`, "info");
+        generateTelegramMessages();
+        
+        // Обновляем расписание в user.html
+        const iframe = document.getElementById('browserIframe');
+        if (iframe && iframe.contentWindow) {
+            iframe.contentWindow.postMessage({ type: 'updateSchedule' }, '*');
+        }
+        return true;
+    }
+    return false;
+}
+
 // Отметка на паре
 function markAttendance(lessonName, reward) {
-    const todaySchedule = scheduleByDay[gameData.day];
-    if (!todaySchedule) return false;
+    const gameData = getGameData();
+    const currentDay = gameData?.day || 1;
+    const savedKey = `marked_${currentDay}_${lessonName}`;
     
-    const lesson = todaySchedule.find(l => l.name === lessonName);
-    if (!lesson || lesson.taken) {
+    if (localStorage.getItem(savedKey)) {
         addNotification("❌ Вы уже отметились на этой паре!", "alert");
         return false;
     }
     
-    lesson.taken = true;
+    localStorage.setItem(savedKey, 'true');
     modifyIntellect(reward);
     addNotification(`✅ Отмечено на "${lessonName}"! +${reward} интеллекта`, "success");
     saveGame();
@@ -584,16 +625,26 @@ function powerOnDesktop() {
         desktopElem.style.display = 'block';
         updateStatsDisplay();
         
+        setTimeout(() => {
+            restoreTerminalHistory();
+        }, 500);
+        
         if (!gameData.hasActiveGame) {
             gameData.hasActiveGame = true;
             initSchedule();
             saveGame();
-            addNotification("👋 Ты — Коля, первокурсник и админ.", "character");
-            addNotification("📁 Открой Браузер → Панель администратора → Терминал", "system");
-            addNotification("💡 Введи 'help' в терминале для списка команд", "system");
+            addNotification("👋 Привет! Впервые тут? Открой файл 'Инструкция', расположенный на рабочем столе.", "character");
             generateTelegramMessages();
         } else {
-            addNotification(`📅 День ${gameData.day}. Продолжаем расследование!`, "character");
+            // Проверяем, нужно ли перейти на следующий день
+            if (gameData.completedDays.includes(gameData.day) && gameData.day < 5) {
+                advanceToNextDay();
+            } else if (gameData.day === 5 && gameData.completedDays.includes(5)) {
+                showFinalChoice();
+            } else {
+                addNotification(`📅 День ${gameData.day}. Продолжаем расследование!`, "character");
+                generateTelegramMessages();
+            }
         }
     }
 }
@@ -615,9 +666,20 @@ function resetProgress() {
             lastAction: null,
             rebootCount: 0,
             vpnEnabled: false,
-            deepseekUnlocked: false
+            deepseekUnlocked: false,
+            terminalHistory: []
         };
         initSchedule();
+        // Очищаем отметки на парах
+        for (let day in scheduleByDay) {
+            for (let lesson of scheduleByDay[day]) {
+                localStorage.removeItem(`marked_${day}_${lesson.name}`);
+            }
+        }
+        // Очищаем отметки о отправленных сообщениях
+        for (let i = 1; i <= 6; i++) {
+            localStorage.removeItem(`day_${i}_messages_sent`);
+        }
         saveGame();
         addNotification("🔄 Прогресс сброшен.", "system");
         
@@ -726,7 +788,8 @@ function openApp(appName) {
     const apps = {
         'deepseek': document.getElementById('deepseekChat'),
         'telegram': document.getElementById('telegramChat'),
-        'vpn': document.getElementById('vpnApp')
+        'vpn': document.getElementById('vpnApp'),
+        'notepad': document.getElementById('notepadApp')
     };
     
     const app = apps[appName];
@@ -761,6 +824,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const deepseek = document.getElementById('deepseekChat');
     const telegram = document.getElementById('telegramChat');
     const vpn = document.getElementById('vpnApp');
+    const notepad = document.getElementById('notepadApp');
     
     if (deepseek && deepseek.querySelector('.deepseek-header')) {
         makeDraggable(deepseek, deepseek.querySelector('.deepseek-header'));
@@ -770,6 +834,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (vpn && vpn.querySelector('.vpn-header')) {
         makeDraggable(vpn, vpn.querySelector('.vpn-header'));
+    }
+    if (notepad && notepad.querySelector('.notepad-header')) {
+        makeDraggable(notepad, notepad.querySelector('.notepad-header'));
     }
     
     // Кнопки главного меню
@@ -789,7 +856,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     document.getElementById('resetBtn')?.addEventListener('click', resetProgress);
-    document.getElementById('shutdownBtn')?.addEventListener('click', shutdownComputer);
     
     // Панель задач
     document.querySelector('.start-button')?.addEventListener('click', (e) => {
@@ -812,20 +878,28 @@ document.addEventListener('DOMContentLoaded', () => {
         if (iframe && (!iframe.src || iframe.src === 'about:blank')) {
             iframe.src = 'user.html';
         }
+        setTimeout(() => {
+            restoreTerminalHistory();
+        }, 500);
     });
     
     document.getElementById('deepseekIcon')?.addEventListener('click', () => openApp('deepseek'));
     document.getElementById('telegramIcon')?.addEventListener('click', () => openApp('telegram'));
     document.getElementById('vpnIcon')?.addEventListener('click', () => openApp('vpn'));
+    document.getElementById('notepadIcon')?.addEventListener('click', () => openApp('notepad'));
     
     // Панель задач - иконки
     document.querySelector('.taskbar-app-icon[data-app="browser"]')?.addEventListener('click', () => {
         browserModal?.classList.add('active');
+        setTimeout(() => {
+            restoreTerminalHistory();
+        }, 500);
     });
     
     document.getElementById('deepseekTaskbarIcon')?.addEventListener('click', () => openApp('deepseek'));
     document.getElementById('telegramTaskbarIcon')?.addEventListener('click', () => openApp('telegram'));
     document.getElementById('vpnTaskbarIcon')?.addEventListener('click', () => openApp('vpn'));
+    document.getElementById('notepadTaskbarIcon')?.addEventListener('click', () => openApp('notepad'));
     
     // Кнопки закрытия
     document.querySelector('.deepseek-close')?.addEventListener('click', () => {
@@ -838,6 +912,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.querySelector('.vpn-close')?.addEventListener('click', () => {
         document.getElementById('vpnApp').style.display = 'none';
+    });
+    
+    document.querySelector('.notepad-close')?.addEventListener('click', () => {
+        document.getElementById('notepadApp').style.display = 'none';
     });
     
     document.getElementById('vpnToggleBtn')?.addEventListener('click', toggleVPN);
@@ -864,6 +942,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (iframe) iframe.src = page;
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
+                if (page === 'admin.html') {
+                    setTimeout(() => {
+                        restoreTerminalHistory();
+                    }, 500);
+                }
             }
         });
     });
@@ -877,6 +960,9 @@ document.addEventListener('DOMContentLoaded', () => {
         startBrowserBtn.addEventListener('click', () => {
             startMenu?.classList.remove('active');
             browserModal?.classList.add('active');
+            setTimeout(() => {
+                restoreTerminalHistory();
+            }, 500);
         });
     }
     
@@ -893,6 +979,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('startVpnBtn')?.addEventListener('click', () => {
         startMenu?.classList.remove('active');
         openApp('vpn');
+    });
+    
+    document.getElementById('startNotepadBtn')?.addEventListener('click', () => {
+        startMenu?.classList.remove('active');
+        openApp('notepad');
     });
     
     // Закрытие меню при клике вне
@@ -920,6 +1011,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (gameData.hasActiveGame && desktop) {
         desktop.style.display = 'block';
+        setTimeout(() => {
+            restoreTerminalHistory();
+        }, 1000);
     }
 });
 
@@ -936,7 +1030,9 @@ window.shutdownComputer = shutdownComputer;
 window.getTodaySchedule = () => scheduleByDay[gameData.day];
 window.toggleVPN = toggleVPN;
 window.isTelegramAvailable = isTelegramAvailable;
+window.isLKAvailable = isLKAvailable;
 window.renderTelegramMessages = renderTelegramMessages;
 window.addToTerminalFromGame = addToTerminalFromGame;
+window.advanceToNextDay = advanceToNextDay;
 
 console.log("Game.js loaded, executeCommand exported");

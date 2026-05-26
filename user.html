@@ -120,27 +120,24 @@
             font-family: 'Courier New', monospace;
             clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
             box-shadow: inset -2px -2px 0 #aa7733, inset 2px 2px 0 #ffeedd;
+            transition: all 0.1s ease;
         }
         
-        .mark-btn:hover {
+        .mark-btn:hover:not(:disabled) {
             background: #ffcc66;
             transform: scale(1.02);
         }
         
-        .mark-btn:active {
+        .mark-btn:active:not(:disabled) {
             box-shadow: inset -2px -2px 0 #ffeedd, inset 2px 2px 0 #aa7733;
-        }
-        
-        .mark-btn:disabled {
-            background: #ccaa66;
-            cursor: not-allowed;
-            transform: none;
         }
         
         .mark-btn.marked {
             background: #27ae60;
             color: white;
             box-shadow: inset -2px -2px 0 #1a6e3a, inset 2px 2px 0 #6ecc8e;
+            cursor: default;
+            pointer-events: none;
         }
         
         .message-area {
@@ -188,50 +185,55 @@
             clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
             box-shadow: inset -2px -2px 0 #aa7733, inset 2px 2px 0 #ffeedd;
         }
+        
+        .error-403 {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            text-align: center;
+            background: #fff0e0;
+            border: 4px solid #ffaa44;
+            clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
+            padding: 40px;
+        }
+        
+        .error-403-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        .error-403-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 10px;
+        }
+        
+        .error-403-text {
+            font-size: 14px;
+            color: #886633;
+        }
+        
+        @keyframes btnPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .mark-btn.marked {
+            animation: btnPulse 0.3s ease;
+        }
     </style>
 </head>
 <body>
-    <!-- содержимое остаётся ТОЧНО ТАКИМ ЖЕ как у тебя было, только стили поменялись -->
-    <div class="diary-container">
-        <div class="warning-banner" id="warningBanner">
-            ⚠️ ВНИМАНИЕ! Обнаружены проблемы с загрузкой файлов!
-        </div>
-        
-        <h2>Дневник успеваемости</h2>
-        <table class="grades-table">
-            <thead>
-                <tr><th>Предмет</th><th>Оценка</th><th>Статус</th></tr>
-            </thead>
-            <tbody>
-                <tr><td>Математика</td><td>4</td><td>✅</td></tr>
-                <tr><td>Программирование</td><td>5</td><td>✅</td></tr>
-                <tr><td>Базы данных</td><td>4</td><td>✅</td></tr>
-                <tr id="lastWorkRow"><td>Курсовая работа</td><td id="lastWorkGrade">2</td><td id="lastWorkStatus">⏳ Проверяется</td></tr>
-            </tbody>
-        </table>
-        
-        <div class="schedule-section">
-            <div class="schedule-title">📅 Расписание на сегодня</div>
-            <div id="scheduleList"></div>
-            <div class="intellect-tip" id="intellectTip">
-                💡 Посещай пары, чтобы повышать интеллект! Интеллект открывает доступ к подсказкам DeepSeek.
-            </div>
-        </div>
-        
-        <div class="message-area">
-            <h3>💬 Сообщения</h3>
-            <div class="system-message" id="sentFilesMessage">
-                📁 Отправленные файлы: <span id="filesStatus">загрузка...</span>
-            </div>
-            <div class="system-message" id="teacherMessage">
-                💬 Сообщение от преподавателя: <span id="teacherMessageText">—</span>
-            </div>
-        </div>
-    </div>
+    <div class="diary-container" id="diaryContainer"></div>
     
     <script>
-        // весь твой оригинальный JS остаётся БЕЗ ИЗМЕНЕНИЙ
-        let markedLessons = [];
+        // Глобальные переменные
+        let currentDay = 1;
+        let buttonHandlersAttached = false;
         
         function getGameData() {
             return window.parent.getGameData ? window.parent.getGameData() : null;
@@ -249,25 +251,33 @@
             }
         }
         
-        function markAttendance(lessonName, reward) {
-            if (markedLessons.includes(lessonName)) return;
-            
-            markedLessons.push(lessonName);
-            localStorage.setItem('markedLessons', JSON.stringify(markedLessons));
-            
+        function updateParentStats() {
+            if (window.parent.updateStatsDisplay) {
+                window.parent.updateStatsDisplay();
+            }
+        }
+        
+        function modifyIntellectLocally(delta) {
             const gameData = getGameData();
             if (gameData) {
-                gameData.intellect = (gameData.intellect || 0) + reward;
+                gameData.intellect = (gameData.intellect || 0) + delta;
                 updateGameData(gameData);
+                updateParentStats();
             }
-            
-            showBubble(`✅ Отмечено на "${lessonName}"! +${reward} интеллекта`, 'character');
-            updateScheduleUI();
+        }
+        
+        function isLKAccessible() {
+            const gameData = getGameData();
+            if (gameData && gameData.day >= 4 && !gameData.completedDays?.includes(4)) {
+                return !gameData.vpnEnabled;
+            }
+            return true;
         }
         
         function getTodaySchedule() {
             const gameData = getGameData();
             const day = gameData?.day || 1;
+            currentDay = day;
             
             const schedules = {
                 1: [
@@ -301,70 +311,123 @@
             return schedules[day] || schedules[1];
         }
         
-        function updateScheduleUI() {
+        function isLessonMarked(lessonName) {
+            const savedKey = `marked_${currentDay}_${lessonName}`;
+            return localStorage.getItem(savedKey) === 'true';
+        }
+        
+        function markAttendance(lessonName, reward, buttonElement) {
+            const savedKey = `marked_${currentDay}_${lessonName}`;
+            
+            if (localStorage.getItem(savedKey) === 'true') {
+                showBubble("❌ Вы уже отметились на этой паре!", "system");
+                return false;
+            }
+            
+            // Сохраняем отметку
+            localStorage.setItem(savedKey, 'true');
+            
+            // Меняем кнопку
+            if (buttonElement) {
+                buttonElement.textContent = '✓ Отмечено';
+                buttonElement.classList.add('marked');
+                buttonElement.disabled = true;
+            }
+            
+            modifyIntellectLocally(reward);
+            showBubble(`✅ Отмечено на "${lessonName}"! +${reward} интеллекта`, 'character');
+            
+            return true;
+        }
+        
+        // Создание расписания с привязкой обработчиков (вызывается 1 раз)
+        function buildSchedule() {
             const container = document.getElementById('scheduleList');
             if (!container) return;
             
-            const savedMarked = localStorage.getItem('markedLessons');
-            if (savedMarked) markedLessons = JSON.parse(savedMarked);
-            
             const schedule = getTodaySchedule();
             
-            if (schedule.length === 0) {
+            if (!schedule || schedule.length === 0) {
                 container.innerHTML = '<p>Сегодня пар нет. Отдохни или займись расследованием!</p>';
                 return;
             }
             
-            container.innerHTML = schedule.map(lesson => `
-                <div class="schedule-item">
-                    <div class="schedule-info">
-                        <span class="schedule-name">📖 ${lesson.name}</span>
-                        <span class="schedule-time">🕐 ${lesson.time}</span>
-                        <span class="schedule-time">✨ +${lesson.reward} интеллекта</span>
+            let html = '';
+            for (let lesson of schedule) {
+                const isMarked = isLessonMarked(lesson.name);
+                html += `
+                    <div class="schedule-item">
+                        <div class="schedule-info">
+                            <span class="schedule-name">📖 ${lesson.name}</span>
+                            <span class="schedule-time">🕐 ${lesson.time}</span>
+                            <span class="schedule-time">✨ +${lesson.reward} интеллекта</span>
+                        </div>
+                        <button class="mark-btn ${isMarked ? 'marked' : ''}" 
+                                data-lesson="${lesson.name}"
+                                data-reward="${lesson.reward}"
+                                ${isMarked ? 'disabled' : ''}>
+                            ${isMarked ? '✓ Отмечено' : '✎ Отметиться'}
+                        </button>
                     </div>
-                    <button class="mark-btn ${markedLessons.includes(lesson.name) ? 'marked' : ''}" 
-                            onclick="markAttendance('${lesson.name}', ${lesson.reward})"
-                            ${markedLessons.includes(lesson.name) ? 'disabled' : ''}>
-                        ${markedLessons.includes(lesson.name) ? '✓ Отмечено' : '✎ Отметиться'}
-                    </button>
-                </div>
-            `).join('');
+                `;
+            }
+            
+            container.innerHTML = html;
+            
+            // Привязываем обработчики к НЕотмеченным кнопкам
+            const buttons = container.querySelectorAll('.mark-btn:not(.marked)');
+            buttons.forEach(btn => {
+                const lessonName = btn.dataset.lesson;
+                const reward = parseInt(btn.dataset.reward);
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    markAttendance(lessonName, reward, this);
+                });
+            });
         }
         
-        function updateUI() {
+        // Обновление состояния кнопок без пересоздания
+        function updateButtonsState() {
+            const buttons = document.querySelectorAll('.mark-btn');
+            buttons.forEach(btn => {
+                const lessonName = btn.dataset.lesson;
+                if (lessonName && isLessonMarked(lessonName) && !btn.classList.contains('marked')) {
+                    btn.textContent = '✓ Отмечено';
+                    btn.classList.add('marked');
+                    btn.disabled = true;
+                }
+            });
+        }
+        
+        // Обновление только текстовых данных
+        function updateUIData() {
             const gameData = getGameData();
             if (!gameData) return;
             
             const gradeSpan = document.getElementById('lastWorkGrade');
             const filesStatus = document.getElementById('filesStatus');
             const warningBanner = document.getElementById('warningBanner');
-            const teacherMessageSpan = document.getElementById('teacherMessageText');
             
             if (gameData.day === 1 && !gameData.completedDays?.includes(1)) {
                 if (gradeSpan) gradeSpan.textContent = '2';
                 if (filesStatus) filesStatus.textContent = 'пусто (ошибка загрузки)';
                 if (warningBanner) warningBanner.innerHTML = '⚠️ ОШИБКА: Файл не найден в очереди загрузки!';
-                if (teacherMessageSpan) teacherMessageSpan.innerHTML = 'Коля, работа не загрузилась! Почему у меня 2?';
             } else if (gameData.day >= 2 && gameData.completedDays?.includes(1)) {
                 if (gradeSpan) gradeSpan.innerHTML = '2 <span style="font-size:10px">(ожидает API)</span>';
                 if (filesStatus) filesStatus.innerHTML = '✅ Курсовая_работа.pdf (отправлено)';
                 if (warningBanner) warningBanner.innerHTML = '⚠️ API ОЦЕНИВАНИЯ НЕ ОТВЕЧАЕТ (502)';
-                if (teacherMessageSpan) teacherMessageSpan.innerHTML = 'Учитель поставил 5, но в дневнике всё ещё 2!';
             }
             
             if (gameData.day >= 3 && gameData.completedDays?.includes(2)) {
                 if (warningBanner) warningBanner.innerHTML = '⚠️ КЕШ НЕ СИНХРОНИЗИРОВАН! Данные устарели.';
-                if (teacherMessageSpan) teacherMessageSpan.innerHTML = 'Вижу старые оценки! Где моё текущее расписание?';
             }
             
             if (gameData.day >= 4 && gameData.completedDays?.includes(3)) {
                 if (warningBanner) warningBanner.innerHTML = '⚠️ ОБНАРУЖЕНЫ ПОДОЗРИТЕЛЬНЫЕ ЗАПРОСЫ К API!';
-                if (teacherMessageSpan) teacherMessageSpan.innerHTML = 'Странно, иногда файлы загружаются, иногда нет...';
             }
             
             if (gameData.day >= 5 && gameData.completedDays?.includes(4)) {
                 if (warningBanner) warningBanner.innerHTML = '🔴 КРИТИЧЕСКОЕ ПРЕДУПРЕЖДЕНИЕ! До отчисления 1 день!';
-                if (teacherMessageSpan) teacherMessageSpan.innerHTML = 'Если завтра не будет отчёта о причинах сбоев — отчисление!';
             }
             
             if (gameData.day >= 6) {
@@ -379,46 +442,89 @@
             }
         }
         
-        function init() {
-            updateScheduleUI();
-            updateUI();
+        // Полная перерисовка (при смене дня или VPN)
+        let lastDay = 1;
+        function fullRender() {
+            const container = document.getElementById('diaryContainer');
+            if (!container) return;
             
-            setInterval(() => {
-                updateUI();
-                updateScheduleUI();
-            }, 2000);
+            if (!isLKAccessible()) {
+                container.innerHTML = `
+                    <div class="error-403">
+                        <div class="error-403-icon">🔒</div>
+                        <div class="error-403-title">403 Forbidden</div>
+                        <div class="error-403-text">Доступ к Личному кабинету заблокирован</div>
+                        <div class="error-403-text" style="margin-top: 10px;">Для доступа необходимо выключить VPN</div>
+                        <div class="error-403-text" style="margin-top: 5px; font-size: 11px;">Откройте приложение VPN Client и отключите VPN</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="warning-banner" id="warningBanner">
+                    ⚠️ ВНИМАНИЕ! Обнаружены проблемы с загрузкой файлов!
+                </div>
+                
+                <h2>Дневник успеваемости</h2>
+                <table class="grades-table">
+                    <thead>
+                        <tr><th>Предмет</th><th>Оценка</th><th>Статус</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Математика</td><td>4</td><td>✅</td></tr>
+                        <tr><td>Программирование</td><td>5</td><td>✅</td></tr>
+                        <tr><td>Базы данных</td><td>4</td><td>✅</td></tr>
+                        <tr id="lastWorkRow"><td>Курсовая работа</td><td id="lastWorkGrade">2</td><td id="lastWorkStatus">⏳ Проверяется</td></tr>
+                    </tbody>
+                </table>
+                
+                <div class="schedule-section">
+                    <div class="schedule-title">📅 Расписание на сегодня</div>
+                    <div id="scheduleList"></div>
+                    <div class="intellect-tip" id="intellectTip">
+                        💡 Посещай пары, чтобы повышать интеллект! Интеллект открывает доступ к подсказкам DeepSeek.
+                    </div>
+                </div>
+                
+                <div class="message-area">
+                    <h3>💬 Сообщения</h3>
+                    <div class="system-message" id="sentFilesMessage">
+                        📁 Отправленные файлы: <span id="filesStatus">загрузка...</span>
+                    </div>
+                </div>
+            `;
+            
+            buildSchedule();
+            updateUIData();
+        }
+        
+        function checkAndUpdate() {
+            const gameData = getGameData();
+            if (gameData && gameData.day !== lastDay) {
+                lastDay = gameData.day;
+                fullRender();
+            } else {
+                // Обновляем только состояние кнопок и текстовые данные
+                updateButtonsState();
+                updateUIData();
+            }
+        }
+        
+        function init() {
+            const gameData = getGameData();
+            if (gameData) lastDay = gameData.day;
+            fullRender();
+            
+            setInterval(checkAndUpdate, 500);
             
             window.addEventListener('message', (e) => {
-                if (e.data.type === 'updateSchedule') {
-                    updateScheduleUI();
+                if (e.data.type === 'updateSchedule' || e.data.type === 'vpnToggle') {
+                    fullRender();
                 }
             });
         }
-window.addEventListener('message', (e) => {
-    if (e.data.type === 'updateSchedule') {
-        updateScheduleUI();
-    }
-    if (e.data.type === 'vpnToggle') {
-        const gameData = getGameData();
-        if (gameData && gameData.day >= 4 && !gameData.completedDays?.includes(4)) {
-            if (e.data.enabled) {
-                showBubble("🌐 VPN включён. Личный кабинет может быть недоступен!", "system");
-                // Здесь можно показать ошибку 403
-            } else {
-                showBubble("🌐 VPN выключен. Личный кабинет работает.", "system");
-            }
-        }
-    }
-});
-
-// Функция для проверки доступности ЛК
-function isLKAccessible() {
-    const gameData = getGameData();
-    if (gameData && gameData.day >= 4 && !gameData.completedDays?.includes(4)) {
-        return !gameData.vpnEnabled;
-    }
-    return true;
-}
+        
         init();
     </script>
 </body>

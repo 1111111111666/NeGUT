@@ -16,19 +16,6 @@
             margin: 0 auto;
         }
         
-        .clue-card {
-            background: #ffffee;
-            border: 4px solid #ffaa44;
-            padding: 15px;
-            margin: 10px 0;
-            clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
-        }
-        
-        .clue-card h4 {
-            color: #442200;
-            margin-bottom: 8px;
-        }
-        
         .timeline {
             background: #ffaa44;
             color: #442200;
@@ -93,6 +80,69 @@
             margin-bottom: 15px;
             clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
         }
+        
+        /* Объединённая карточка для записей */
+        .log-card {
+            background: #ffffee;
+            border: 4px solid #ffaa44;
+            padding: 15px;
+            margin: 10px 0;
+            clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
+        }
+        
+        .log-card h4 {
+            color: #442200;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .log-card .result-badge {
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        
+        .log-card .result-badge.success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .log-card .result-badge.failure {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .log-card .result-badge.clue {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .log-card .command {
+            font-family: monospace;
+            background: #ffeedd;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+        
+        .log-card .explanation {
+            margin-top: 10px;
+            padding: 8px;
+            background: #fff8e8;
+            border-left: 3px solid #ffaa44;
+            font-size: 12px;
+            color: #664400;
+        }
+        
+        .log-card .stats-delta {
+            font-size: 11px;
+            color: #886633;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -108,12 +158,9 @@
             <div id="timelineContent"></div>
         </div>
         
-        <h3>🔍 Собранные улики</h3>
-        <div id="cluesList"></div>
-        
         <hr>
         
-        <h3>⚠️ Журнал ошибок системы</h3>
+        <h3>🔍 Журнал ошибок и улики</h3>
         <div id="errorLogList"></div>
         
         <button id="prepareReportBtn" class="report-btn">📄 Подготовить отчёт для преподавателя</button>
@@ -141,30 +188,15 @@
             const statsDiv = document.getElementById('statsBadge');
             if (!statsDiv || !gameData) return;
             
+            const successCount = gameData.errorLog.filter(e => e.result === 'исправлена').length;
+            const clueCount = gameData.clues?.length || 0;
+            
             statsDiv.innerHTML = `
                 📊 ТЕКУЩАЯ СТАТИСТИКА:<br>
                 ❤️ Доверие: ${gameData.trust}% | 🧠 Интеллект: ${gameData.intellect}<br>
-                📅 Текущий день: ${gameData.day} | ✅ Решено дней: ${gameData.completedDays?.length || 0}/5
+                📅 Текущий день: ${gameData.day} | ✅ Решено дней: ${gameData.completedDays?.length || 0}/5<br>
+                🔍 Улик собрано: ${clueCount} | ✅ Успешных действий: ${successCount}
             `;
-        }
-        
-        function renderClues() {
-            const gameData = getGameData();
-            const cluesDiv = document.getElementById('cluesList');
-            if (!cluesDiv) return;
-            
-            const clues = gameData?.clues || [];
-            if (clues.length === 0) {
-                cluesDiv.innerHTML = '<div class="clue-card"><p>🔍 Пока нет собранных улик. Используйте терминал в панели администратора.</p></div>';
-                return;
-            }
-            
-            cluesDiv.innerHTML = clues.map(clue => `
-                <div class="clue-card">
-                    <h4>🔍 Улика</h4>
-                    <p>${clue}</p>
-                </div>
-            `).join('');
         }
         
         function renderTimeline() {
@@ -197,19 +229,60 @@
             if (!logDiv) return;
             
             const errors = gameData?.errorLog || [];
-            if (errors.length === 0) {
-                logDiv.innerHTML = '<div class="clue-card"><p>Журнал ошибок пуст. Выполните команды в терминале.</p></div>';
+            const clues = gameData?.clues || [];
+            
+            if (errors.length === 0 && clues.length === 0) {
+                logDiv.innerHTML = '<div class="log-card"><p>Журнал ошибок пуст. Выполните команды в терминале.</p></div>';
                 return;
             }
             
-            logDiv.innerHTML = errors.slice(0, 20).map(err => `
-                <div class="clue-card">
-                    <h4>⚠️ [День ${err.day}] ${err.timestamp || ''}</h4>
-                    <p>📌 Команда: ${err.action}</p>
-                    <p>📊 Результат: ${err.result === 'исправлена' ? '✅ ' + err.result : '❌ ' + err.result}</p>
-                    <p>💬 ${err.message}</p>
-                </div>
-            `).join('');
+            // Сначала показываем ошибки/действия, потом улики
+            let html = '';
+            
+            // Показываем действия из журнала ошибок
+            errors.slice(0, 20).forEach(err => {
+                const resultClass = err.result === 'исправлена' ? 'success' : (err.result === 'не исправлена' ? 'failure' : 'clue');
+                const resultText = err.result === 'исправлена' ? '✅ ' + err.result : (err.result === 'не исправлена' ? '❌ ' + err.result : '🔍 ' + err.result);
+                
+                html += `
+                    <div class="log-card">
+                        <h4>
+                            ⚠️ [День ${err.day}] ${err.timestamp || ''}
+                            <span class="result-badge ${resultClass}">${resultText}</span>
+                        </h4>
+                        <div class="command">📌 Команда: ${err.action}</div>
+                        <p>💬 ${err.message}</p>
+                        <div class="explanation">
+                            📝 <strong>Почему так произошло?</strong><br>${err.explanation || 'Нет дополнительного объяснения.'}
+                        </div>
+                        <div class="stats-delta">
+                            ${err.trustDelta !== 0 ? (err.trustDelta > 0 ? `❤️ Доверие +${err.trustDelta}` : `❤️ Доверие ${err.trustDelta}`) : ''}
+                            ${err.intellectDelta !== 0 ? (err.intellectDelta > 0 ? ` | 🧠 Интеллект +${err.intellectDelta}` : ` | 🧠 Интеллект ${err.intellectDelta}`) : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Показываем отдельно собранные улики
+            if (clues.length > 0) {
+                html += `<h3 style="margin-top: 20px;">🔍 Собранные улики</h3>`;
+                clues.forEach(clue => {
+                    html += `
+                        <div class="log-card">
+                            <h4>
+                                🔍 Улика
+                                <span class="result-badge clue">НАЙДЕНО</span>
+                            </h4>
+                            <p>${clue}</p>
+                            <div class="explanation">
+                                💡 Эта улика поможет в финальном расследовании!
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            logDiv.innerHTML = html;
         }
         
         function prepareReport() {
@@ -239,7 +312,6 @@
         
         function init() {
             renderStats();
-            renderClues();
             renderTimeline();
             renderErrorLog();
             
@@ -250,7 +322,6 @@
             
             setInterval(() => {
                 renderStats();
-                renderClues();
                 renderTimeline();
                 renderErrorLog();
             }, 2000);
