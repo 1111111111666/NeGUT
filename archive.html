@@ -17,7 +17,6 @@
         }
         
         .timeline {
-            background: #ffaa44;
             color: #442200;
             padding: 15px;
             margin: 20px 0;
@@ -81,7 +80,6 @@
             clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
         }
         
-        /* Объединённая карточка для записей */
         .log-card {
             background: #ffffee;
             border: 4px solid #ffaa44;
@@ -147,10 +145,10 @@
 </head>
 <body>
     <div class="archive-container">
-        <h2>📚 Архив данных / Хранилище ошибок</h2>
+        <h2>Архив данных / Хранилище ошибок</h2>
         
         <div class="stats-badge" id="statsBadge">
-            <!-- Статистика будет здесь -->
+            <!-- здесь будет cтатистика -->
         </div>
         
         <div class="timeline">
@@ -192,10 +190,10 @@
             const clueCount = gameData.clues?.length || 0;
             
             statsDiv.innerHTML = `
-                📊 ТЕКУЩАЯ СТАТИСТИКА:<br>
-                ❤️ Доверие: ${gameData.trust}% | 🧠 Интеллект: ${gameData.intellect}<br>
-                📅 Текущий день: ${gameData.day} | ✅ Решено дней: ${gameData.completedDays?.length || 0}/5<br>
-                🔍 Улик собрано: ${clueCount} | ✅ Успешных действий: ${successCount}
+                <strong>ТЕКУЩАЯ СТАТИСТИКА:</strong><br>
+                ♥ Доверие: ${gameData.trust}% | ★ Интеллект: ${gameData.intellect}<br>
+                📅 Текущий день: ${gameData.day} | Решено дней: ${gameData.completedDays?.length || 0}/5<br>
+                🔍 Улик собрано: ${clueCount} | Успешных действий: ${successCount}
             `;
         }
         
@@ -206,11 +204,11 @@
             
             const completedDays = gameData?.completedDays || [];
             const dayNames = {
-                1: '📁 День 1: Пропажа отправленного файла',
-                2: '🔌 День 2: API оценивания не работает',
-                3: '💾 День 3: Интерфейс показывает старые данные',
-                4: '🌐 День 4: Проверка VPN через API',
-                5: '📋 День 5: Угроза отчисления'
+                1: 'День 1: Пропажа отправленного файла',
+                2: 'День 2: API оценивания не работает',
+                3: 'День 3: Интерфейс показывает старые данные',
+                4: 'День 4: Проверка VPN через API',
+                5: 'День 5: Угроза отчисления'
             };
             
             const allDays = [1, 2, 3, 4, 5];
@@ -236,10 +234,8 @@
                 return;
             }
             
-            // Сначала показываем ошибки/действия, потом улики
             let html = '';
             
-            // Показываем действия из журнала ошибок
             errors.slice(0, 20).forEach(err => {
                 const resultClass = err.result === 'исправлена' ? 'success' : (err.result === 'не исправлена' ? 'failure' : 'clue');
                 const resultText = err.result === 'исправлена' ? '✅ ' + err.result : (err.result === 'не исправлена' ? '❌ ' + err.result : '🔍 ' + err.result);
@@ -247,30 +243,29 @@
                 html += `
                     <div class="log-card">
                         <h4>
-                            ⚠️ [День ${err.day}] ${err.timestamp || ''}
+                            [День ${err.day}] ${err.timestamp || ''}
                             <span class="result-badge ${resultClass}">${resultText}</span>
                         </h4>
                         <div class="command">📌 Команда: ${err.action}</div>
-                        <p>💬 ${err.message}</p>
+                        <p>${err.message}</p>
                         <div class="explanation">
-                            📝 <strong>Почему так произошло?</strong><br>${err.explanation || 'Нет дополнительного объяснения.'}
+                            <strong>Почему так произошло?</strong><br>${err.explanation || 'Нет дополнительного объяснения.'}
                         </div>
                         <div class="stats-delta">
-                            ${err.trustDelta !== 0 ? (err.trustDelta > 0 ? `❤️ Доверие +${err.trustDelta}` : `❤️ Доверие ${err.trustDelta}`) : ''}
-                            ${err.intellectDelta !== 0 ? (err.intellectDelta > 0 ? ` | 🧠 Интеллект +${err.intellectDelta}` : ` | 🧠 Интеллект ${err.intellectDelta}`) : ''}
+                            ${err.trustDelta !== 0 ? (err.trustDelta > 0 ? `♥ Доверие +${err.trustDelta}` : `♥ Доверие ${err.trustDelta}`) : ''}
+                            ${err.intellectDelta !== 0 ? (err.intellectDelta > 0 ? ` | ★ Интеллект +${err.intellectDelta}` : ` | ★ Интеллект ${err.intellectDelta}`) : ''}
                         </div>
                     </div>
                 `;
             });
             
-            // Показываем отдельно собранные улики
             if (clues.length > 0) {
                 html += `<h3 style="margin-top: 20px;">🔍 Собранные улики</h3>`;
                 clues.forEach(clue => {
                     html += `
                         <div class="log-card">
                             <h4>
-                                🔍 Улика
+                                Улика
                                 <span class="result-badge clue">НАЙДЕНО</span>
                             </h4>
                             <p>${clue}</p>
@@ -304,7 +299,6 @@
                 return;
             }
             
-            // Выполняем команду report.generate
             if (window.parent.executeCommand) {
                 window.parent.executeCommand('report.generate');
             }

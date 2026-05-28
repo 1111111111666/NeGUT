@@ -324,10 +324,8 @@
                 return false;
             }
             
-            // Сохраняем отметку
             localStorage.setItem(savedKey, 'true');
             
-            // Меняем кнопку
             if (buttonElement) {
                 buttonElement.textContent = '✓ Отмечено';
                 buttonElement.classList.add('marked');
@@ -358,15 +356,15 @@
                 html += `
                     <div class="schedule-item">
                         <div class="schedule-info">
-                            <span class="schedule-name">📖 ${lesson.name}</span>
-                            <span class="schedule-time">🕐 ${lesson.time}</span>
-                            <span class="schedule-time">✨ +${lesson.reward} интеллекта</span>
+                            <span class="schedule-name">${lesson.name}</span>
+                            <span class="schedule-time">${lesson.time}</span>
+                            <span class="schedule-time">+${lesson.reward} интеллекта</span>
                         </div>
                         <button class="mark-btn ${isMarked ? 'marked' : ''}" 
                                 data-lesson="${lesson.name}"
                                 data-reward="${lesson.reward}"
                                 ${isMarked ? 'disabled' : ''}>
-                            ${isMarked ? '✓ Отмечено' : '✎ Отметиться'}
+                            ${isMarked ? '✓ Отмечено' : 'Отметиться'}
                         </button>
                     </div>
                 `;
@@ -374,7 +372,6 @@
             
             container.innerHTML = html;
             
-            // Привязываем обработчики к НЕотмеченным кнопкам
             const buttons = container.querySelectorAll('.mark-btn:not(.marked)');
             buttons.forEach(btn => {
                 const lessonName = btn.dataset.lesson;
@@ -442,7 +439,6 @@
             }
         }
         
-        // Полная перерисовка (при смене дня или VPN)
         let lastDay = 1;
         function fullRender() {
             const container = document.getElementById('diaryContainer');
@@ -490,7 +486,7 @@
                 <div class="message-area">
                     <h3>💬 Сообщения</h3>
                     <div class="system-message" id="sentFilesMessage">
-                        📁 Отправленные файлы: <span id="filesStatus">загрузка...</span>
+                        Отправленные файлы: <span id="filesStatus">загрузка...</span>
                     </div>
                 </div>
             `;
@@ -505,7 +501,6 @@
                 lastDay = gameData.day;
                 fullRender();
             } else {
-                // Обновляем только состояние кнопок и текстовые данные
                 updateButtonsState();
                 updateUIData();
             }

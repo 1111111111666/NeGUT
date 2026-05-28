@@ -130,18 +130,18 @@
 <body>
     <div class="admin-container">
         <div class="dashboard">
-            <h2>🖥️ ADMIN CONSOLE v3.0</h2>
+            <h2>ADMIN CONSOLE v3.0</h2>
             <div class="status">
                 <div class="status-badge online" id="apiGatewayStatus">🟢 API Gateway: ONLINE</div>
-                <div class="status-badge" id="queueStatus">📦 Очередь: 0</div>
-                <div class="status-badge" id="cacheStatus">💾 Кеш: OK</div>
-                <div class="status-badge" id="vpnStatus">🌐 VPN check: OFF</div>
+                <div class="status-badge" id="queueStatus">Очередь: 0</div>
+                <div class="status-badge" id="cacheStatus">Кеш: OK</div>
+                <div class="status-badge" id="vpnStatus">VPN check: OFF</div>
             </div>
             <div class="status-info" id="dayInfo">День 1 | Ожидание решения</div>
             
             <div class="terminal">
                 <div class="terminal-header">
-                    ⚡ SYSTEM TERMINAL | Введите "help" для списка команд
+                    SYSTEM TERMINAL | Введите "help" для списка команд
                 </div>
                 <div class="terminal-output" id="terminalOutput">
                     <div class="terminal-line"><span class="terminal-prompt">$></span> Терминал готов.</div>
@@ -202,18 +202,18 @@
                     
                     const completedDays = gameData.completedDays || [];
                     
-                    dayInfo.innerHTML = `📅 День ${gameData.day} | ✅ Решено: ${completedDays.length}/5 | ❤️ Доверие: ${gameData.trust} | 🧠 Интеллект: ${gameData.intellect}`;
+                    dayInfo.innerHTML = `📅 День ${gameData.day} | Решено: ${completedDays.length}/5 | ♥ Доверие: ${gameData.trust} | ★ Интеллект: ${gameData.intellect}`;
                     
                     if (gameData.day === 1 && !completedDays.includes(1)) {
                         apiStatus.innerHTML = '🟡 API Gateway: DEGRADED';
                         apiStatus.className = 'status-badge warning';
-                        queueStatus.innerHTML = '📦 Очередь: ПЕРЕПОЛНЕНА';
+                        queueStatus.innerHTML = 'Очередь: ПЕРЕПОЛНЕНА';
                         queueStatus.className = 'status-badge warning';
                         dayInfoBox.innerHTML = '💡 День 1: Кажется есть проблемы с отправкой файлов. Может быть проблема в очереди?"';
                     } else if (gameData.day === 2 && !completedDays.includes(2)) {
                         apiStatus.innerHTML = '🔴 API Gateway: OFFLINE (502)';
                         apiStatus.className = 'status-badge offline';
-                        queueStatus.innerHTML = '📦 Очередь: 15';
+                        queueStatus.innerHTML = 'Очередь: 15';
                         dayInfoBox.innerHTML = '💡 День 2: API оценивания не отвечает..."';
                     } else if (gameData.day === 3 && !completedDays.includes(3)) {
                         apiStatus.innerHTML = '🟢 API Gateway: ONLINE';
@@ -224,7 +224,7 @@
                     } else if (gameData.day === 4 && !completedDays.includes(4)) {
                         apiStatus.innerHTML = '🟡 API Gateway: НЕСТАБИЛЕН';
                         apiStatus.className = 'status-badge warning';
-                        vpnStatus.innerHTML = '🌐 VPN check: АКТИВЕН';
+                        vpnStatus.innerHTML = 'VPN check: АКТИВЕН';
                         vpnStatus.className = 'status-badge warning';
                         dayInfoBox.innerHTML = '💡 День 4: Странные запросы от сервера лк. Неужели и до нас дошло.."';
                     } else if (gameData.day === 5 && !completedDays.includes(5)) {
@@ -232,11 +232,11 @@
                     } else {
                         apiStatus.innerHTML = '🟢 API Gateway: ONLINE';
                         apiStatus.className = 'status-badge online';
-                        queueStatus.innerHTML = '📦 Очередь: 0';
+                        queueStatus.innerHTML = 'Очередь: 0';
                         queueStatus.className = 'status-badge online';
-                        cacheStatus.innerHTML = '💾 Кеш: OK';
+                        cacheStatus.innerHTML = 'Кеш: OK';
                         cacheStatus.className = 'status-badge online';
-                        vpnStatus.innerHTML = '🌐 VPN check: OFF';
+                        vpnStatus.innerHTML = 'VPN check: OFF';
                         vpnStatus.className = 'status-badge online';
                     }
                 }

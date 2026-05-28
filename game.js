@@ -14,10 +14,12 @@ let gameData = {
     rebootCount: 0,
     vpnEnabled: false,
     deepseekUnlocked: false,
-    terminalHistory: []
+    terminalHistory: [],
+    gameLost: false,
+    finalShown: false,
+    victoryShown: false
 };
 
-// Расписание пар по дням
 let scheduleByDay = {};
 
 // Команды терминала и их результаты
@@ -46,7 +48,7 @@ const initialTelegramMessages = [
     { sender: "Зав. кафедрой", text: "Коля, бери ситуацию под контроль. Если не починишь - будут последствия." }
 ];
 
-// Сообщения по дням (каждый день новые)
+// Сообщения по дням 
 const telegramMessagesByDay = {
     1: [
         { sender: "Одногруппник Миша", text: "Слушай, у меня тоже файлы вообще не отправляются... Нас отчислят?" },
@@ -149,7 +151,6 @@ function loadGame() {
             const parsed = JSON.parse(saved);
             gameData = { ...gameData, ...parsed };
             if (!gameData.terminalHistory) gameData.terminalHistory = [];
-            // Восстанавливаем расписание
             for (let day in scheduleByDay) {
                 for (let lesson of scheduleByDay[day]) {
                     const savedKey = `marked_${day}_${lesson.name}`;
@@ -166,7 +167,6 @@ function loadGame() {
 // Сохранение
 function saveGame() {
     localStorage.setItem("spbGameSave", JSON.stringify(gameData));
-    // Сохраняем отметки на парах отдельно для каждого дня
     for (let day in scheduleByDay) {
         for (let lesson of scheduleByDay[day]) {
             const savedKey = `marked_${day}_${lesson.name}`;
@@ -193,13 +193,6 @@ function updateStatsDisplay() {
     if (intellectFill) intellectFill.style.width = Math.min(100, (gameData.intellect / 100) * 100) + '%';
     
     updateDeepseekAdvice();
-    
-    if (gameData.trust <= 20 && gameData.day < 5 && !gameData.completedDays.includes(4)) {
-        gameData.day = 5;
-        saveGame();
-        addTelegramMessage("Зам. директора", "Доверия больше нет. Завтра отчисление!");
-        addNotification("⚠️ ДОВЕРИЕ НА НУЛЕ! Завтра отчисление!", "alert");
-    }
 }
 
 // DeepSeek подсказки
@@ -320,7 +313,6 @@ function generateTelegramMessages() {
     
     const msgs = telegramMessagesByDay[gameData.day];
     if (msgs) {
-        // Проверяем, не отправляли ли уже сообщения за этот день
         const todayMessagesKey = `day_${gameData.day}_messages_sent`;
         if (!localStorage.getItem(todayMessagesKey)) {
             setTimeout(() => {
@@ -388,6 +380,14 @@ function modifyTrust(delta) {
     gameData.trust = Math.min(100, Math.max(0, newTrust));
     saveGame();
     updateStatsDisplay();
+    
+    if (gameData.trust <= 0 && gameData.hasActiveGame) {
+        if (!gameData.gameLost) {
+            gameData.gameLost = true;
+            saveGame();
+            showGameOver();
+        }
+    }
 }
 
 // Изменение интеллекта
@@ -445,7 +445,7 @@ function restoreTerminalHistory() {
 
 // ГЛАВНАЯ ФУНКЦИЯ ВЫПОЛНЕНИЯ КОМАНД
 function executeCommand(command) {
-    console.log("📟 Выполнение команды:", command);
+    console.log("Выполнение команды:", command);
     const cmd = command.toLowerCase().trim();
     
     addToTerminalFromGame(`> ${command}`, false, false);
@@ -458,7 +458,7 @@ function executeCommand(command) {
                 addToTerminalFromGame(`${cmdName.padEnd(30)} ${dayInfo.padEnd(10)} - ${terminalCommands[cmdName].description}`, false, false);
             }
         }
-        addToTerminalFromGame(`📅 Текущий день: ${gameData.day} | ❤️ Доверие: ${gameData.trust} | 🧠 Интеллект: ${gameData.intellect}`, false, false);
+        addToTerminalFromGame(`📅 Текущий день: ${gameData.day} | ♥ Доверие: ${gameData.trust} | ★ Интеллект: ${gameData.intellect}`, false, false);
         return;
     }
     
@@ -518,7 +518,6 @@ function advanceToNextDay() {
         addNotification(`📅 День ${gameData.day} начался! Решите новую проблему.`, "info");
         generateTelegramMessages();
         
-        // Обновляем расписание в user.html
         const iframe = document.getElementById('browserIframe');
         if (iframe && iframe.contentWindow) {
             iframe.contentWindow.postMessage({ type: 'updateSchedule' }, '*');
@@ -636,7 +635,6 @@ function powerOnDesktop() {
             addNotification("👋 Привет! Впервые тут? Открой файл 'Инструкция', расположенный на рабочем столе.", "character");
             generateTelegramMessages();
         } else {
-            // Проверяем, нужно ли перейти на следующий день
             if (gameData.completedDays.includes(gameData.day) && gameData.day < 5) {
                 advanceToNextDay();
             } else if (gameData.day === 5 && gameData.completedDays.includes(5)) {
@@ -670,18 +668,16 @@ function resetProgress() {
             terminalHistory: []
         };
         initSchedule();
-        // Очищаем отметки на парах
         for (let day in scheduleByDay) {
             for (let lesson of scheduleByDay[day]) {
                 localStorage.removeItem(`marked_${day}_${lesson.name}`);
             }
         }
-        // Очищаем отметки о отправленных сообщениях
         for (let i = 1; i <= 6; i++) {
             localStorage.removeItem(`day_${i}_messages_sent`);
         }
         saveGame();
-        addNotification("🔄 Прогресс сброшен.", "system");
+        addNotification("⟲ Прогресс сброшен.", "system");
         
         const desktopElem = document.getElementById('desktop');
         if (desktopElem) desktopElem.style.display = 'none';
@@ -693,8 +689,161 @@ function resetProgress() {
 
 // Финальная катсцена
 function showFinalChoice() {
-    addNotification("🏆 РАССЛЕДОВАНИЕ ЗАВЕРШЕНО! 🏆", "system");
+    if (gameData.completedDays.length < 5) {
+        addNotification("❌ Сначала решите все проблемы дней 1-5!", "alert");
+        return;
+    }
     
+    if (gameData.finalShown) return;
+    gameData.finalShown = true;
+    saveGame();
+    
+    addNotification("🏆 ВСЕ ПРОБЛЕМЫ РЕШЕНЫ! Теперь нужно объяснить причину сбоя...", "system");
+    
+    const cluesList = gameData.clues || [];
+    
+    const commandHistory = (gameData.errorLog || [])
+        .filter(log => log.action && log.action !== 'help')
+        .slice(0, 12)
+        .map(log => {
+            const day = log.day || '?';
+            const status = log.result === 'исправлена' ? '✅' : (log.result === 'не исправлена' ? '❌' : '🔍');
+            return `[День ${day}] ${status} ${log.action}`;
+        });
+    
+    const cluesHtml = cluesList.length > 0 
+        ? `<div class="final-clues-box">
+               <h4>🔍 СОБРАННЫЕ УЛИКИ</h4>
+               <div class="final-clues-list">
+                   <ul style="margin-left: 20px;">${cluesList.map(c => `<li>${c}</li>`).join('')}</ul>
+               </div>
+           </div>`
+        : `<div class="final-clues-box">
+               <h4>⚠️ УЛИКИ НЕ СОБРАНЫ</h4>
+               <p style="color: #886633;">Вы не обращали внимание на диагностические команды. Будет сложно доказать причину...</p>
+           </div>`;
+    
+    const commandsHtml = commandHistory.length > 0
+        ? `<div class="final-commands-history">
+               <h4>ИСТОРИЯ ВАШИХ КОМАНД</h4>
+               <div style="max-height: 120px; overflow-y: auto;">
+                   ${commandHistory.map(cmd => `<div style="font-family: monospace; font-size: 10px; margin: 3px 0;">${cmd}</div>`).join('')}
+               </div>
+           </div>`
+        : '';
+    
+    // Варианты ответов
+    const options = [
+        { 
+            text: "🔌 Проблемы с электропитанием сервера", 
+            isCorrect: false,
+            feedback: "❌ Неверно. Сервер не выключался, логи это подтверждают (uptime был в норме). Подумайте, какой компонент отвечал за передачу данных между сервисами."
+        },
+        { 
+            text: "💾 Сбой в системе хранения данных (диски переполнены)", 
+            isCorrect: false,
+            feedback: "❌ Неверно. Диски были в порядке, проблема не в хранилище. Обратите внимание — ошибки были связаны с обработкой запросов и маршрутизацией."
+        },
+        { 
+            text: "🌐 DDoS-атака извне", 
+            isCorrect: false,
+            feedback: "❌ Неверно. Атаки не было, трафик был в норме. Но был один компонент, который отказывал и вызывал цепную реакцию во всех сервисах."
+        },
+        { 
+            text: "🔧 Неисправность API-шлюза (API Gateway)", 
+            isCorrect: true,
+            feedback: "✅ АБСОЛЮТНО ВЕРНО! API-шлюз работал нестабильно: он не передавал файлы в очередь, зависал при запросе оценок, кешировал старые данные и создавал ложные проверки VPN. После его замены всё заработало! Комиссия впечатлена вашим расследованием."
+        },
+        { 
+            text: "🐛 Вирус в коде личного кабинета", 
+            isCorrect: false,
+            feedback: "❌ Неверно. Вируса не было, код ЛК не менялся. Проблема была на уровне инфраструктуры (сетевой уровень), а не в самом приложении."
+        }
+    ];
+    
+    const modal = document.createElement('div');
+    modal.className = 'final-modal-overlay';
+    
+    let optionsHtml = '';
+    options.forEach((opt, idx) => {
+        optionsHtml += `
+            <button class="final-choice-btn" data-correct="${opt.isCorrect}" data-feedback="${opt.feedback.replace(/"/g, '&quot;')}">
+                ${opt.text}
+            </button>
+        `;
+    });
+    
+    modal.innerHTML = `
+        <div class="final-modal">
+            <h2>🔍 ЗАСЕДАНИЕ КОМИССИИ</h2>
+            <p style="margin-bottom: 10px; color: #442200;">Преподаватель: <em>"Итак, Коля. Все проблемы ты починил. Но главный вопрос: <strong>ПОЧЕМУ</strong> это случилось? Что было первопричиной?"</em></p>
+            ${cluesHtml}
+            ${commandsHtml}
+            <hr style="margin: 15px 0; border: 2px solid #ffaa44;">
+            <p style="font-weight: bold; margin-bottom: 15px; color: #442200;">📌 Выберите правильную причину сбоя:</p>
+            <div id="finalOptionsContainer">
+                ${optionsHtml}
+            </div>
+            <div id="finalFeedback" class="final-feedback" style="display: none;"></div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Обработка выбора
+    document.querySelectorAll('.final-choice-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const isCorrect = btn.dataset.correct === 'true';
+            const feedback = btn.dataset.feedback;
+            const feedbackDiv = document.getElementById('finalFeedback');
+            
+            if (feedbackDiv) {
+                feedbackDiv.style.display = 'block';
+                feedbackDiv.innerHTML = feedback;
+                
+                if (isCorrect) {
+                    feedbackDiv.style.background = '#a5d6a5';
+                    feedbackDiv.style.borderLeftColor = '#2e7d32';
+                    modifyTrust(30);
+                    modifyIntellect(20);
+                    addNotification("🎉 Комиссия одобрила ваше расследование! Переход к финалу...", "success");
+                    
+                    document.querySelectorAll('.final-choice-btn').forEach(b => {
+                        b.disabled = true;
+                        b.style.opacity = '0.5';
+                    });
+                    
+                    setTimeout(() => {
+                        modal.remove();
+                        showVictoryScreen();
+                    }, 2000);
+                } else {
+                    feedbackDiv.style.background = '#ffcdd2';
+                    feedbackDiv.style.borderLeftColor = '#c62828';
+                    modifyTrust(-15);
+                    addNotification("❌ Неправильный ответ! Доверие снижено.", "alert");
+                    
+                    if (gameData.trust <= 0) {
+                        setTimeout(() => {
+                            modal.remove();
+                            showGameOver();
+                        }, 2000);
+                    }
+                }
+            }
+        });
+    });
+    
+    document.getElementById('closeFinalModalBtn')?.addEventListener('click', () => {
+        modal.remove();
+        if (gameData.trust > 0 && !gameData.gameLost && gameData.completedDays.includes(5)) {
+            addNotification("💡 Комиссия ждёт вашего ответа! Вернитесь в Архив данных и подумайте.", "system");
+        }
+    });
+}
+
+// Экран проигрыша (отчисление)
+function showGameOver() {
     const modal = document.createElement('div');
     modal.style.cssText = `
         position: fixed;
@@ -710,77 +859,213 @@ function showFinalChoice() {
         font-family: 'Courier New', monospace;
     `;
     
-    const endings = {
-        tech: { title: "🏆 ТЕХНИЧЕСКАЯ ПОБЕДА", text: "API не выдержал нагрузки. Систему масштабировали, вас повысили до старшего администратора.", icon: "🔧", color: "#4caf50" },
-        sabotage: { title: "🕵️ ЗАГОВОР РАСКРЫТ", text: "Вы нашли следы взлома! Обиженный студент. Его отчислили, вас наградили.", icon: "🕵️", color: "#ff9800" },
-        accident: { title: "😅 НЕСЧАСТНЫЙ СЛУЧАЙ", text: "Сисадмин споткнулся о кабель. Его не уволили, поставили на кофе. Вас угостили пиццей!", icon: "🍕", color: "#2196f3" },
-        virus: { title: "💻 ВИРУСНАЯ АТАКА", text: "Вы обнаружили вирус! Антивирусная компания предложила вам работу.", icon: "💻", color: "#9c27b0" }
-    };
-    
-    let html = `
-        <div style="background: #ffdd99; border: 8px solid #ffaa44; padding: 30px; max-width: 500px; text-align: center;">
-            <h2 style="color: #442200; margin-bottom: 20px;">🔍 ВЫБЕРИТЕ ПРИЧИНУ СБОЯ</h2>
-    `;
-    
-    for (let [key, ending] of Object.entries(endings)) {
-        html += `
-            <button class="final-option" data-result="${key}" style="
-                display: block;
-                width: 100%;
-                margin: 10px 0;
-                padding: 15px;
-                background: ${ending.color};
-                border: none;
-                font-family: 'Courier New', monospace;
-                font-weight: bold;
-                font-size: 16px;
-                cursor: pointer;
-                color: white;
-            ">
-                ${ending.icon} ${ending.title.split(' ').slice(1).join(' ')}
-            </button>
-        `;
-    }
-    
-    html += `
-            <div style="margin-top: 20px; padding: 15px; background: #ffcc77;">
-                <p>📊 ВАША СТАТИСТИКА:</p>
-                <p>❤️ Доверие: ${gameData.trust}% | 🧠 Интеллект: ${gameData.intellect}</p>
+    modal.innerHTML = `
+        <div style="background: #2a1a1a; border: 8px solid #ff4444; padding: 30px; max-width: 500px; text-align: center;">
+            <div style="font-size: 64px; margin-bottom: 20px;">❌</div>
+            <h2 style="color: #ffaaaa; margin-bottom: 20px;">ВЫ ОТЧИСЛЕНЫ!</h2>
+            <p style="margin-bottom: 20px; color: #ffaaaa;">Доверие преподавателей упало до нуля. Вы не справились с расследованием.</p>
+            <div style="background: #ffffff; padding: 15px; margin-bottom: 20px;">
+                <p>📊 ИТОГИ:</p>
+                <p>♥ Доверие: 0% | ★ Интеллект: ${gameData.intellect}</p>
                 <p>📅 Пройдено дней: ${gameData.completedDays.length}/5</p>
                 <p>🔍 Собрано улик: ${gameData.clues.length}</p>
             </div>
-            <button id="closeFinalModal" style="margin-top: 15px; padding: 8px 20px; background: #442200; color: white; border: none; cursor: pointer;">Закрыть</button>
+            <button id="gameOverRestartBtn" style="margin: 5px; padding: 10px 30px; background: #ff4444; color: white; border: none; cursor: pointer;">▶ Начать заново</button>
+            <button id="gameOverMenuBtn" style="margin: 5px; padding: 10px 30px; background: #2d2d4a; color: white; border: none; cursor: pointer;">В главное меню</button>
         </div>
     `;
     
-    modal.innerHTML = html;
     document.body.appendChild(modal);
     
-    document.querySelectorAll('.final-option').forEach(btn => {
+    document.getElementById('gameOverRestartBtn')?.addEventListener('click', () => {
+        modal.remove();
+        resetProgress();
+        powerOnDesktop();
+    });
+    
+    document.getElementById('gameOverMenuBtn')?.addEventListener('click', () => {
+        modal.remove();
+        const desktopElem = document.getElementById('desktop');
+        if (desktopElem) desktopElem.style.display = 'none';
+        resetProgress();
+    });
+}
+
+// Финальная катсцена
+function showFinalChoice() {
+    if (gameData.completedDays.length < 5) {
+        addNotification("❌ Сначала решите все проблемы дней 1-5!", "alert");
+        return;
+    }
+    
+    if (gameData.finalShown) return;
+    gameData.finalShown = true;
+    saveGame();
+    
+    addNotification("🏆 ВСЕ ПРОБЛЕМЫ РЕШЕНЫ! Теперь нужно объяснить причину сбоя...", "system");
+    
+    const cluesList = gameData.clues || [];
+    
+    const commandHistory = (gameData.errorLog || [])
+        .filter(log => log.action && log.action !== 'help')
+        .slice(0, 12)
+        .map(log => {
+            const day = log.day || '?';
+            const status = log.result === 'исправлена' ? '✅' : (log.result === 'не исправлена' ? '❌' : '🔍');
+            return `[День ${day}] ${status} ${log.action}`;
+        });
+    
+    let cluesMessage = '';
+    if (cluesList.length >= 7) {
+        cluesMessage = 'Отлично! Вы собрали почти все улики. Это поможет убедить комиссию.';
+    } else if (cluesList.length >= 4) {
+        cluesMessage = 'Неплохо, вы собрали несколько важных улик.';
+    } else if (cluesList.length >= 1) {
+        cluesMessage = 'Вы собрали немного улик, но этого может быть недостаточно...';
+    } else {
+        cluesMessage = 'Вы не собрали ни одной дополнительной улики! Комиссия будет скептична.';
+    }
+    
+    const cluesHtml = cluesList.length > 0 
+        ? `<div class="final-clues-box">
+               <h4>🔍 СОБРАННЫЕ УЛИКИ (${cluesList.length} шт.)</h4>
+               <div class="final-clues-list">
+                   <ul style="margin-left: 20px;">${cluesList.map(c => `<li>${c}</li>`).join('')}</ul>
+               </div>
+               <p style="margin-top: 8px; font-size: 11px; color: #886633;">${cluesMessage}</p>
+           </div>`
+        : `<div class="final-clues-box">
+               <h4>⚠️ УЛИКИ НЕ СОБРАНЫ</h4>
+               <p>Вы не обращали внимание на диагностические команды. Комиссия будет сомневаться в ваших выводах.</p>
+           </div>`;
+    
+    const commandsHtml = commandHistory.length > 0
+        ? `<div class="final-commands-history">
+               <h4>ИСТОРИЯ ВАШИХ КОМАНД</h4>
+               <div style="max-height: 120px; overflow-y: auto;">
+                   ${commandHistory.map(cmd => `<div style="font-family: monospace; font-size: 10px; margin: 3px 0;">${cmd}</div>`).join('')}
+               </div>
+           </div>`
+        : '';
+    
+    // Варианты ответов (правильный только один)
+    const options = [
+        { 
+            text: "🔌 Проблемы с электропитанием сервера", 
+            isCorrect: false,
+            feedback: "❌ Неверно. Сервер не выключался, логи это подтверждают (uptime сервера был в норме)."
+        },
+        { 
+            text: "💾 Сбой в системе хранения данных (диски переполнены)", 
+            isCorrect: false,
+            feedback: "❌ Неверно. Диски были в порядке, проблема не в хранилище. Ошибки были связаны с обработкой запросов."
+        },
+        { 
+            text: "🌐 DDoS-атака извне", 
+            isCorrect: false,
+            feedback: "❌ Неверно. Атаки не было, трафик был в норме. Был один компонент, который отказывал во всех сервисах."
+        },
+        { 
+            text: "🔧 Неисправность API-шлюза (API Gateway)", 
+            isCorrect: true,
+            feedback: "✅ АБСОЛЮТНО ВЕРНО! API-шлюз работал нестабильно: он не передавал файлы в очередь, зависал при запросе оценок, кешировал старые данные и создавал ложные проверки VPN. Комиссия впечатлена!"
+        },
+        { 
+            text: "🐛 Вирус в коде личного кабинета", 
+            isCorrect: false,
+            feedback: "❌ Неверно. Вируса не было, код ЛК не менялся. Проблема была на уровне инфраструктуры."
+        }
+    ];
+    
+    const modal = document.createElement('div');
+    modal.className = 'final-modal-overlay';
+    
+    let optionsHtml = '';
+    options.forEach((opt, idx) => {
+        optionsHtml += `
+            <button class="final-choice-btn" data-correct="${opt.isCorrect}" data-feedback="${opt.feedback.replace(/"/g, '&quot;')}" data-disabled="false">
+                ${opt.text}
+            </button>
+        `;
+    });
+    
+    modal.innerHTML = `
+        <div class="final-modal">
+            <h2>🔍 ЗАСЕДАНИЕ КОМИССИИ</h2>
+            <p style="margin-bottom: 10px; color: #442200;">Преподаватель: <em>"Итак, Коля. Все проблемы ты починил. Но главный вопрос: <strong>ПОЧЕМУ</strong> это случилось? Что было первопричиной?"</em></p>
+            ${cluesHtml}
+            ${commandsHtml}
+            <hr style="margin: 15px 0; border: 2px solid #ffaa44;">
+            <p style="font-weight: bold; margin-bottom: 15px; color: #442200;">📌 Выберите правильную причину сбоя:</p>
+            <div id="finalOptionsContainer">
+                ${optionsHtml}
+            </div>
+            <div id="finalFeedback" class="final-feedback" style="display: none;"></div>
+            <button id="closeFinalModalBtn" class="final-close-btn">✖ Закрыть</button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    let correctAnswerChosen = false;
+    
+    // Обработка выбора
+    document.querySelectorAll('.final-choice-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            const result = btn.dataset.result;
-            const ending = endings[result];
+            if (correctAnswerChosen) return;
             
-            modal.innerHTML = `
-                <div style="background: #ffdd99; border: 8px solid #ffaa44; padding: 30px; max-width: 500px; text-align: center;">
-                    <h2 style="color: #442200;">${ending.title}</h2>
-                    <div style="font-size: 64px; margin: 20px;">${ending.icon}</div>
-                    <p style="margin: 20px 0;">${ending.text}</p>
-                    <button id="restartGameBtn" style="margin-top: 10px; padding: 10px 30px; background: #4caf50; color: white; border: none; cursor: pointer;">▶ Играть снова</button>
-                    <button id="closeFinalModal2" style="margin-top: 10px; margin-left: 10px; padding: 10px 30px; background: #442200; color: white; border: none; cursor: pointer;">Закрыть</button>
-                </div>
-            `;
+            const isCorrect = btn.dataset.correct === 'true';
+            const feedback = btn.dataset.feedback;
+            const feedbackDiv = document.getElementById('finalFeedback');
             
-            document.getElementById('restartGameBtn')?.addEventListener('click', () => {
-                modal.remove();
-                resetProgress();
-                powerOnDesktop();
-            });
-            document.getElementById('closeFinalModal2')?.addEventListener('click', () => modal.remove());
+            if (feedbackDiv) {
+                feedbackDiv.style.display = 'block';
+                feedbackDiv.innerHTML = feedback;
+                
+                if (isCorrect) {
+                    correctAnswerChosen = true;
+                    feedbackDiv.style.background = '#a5d6a5';
+                    feedbackDiv.style.borderLeftColor = '#2e7d32';
+                    modifyTrust(30);
+                    modifyIntellect(20);
+                    addNotification("🎉 Комиссия одобрила ваше расследование! Переход к финалу...", "success");
+                    
+                    document.querySelectorAll('.final-choice-btn').forEach(b => {
+                        b.disabled = true;
+                        b.style.opacity = '0.5';
+                    });
+                    
+                    setTimeout(() => {
+                        modal.remove();
+                        showVictoryScreen();
+                    }, 2000);
+                } else {
+                    btn.disabled = true;
+                    btn.style.opacity = '0.4';
+                    btn.style.cursor = 'not-allowed';
+                    
+                    feedbackDiv.style.background = '#ffcdd2';
+                    feedbackDiv.style.borderLeftColor = '#c62828';
+                    modifyTrust(-15);
+                    addNotification("❌ Неправильный ответ! Доверие снижено. Попробуйте другой вариант.", "alert");
+                    
+                    if (gameData.trust <= 0) {
+                        setTimeout(() => {
+                            modal.remove();
+                            showGameOver();
+                        }, 2000);
+                    }
+                }
+            }
         });
     });
     
-    document.getElementById('closeFinalModal')?.addEventListener('click', () => modal.remove());
+    document.getElementById('closeFinalModalBtn')?.addEventListener('click', () => {
+        modal.remove();
+        if (gameData.trust > 0 && !gameData.gameLost && gameData.completedDays.includes(5) && !correctAnswerChosen) {
+            addNotification("💡 Комиссия ждёт вашего ответа! Вернитесь в Архив данных и подумайте.", "system");
+        }
+    });
 }
 
 // Открытие приложений
@@ -803,7 +1088,7 @@ function openApp(appName) {
 window.addEventListener('message', function(event) {
     if (event.data && event.data.type === 'terminalCommand') {
         const command = event.data.command;
-        console.log("📟 Получена команда из iframe:", command);
+        console.log("Получена команда из iframe:", command);
         executeCommand(command);
     }
 });

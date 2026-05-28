@@ -9,9 +9,9 @@ body {
     overflow: hidden;
 }
 
-/* Главная страница */
+/* ===== ГЛАВНАЯ СТРАНИЦА ===== */
 body.main-page {
-    background-image: url('images/fon.jpg');
+    background-image: url('images/fon.png');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -27,56 +27,40 @@ body.main-page {
     padding: 20px;
 }
 
-.game-title {
-    font-size: 64px;
-    font-family: 'Courier New', monospace;
-    font-weight: bold;
-    text-shadow: 6px 6px 0px rgba(0, 0, 0, 0.5);
-    color: #ffff00;
-    text-align: center;
-    margin-bottom: 80px;
-    letter-spacing: 4px;
-    image-rendering: pixelated;
-}
-
 .menu-buttons {
     display: flex;
     gap: 50px;
     justify-content: center;
     flex-wrap: wrap;
-    margin-top: 80px;
-    margin-left: 100px;
+    margin-top: 350px;
 }
 
 .menu-btn {
     display: flex;
+    border: none;
     flex-direction: column;
     align-items: center;
     gap: 15px;
-    background: rgba(0, 0, 0, 0.3);
-    border: 4px solid #ffffff;
-    border-radius: 0px;
-    padding: 30px 45px;  /* было 20px 30px */
+    background: rgba(0, 0, 0, 0);
+    padding: 10px;
     cursor: pointer;
     transition: all 0.05s linear;
     min-width: 180px;
-    box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.3);
 }
 
 .menu-btn:hover {
     transform: translate(-2px, -2px);
-    box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.4);
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .menu-btn:active {
     transform: translate(4px, 4px);
-    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.3);
+    box-shadow: 4px 4px 0px rgba(255, 255, 255, 0.3);
 }
 
 .menu-icon {
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
     object-fit: contain;
     image-rendering: pixelated;
     filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.3));
@@ -90,42 +74,6 @@ body.main-page {
     text-align: center;
     font-family: 'Courier New', monospace;
     letter-spacing: 1px;
-}
-
-.shutdown-btn {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    background: #ff4444;
-    border: 5px solid #ffcccc;
-    width: 90px;
-    height: 90px;
-    cursor: pointer;
-    transition: all 0.05s linear;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 15px;
-    box-shadow: 8px 8px 0px #880000;
-}
-
-.shutdown-btn:hover {
-    transform: translate(-3px, -3px);
-    box-shadow: 11px 11px 0px #880000;
-    background: #ff6666;
-}
-
-.shutdown-btn:active {
-    transform: translate(5px, 5px);
-    box-shadow: 3px 3px 0px #880000;
-}
-
-.shutdown-icon {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    image-rendering: pixelated;
-    filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.5));
 }
 
 /* ===== РАБОЧИЙ СТОЛ ===== */
@@ -146,21 +94,23 @@ body.main-page {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('images/fon.jpg');
+    background-image: url('images/fon.png');
     background-size: cover;
     background-position: center;
     opacity: 0.85;
 }
 
-/* Иконки рабочего стола - пиксельный стиль */
 .desktop-icons {
     position: absolute;
     top: 20px;
     left: 20px;
     display: flex;
     flex-direction: column;
+    flex-wrap: wrap;
     gap: 15px;
     z-index: 110;
+    max-height: calc(100vh - 100px);
+    width: auto;
 }
 
 .icon {
@@ -169,12 +119,8 @@ body.main-page {
     align-items: center;
     cursor: pointer;
     padding: 10px;
-    border-radius: 0px;
     transition: all 0.05s linear;
-    width: 85px;
-    background: rgba(0, 0, 0, 0.3);
-    border: 3px solid #ffffff;
-    clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
+    width: 100px;
 }
 
 .icon:hover {
@@ -186,14 +132,18 @@ body.main-page {
     transform: translate(2px, 2px);
 }
 
-.icon-emoji {
-    font-size: 42px;
-    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
+.icon-img {
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+    filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.3));
 }
 
 .icon-label {
     color: white;
-    font-size: 11px;
+    font-size: 14px;
     margin-top: 5px;
     text-shadow: 1px 1px 0 black;
     text-align: center;
@@ -201,7 +151,7 @@ body.main-page {
     font-family: 'Courier New', monospace;
 }
 
-/* ===== ПАНЕЛЬ ЗАДАЧ (пиксельный стиль как у браузера) ===== */
+/* ===== ПАНЕЛЬ ЗАДАЧ ===== */
 .taskbar {
     position: absolute;
     bottom: 0;
@@ -216,7 +166,6 @@ body.main-page {
     z-index: 200;
     border-top: 4px solid #ffcc66;
     border-bottom: 4px solid #cc8833;
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
 }
 
 .taskbar-left {
@@ -271,6 +220,13 @@ body.main-page {
     box-shadow: inset -2px -2px 0 #ffeedd, inset 2px 2px 0 #aa7733;
 }
 
+.taskbar-icon-img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
 .taskbar-right {
     display: flex;
     align-items: center;
@@ -306,7 +262,6 @@ body.main-page {
     flex-direction: column;
     align-items: flex-end;
     padding: 4px 12px;
-    background: #ffcc77;
     clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
     box-shadow: inset -2px -2px 0 #aa7733, inset 2px 2px 0 #ffeedd;
 }
@@ -322,7 +277,7 @@ body.main-page {
     font-size: 10px;
 }
 
-/* ===== МЕНЮ ПУСК (пиксельный стиль) ===== */
+/* ===== МЕНЮ ПУСК ===== */
 .start-menu {
     position: absolute;
     bottom: 52px;
@@ -368,8 +323,6 @@ body.main-page {
     font-family: 'Courier New', monospace;
 }
 
-
-
 .start-menu-items {
     display: flex;
     flex-direction: column;
@@ -403,6 +356,13 @@ body.main-page {
     font-size: 20px;
 }
 
+.start-menu-icon-img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
 .start-menu-power {
     display: flex;
     justify-content: space-between;
@@ -428,7 +388,7 @@ body.main-page {
     box-shadow: inset -2px -2px 0 #ffeedd, inset 2px 2px 0 #aa7733;
 }
 
-/* ===== ПАНЕЛЬ УВЕДОМЛЕНИЙ (пиксельный стиль) ===== */
+/* ===== ПАНЕЛЬ УВЕДОМЛЕНИЙ ===== */
 .notification-panel {
     position: absolute;
     bottom: 52px;
@@ -486,7 +446,7 @@ body.main-page {
     margin-top: 4px;
 }
 
-/* ===== ОКНО БРАУЗЕРА (твой оригинальный стиль) ===== */
+/* ===== ОКНО БРАУЗЕРА ===== */
 .window-modal {
     position: fixed;
     top: 0;
@@ -597,16 +557,7 @@ body.main-page {
     background: #fff8f0;
 }
 
-.browser-statusbar {
-    background: #ddbb77;
-    padding: 4px 10px;
-    font-size: 11px;
-    color: #442200;
-    font-family: monospace;
-    border-top: 2px solid #ccaa66;
-}
-
-/* ===== ПАНЕЛЬ СТАТИСТИКИ (пиксельный стиль) ===== */
+/* ===== ПАНЕЛЬ СТАТИСТИКИ ===== */
 .stats-panel {
     position: fixed;
     top: 10px;
@@ -653,1203 +604,7 @@ body.main-page {
     transition: width 0.3s;
 }
 
-/* ===== DEEPSEEK ЧАТ (пиксельный стиль) ===== */
-.deepseek-chat {
-    position: fixed;
-    bottom: 60px;
-    right: 20px;
-    width: 320px;
-    background: #ffdd99;
-    border: 6px solid #ffaa44;
-    display: none;
-    z-index: 250;
-    flex-direction: column;
-    clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
-}
-
-.deepseek-chat.active {
-    display: flex;
-}
-
-.deepseek-header {
-    background: #ffaa44;
-    padding: 10px;
-    color: #442200;
-    display: flex;
-    justify-content: space-between;
-    font-weight: bold;
-    font-family: 'Courier New', monospace;
-    border-bottom: 3px solid #cc8833;
-}
-
-.deepseek-close {
-    background: #ff6644;
-    border: none;
-    color: white;
-    cursor: pointer;
-    font-size: 16px;
-    width: 28px;
-    height: 28px;
-    clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
-    box-shadow: inset -2px -2px 0 #aa3311, inset 2px 2px 0 #ffaa88;
-}
-
-.deepseek-content {
-    padding: 15px;
-    color: #442200;
-    font-size: 13px;
-    font-family: 'Courier New', monospace;
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-.deepseek-advice {
-    background: #ffcc88;
-    padding: 10px;
-    margin-top: 10px;
-    clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
-}
-
-/* ===== БАБЛЫ ===== */
-.bubble-container {
-    position: fixed;
-    bottom: 70px;
-    left: 20px;
-    z-index: 250;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    pointer-events: none;
-}
-
-.bubble {
-    background: #ffffcc;
-    padding: 10px 16px;
-    max-width: 300px;
-    font-family: 'Courier New', monospace;
-    font-size: 14px;
-    font-weight: bold;
-    clip-path: polygon(0px 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
-    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
-    position: relative;
-    animation: slideIn 0.2s ease-out;
-}
-
-.bubble.system {
-    background: #ff9800;
-    color: white;
-}
-
-.bubble.user {
-    background: #4caf50;
-    color: white;
-}
-
-.bubble.character {
-    background: #2196f3;
-    color: white;
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-50px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-/* ===== ЭКРАН ВЫКЛЮЧЕНИЯ ===== */
-.shutdown-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #000;
-    z-index: 2000;
-    display: none;
-    justify-content: center;
-    align-items: center;
-    animation: fadeIn 0.3s;
-}
-
-.shutdown-overlay.active {
-    display: flex;
-}
-
-.shutdown-text {
-    color: white;
-    font-size: 24px;
-    font-family: monospace;
-    animation: blink 1s infinite;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-}
-/* Перезагрузка - тот же стиль что и выключение */
-.shutdown-overlay .shutdown-text {
-    transition: all 0.2s;
-}
-/* Telegram панель */
-.telegram-area {
-    position: relative;
-    cursor: pointer;
-    padding: 8px 10px;
-    background: #ffcc77;
-    clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
-    box-shadow: inset -2px -2px 0 #aa7733, inset 2px 2px 0 #ffeedd;
-}
-
-.telegram-badge {
-    position: absolute;
-    top: -2px;
-    right: -2px;
-    width: 10px;
-    height: 10px;
-    background: #ff4444;
-    border-radius: 50%;
-    display: none;
-}
-
-.telegram-panel {
-    position: absolute;
-    bottom: 52px;
-    right: 80px;
-    width: 350px;
-    max-height: 400px;
-    background: #ffeecc;
-    display: none;
-    flex-direction: column;
-    z-index: 250;
-    border: 6px solid #ffaa44;
-    clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
-}
-
-.telegram-panel.active {
-    display: flex;
-}
-
-.telegram-header {
-    padding: 10px 16px;
-    background: #ffaa44;
-    color: #442200;
-    font-weight: bold;
-    font-family: 'Courier New', monospace;
-    border-bottom: 3px solid #cc8833;
-    display: flex;
-    justify-content: space-between;
-}
-
-.telegram-list {
-    flex: 1;
-    max-height: 350px;
-    overflow-y: auto;
-}
-
-/* DeepSeek перетаскивание */
-.deepseek-chat {
-    position: fixed;
-    cursor: default;
-}
-
-.deepseek-header {
-    cursor: move;
-}
-
-/* Анимация для финала */
-@keyframes finalPopup {
-    from {
-        opacity: 0;
-        transform: scale(0.8);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-.final-modal {
-    animation: finalPopup 0.3s ease-out;
-}
-/* Telegram приложение - отдельное окно как DeepSeek */
-.telegram-chat {
-    position: fixed;
-    width: 400px;
-    height: 550px;
-    background: #fff8f0;
-    border: 6px solid #ffaa44;
-    display: none;
-    flex-direction: column;
-    z-index: 250;
-    clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
-    box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.2);
-    overflow: hidden;
-}
-
-.telegram-chat.active {
-    display: flex;
-}
-
-.telegram-header {
-    background: #ffaa44;
-    padding: 12px 16px;
-    color: #442200;
-    font-weight: bold;
-    font-family: 'Courier New', monospace;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: move;
-    border-bottom: 3px solid #cc8833;
-}
-
-.telegram-close {
-    background: #ff6644;
-    border: none;
-    color: white;
-    cursor: pointer;
-    font-size: 16px;
-    width: 28px;
-    height: 28px;
-    clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
-    box-shadow: inset -2px -2px 0 #aa3311, inset 2px 2px 0 #ffaa88;
-}
-
-.telegram-search {
-    padding: 10px;
-    background: #ffddbb;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    border-bottom: 2px solid #ffcc88;
-}
-
-.telegram-search input {
-    flex: 1;
-    background: #ffffee;
-    border: 2px solid #ffaa44;
-    padding: 6px 10px;
-    font-family: 'Courier New', monospace;
-    font-size: 12px;
-    clip-path: polygon(3px 0, calc(100% - 3px) 0, 100% 3px, 100% calc(100% - 3px), calc(100% - 3px) 100%, 3px 100%, 0 calc(100% - 3px), 0 3px);
-}
-
-.telegram-chats {
-    width: 120px;
-    background: #ffeedd;
-    border-right: 2px solid #ffcc88;
-    overflow-y: auto;
-    flex-shrink: 0;
-}
-
-.telegram-chat-item {
-    display: flex;
-    padding: 12px 8px;
-    gap: 8px;
-    cursor: pointer;
-    border-bottom: 1px solid #ffcc88;
-    transition: background 0.1s;
-}
-
-.telegram-chat-item:hover {
-    background: #ffddbb;
-}
-
-.telegram-chat-item.active {
-    background: #ffcc88;
-}
-
-.telegram-chat-avatar {
-    width: 36px;
-    height: 36px;
-    background: #ffaa44;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
-}
-
-.telegram-chat-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.telegram-chat-name {
-    font-weight: bold;
-    font-size: 12px;
-    color: #442200;
-}
-
-.telegram-chat-preview {
-    font-size: 10px;
-    color: #886633;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.telegram-messages-area {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.telegram-messages-header {
-    padding: 10px;
-    background: #ffddbb;
-    border-bottom: 2px solid #ffcc88;
-    font-weight: bold;
-    font-size: 13px;
-    color: #442200;
-}
-
-.telegram-messages-container {
-    flex: 1;
-    overflow-y: auto;
-    padding: 10px;
-    background: #fff8f0;
-}
-
-.telegram-message {
-    background: white;
-    border: 2px solid #ffdd99;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
-}
-
-.telegram-message.unread {
-    background: #fff4cc;
-    border-left: 4px solid #ffaa44;
-}
-
-.telegram-sender {
-    font-weight: bold;
-    color: #442200;
-    font-size: 12px;
-    margin-bottom: 5px;
-}
-
-.telegram-text {
-    font-size: 13px;
-    color: #333;
-    margin-bottom: 5px;
-    line-height: 1.4;
-}
-
-.telegram-time {
-    font-size: 9px;
-    color: #886633;
-    text-align: right;
-}
-
-/* DeepSeek чат */
-.deepseek-chat {
-    position: fixed;
-    width: 320px;
-    height: 400px;
-    background: #1a1a2e;
-    border: 6px solid #ffaa44;
-    display: none;
-    flex-direction: column;
-    z-index: 250;
-    clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
-    box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.2);
-}
-
-.deepseek-chat.active {
-    display: flex;
-}
-
-.deepseek-header {
-    background: #2d2d4a;
-    padding: 12px 16px;
-    color: #ffaa44;
-    font-weight: bold;
-    font-family: 'Courier New', monospace;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: move;
-    border-bottom: 3px solid #ffaa44;
-}
-
-.deepseek-close {
-    background: #ff6644;
-    border: none;
-    color: white;
-    cursor: pointer;
-    font-size: 16px;
-    width: 28px;
-    height: 28px;
-}
-
-.deepseek-content {
-    flex: 1;
-    padding: 15px;
-    color: #ccc;
-    font-size: 13px;
-    font-family: 'Courier New', monospace;
-    overflow-y: auto;
-}
-
-.deepseek-message {
-    background: #2d2d4a;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-}
-
-.deepseek-advice {
-    background: #0a0a1a;
-    padding: 12px;
-    border-left: 3px solid #ffaa44;
-}
-
-/* Анимация для баблов */
-.bubble-container {
-    position: fixed;
-    bottom: 70px;
-    left: 20px;
-    z-index: 250;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    pointer-events: none;
-}
-
-.bubble {
-    background: #ffffcc;
-    padding: 10px 16px;
-    max-width: 300px;
-    font-family: 'Courier New', monospace;
-    font-size: 13px;
-    font-weight: bold;
-    clip-path: polygon(0px 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
-    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
-    animation: slideIn 0.2s ease-out;
-}
-
-.bubble.system {
-    background: #ff9800;
-    color: white;
-}
-
-.bubble.user {
-    background: #4caf50;
-    color: white;
-}
-
-.bubble.character {
-    background: #2196f3;
-    color: white;
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-50px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-/* Оверлей */
-.shutdown-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #000;
-    z-index: 2000;
-    display: none;
-    justify-content: center;
-    align-items: center;
-}
-
-.shutdown-overlay.active {
-    display: flex;
-}
-
-.shutdown-text {
-    color: white;
-    font-size: 24px;
-    font-family: monospace;
-    animation: blink 1s infinite;
-}
-
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-}
-
-/* VPN Client приложение */
-.vpn-app {
-    position: fixed;
-    width: 320px;
-    background: #fff8f0;
-    border: 6px solid #ffaa44;
-    display: none;
-    flex-direction: column;
-    z-index: 250;
-    clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
-    box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.2);
-}
-
-.vpn-app.active {
-    display: flex;
-}
-
-.vpn-header {
-    background: #ffaa44;
-    padding: 12px 16px;
-    color: #442200;
-    font-weight: bold;
-    font-family: 'Courier New', monospace;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 3px solid #cc8833;
-}
-
-.vpn-close {
-    background: #ff6644;
-    border: none;
-    color: white;
-    cursor: pointer;
-    font-size: 16px;
-    width: 28px;
-    height: 28px;
-    clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
-}
-
-.vpn-content {
-    padding: 20px;
-    text-align: center;
-}
-
-.vpn-status {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    margin-bottom: 20px;
-    padding: 15px;
-    background: #ffeedd;
-    border-radius: 8px;
-}
-
-.vpn-status-icon {
-    font-size: 24px;
-}
-
-.vpn-status-text {
-    font-size: 18px;
-    font-weight: bold;
-    font-family: 'Courier New', monospace;
-}
-
-.vpn-status.on .vpn-status-icon {
-    color: #00ff00;
-}
-.vpn-status.on .vpn-status-text {
-    color: #27ae60;
-}
-.vpn-status.off .vpn-status-icon {
-    color: #ff4444;
-}
-.vpn-status.off .vpn-status-text {
-    color: #e74c3c;
-}
-
-.vpn-description {
-    margin: 15px 0;
-    padding: 12px;
-    background: #ffeedd;
-    font-size: 12px;
-    color: #442200;
-    text-align: left;
-    border-left: 4px solid #ffaa44;
-}
-
-.vpn-warning {
-    color: #e74c3c;
-    margin-top: 8px;
-    font-weight: bold;
-}
-
-.vpn-toggle-btn {
-    background: #4caf50;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    margin: 15px 0;
-    font-family: 'Courier New', monospace;
-    width: 100%;
-    clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
-}
-
-.vpn-toggle-btn.off {
-    background: #4caf50;
-}
-
-.vpn-toggle-btn.on {
-    background: #e74c3c;
-}
-
-.vpn-toggle-btn:hover {
-    transform: scale(1.02);
-}
-
-.vpn-info {
-    margin-top: 15px;
-    padding: 10px;
-    background: #ffddbb;
-    font-size: 10px;
-    color: #886633;
-    text-align: center;
-}
-
-/* Telegram чат */
-.telegram-chat {
-    position: fixed;
-    width: 450px;
-    height: 550px;
-    background: #fff8f0;
-    border: 6px solid #ffaa44;
-    display: none;
-    flex-direction: column;
-    z-index: 250;
-    clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
-    box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.2);
-    overflow: hidden;
-}
-
-.telegram-chat.active {
-    display: flex;
-}
-
-.telegram-header {
-    background: #ffaa44;
-    padding: 12px 16px;
-    color: #442200;
-    font-weight: bold;
-    font-family: 'Courier New', monospace;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: move;
-    border-bottom: 3px solid #cc8833;
-}
-
-.telegram-close {
-    background: #ff6644;
-    border: none;
-    color: white;
-    cursor: pointer;
-    font-size: 16px;
-    width: 28px;
-    height: 28px;
-    clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
-}
-
-.telegram-search {
-    padding: 10px;
-    background: #ffddbb;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    border-bottom: 2px solid #ffcc88;
-}
-
-.telegram-search input {
-    flex: 1;
-    background: #ffffee;
-    border: 2px solid #ffaa44;
-    padding: 6px 10px;
-    font-family: 'Courier New', monospace;
-    font-size: 12px;
-    clip-path: polygon(3px 0, calc(100% - 3px) 0, 100% 3px, 100% calc(100% - 3px), calc(100% - 3px) 100%, 3px 100%, 0 calc(100% - 3px), 0 3px);
-}
-
-.telegram-chats {
-    width: 130px;
-    background: #ffeedd;
-    border-right: 2px solid #ffcc88;
-    overflow-y: auto;
-    flex-shrink: 0;
-}
-
-.telegram-chat-item {
-    display: flex;
-    padding: 12px 8px;
-    gap: 8px;
-    cursor: pointer;
-    border-bottom: 1px solid #ffcc88;
-    transition: background 0.1s;
-}
-
-.telegram-chat-item:hover {
-    background: #ffddbb;
-}
-
-.telegram-chat-item.active {
-    background: #ffcc88;
-}
-
-.telegram-chat-avatar {
-    width: 36px;
-    height: 36px;
-    background: #ffaa44;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
-}
-
-.telegram-chat-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.telegram-chat-name {
-    font-weight: bold;
-    font-size: 12px;
-    color: #442200;
-}
-
-.telegram-chat-preview {
-    font-size: 10px;
-    color: #886633;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.telegram-messages-area {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.telegram-messages-header {
-    padding: 10px;
-    background: #ffddbb;
-    border-bottom: 2px solid #ffcc88;
-    font-weight: bold;
-    font-size: 13px;
-    color: #442200;
-}
-
-.telegram-messages-container {
-    flex: 1;
-    overflow-y: auto;
-    padding: 10px;
-    background: #fff8f0;
-}
-
-.telegram-message {
-    background: white;
-    border: 2px solid #ffdd99;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
-}
-
-.telegram-message.unread {
-    background: #fff4cc;
-    border-left: 4px solid #ffaa44;
-}
-
-.telegram-sender {
-    font-weight: bold;
-    color: #442200;
-    font-size: 12px;
-    margin-bottom: 5px;
-}
-
-.telegram-text {
-    font-size: 13px;
-    color: #333;
-    margin-bottom: 5px;
-    line-height: 1.4;
-}
-
-.telegram-time {
-    font-size: 9px;
-    color: #886633;
-    text-align: right;
-}
-
-/* DeepSeek чат */
-.deepseek-chat {
-    position: fixed;
-    width: 320px;
-    height: 400px;
-    background: #1a1a2e;
-    border: 6px solid #ffaa44;
-    display: none;
-    flex-direction: column;
-    z-index: 250;
-    clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
-    box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.2);
-}
-
-.deepseek-chat.active {
-    display: flex;
-}
-
-.deepseek-header {
-    background: #2d2d4a;
-    padding: 12px 16px;
-    color: #ffaa44;
-    font-weight: bold;
-    font-family: 'Courier New', monospace;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: move;
-    border-bottom: 3px solid #ffaa44;
-}
-
-.deepseek-close {
-    background: #ff6644;
-    border: none;
-    color: white;
-    cursor: pointer;
-    font-size: 16px;
-    width: 28px;
-    height: 28px;
-}
-
-.deepseek-content {
-    flex: 1;
-    padding: 15px;
-    color: #ccc;
-    font-size: 13px;
-    font-family: 'Courier New', monospace;
-    overflow-y: auto;
-}
-
-.deepseek-message {
-    background: #2d2d4a;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-}
-
-.deepseek-advice {
-    background: #0a0a1a;
-    padding: 12px;
-    border-left: 3px solid #ffaa44;
-}
-
-/* Анимация для баблов */
-.bubble-container {
-    position: fixed;
-    bottom: 70px;
-    left: 20px;
-    z-index: 250;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    pointer-events: none;
-}
-
-.bubble {
-    background: #ffffcc;
-    padding: 10px 16px;
-    max-width: 300px;
-    font-family: 'Courier New', monospace;
-    font-size: 13px;
-    font-weight: bold;
-    clip-path: polygon(0px 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
-    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
-    animation: slideIn 0.2s ease-out;
-}
-
-.bubble.system {
-    background: #ff9800;
-    color: white;
-}
-
-.bubble.user {
-    background: #4caf50;
-    color: white;
-}
-
-.bubble.character {
-    background: #2196f3;
-    color: white;
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-50px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-/* Оверлей */
-.shutdown-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #000;
-    z-index: 2000;
-    display: none;
-    justify-content: center;
-    align-items: center;
-}
-
-.shutdown-overlay.active {
-    display: flex;
-}
-
-.shutdown-text {
-    color: white;
-    font-size: 24px;
-    font-family: monospace;
-    animation: blink 1s infinite;
-}
-
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-}
-/* Убираем баблы */
-.bubble-container {
-    display: none;
-}
-
-/* Перетаскиваемые окна - правильное позиционирование */
-.deepseek-chat,
-.telegram-chat,
-.vpn-app {
-    position: fixed !important;
-    cursor: default;
-    resize: both;
-    overflow: auto;
-}
-
-.deepseek-header,
-.telegram-header,
-.vpn-header {
-    cursor: move;
-    user-select: none;
-}
-
-/* Telegram чат - увеличенный и исправленный */
-.telegram-chat {
-    position: fixed;
-    width: 500px;
-    height: 600px;
-    background: #fff8f0;
-    border: 6px solid #ffaa44;
-    display: none;
-    flex-direction: row;
-    z-index: 250;
-    clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
-    box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.2);
-    overflow: hidden;
-}
-
-.telegram-chat.active {
-    display: flex;
-}
-
-.telegram-sidebar {
-    width: 140px;
-    background: #ffeedd;
-    border-right: 2px solid #ffcc88;
-    display: flex;
-    flex-direction: column;
-}
-
-.telegram-header {
-    background: #ffaa44;
-    padding: 12px 16px;
-    color: #442200;
-    font-weight: bold;
-    font-family: 'Courier New', monospace;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 3px solid #cc8833;
-    width: 100%;
-}
-
-.telegram-main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.telegram-search {
-    padding: 10px;
-    background: #ffddbb;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    border-bottom: 2px solid #ffcc88;
-}
-
-.telegram-chats {
-    flex: 1;
-    overflow-y: auto;
-}
-
-.telegram-chat-item {
-    display: flex;
-    padding: 12px 8px;
-    gap: 8px;
-    cursor: pointer;
-    border-bottom: 1px solid #ffcc88;
-    transition: background 0.1s;
-}
-
-.telegram-chat-item:hover {
-    background: #ffddbb;
-}
-
-.telegram-chat-item.active {
-    background: #ffcc88;
-}
-
-.telegram-chat-avatar {
-    width: 36px;
-    height: 36px;
-    background: #ffaa44;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-}
-
-.telegram-chat-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.telegram-chat-name {
-    font-weight: bold;
-    font-size: 12px;
-    color: #442200;
-}
-
-.telegram-chat-preview {
-    font-size: 10px;
-    color: #886633;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.telegram-messages-area {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.telegram-messages-header {
-    padding: 10px;
-    background: #ffddbb;
-    border-bottom: 2px solid #ffcc88;
-    font-weight: bold;
-    font-size: 13px;
-    color: #442200;
-}
-
-.telegram-messages-container {
-    flex: 1;
-    overflow-y: auto;
-    padding: 10px;
-    background: #fff8f0;
-}
-
-.telegram-message {
-    background: white;
-    border: 2px solid #ffdd99;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-}
-
-.telegram-message.unread {
-    background: #fff4cc;
-    border-left: 4px solid #ffaa44;
-}
-
-.telegram-sender {
-    font-weight: bold;
-    color: #442200;
-    font-size: 12px;
-    margin-bottom: 5px;
-}
-
-.telegram-text {
-    font-size: 13px;
-    color: #333;
-    margin-bottom: 5px;
-    line-height: 1.4;
-}
-
-.telegram-time {
-    font-size: 9px;
-    color: #886633;
-    text-align: right;
-}
-
-.telegram-locked {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    padding: 40px;
-    text-align: center;
-    color: #886633;
-}
-
-.telegram-lock-icon {
-    font-size: 48px;
-    margin-bottom: 20px;
-}
-
-/* DeepSeek чат */
+/* ===== DEEPSEEK ЧАТ (тёмная тема) ===== */
 .deepseek-chat {
     position: fixed;
     width: 350px;
@@ -1861,6 +616,7 @@ body.main-page {
     z-index: 250;
     clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
     box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.2);
+    cursor: default;
 }
 
 .deepseek-chat.active {
@@ -1876,6 +632,7 @@ body.main-page {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    cursor: move;
     border-bottom: 3px solid #ffaa44;
 }
 
@@ -1912,140 +669,7 @@ body.main-page {
     border-left: 3px solid #ffaa44;
 }
 
-/* VPN Client */
-.vpn-app {
-    position: fixed;
-    width: 350px;
-    background: #fff8f0;
-    border: 6px solid #ffaa44;
-    display: none;
-    flex-direction: column;
-    z-index: 250;
-    clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
-    box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.2);
-}
-
-.vpn-app.active {
-    display: flex;
-}
-
-.vpn-header {
-    background: #ffaa44;
-    padding: 12px 16px;
-    color: #442200;
-    font-weight: bold;
-    font-family: 'Courier New', monospace;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 3px solid #cc8833;
-}
-
-.vpn-close {
-    background: #ff6644;
-    border: none;
-    color: white;
-    cursor: pointer;
-    font-size: 16px;
-    width: 28px;
-    height: 28px;
-    clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
-}
-
-.vpn-content {
-    padding: 20px;
-    text-align: center;
-}
-
-.vpn-status {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    margin-bottom: 20px;
-    padding: 15px;
-    background: #ffeedd;
-    border-radius: 8px;
-}
-
-.vpn-status-icon {
-    font-size: 24px;
-}
-
-.vpn-status-text {
-    font-size: 18px;
-    font-weight: bold;
-    font-family: 'Courier New', monospace;
-}
-
-.vpn-status.on .vpn-status-icon { color: #00ff00; }
-.vpn-status.on .vpn-status-text { color: #27ae60; }
-.vpn-status.off .vpn-status-icon { color: #ff4444; }
-.vpn-status.off .vpn-status-text { color: #e74c3c; }
-
-.vpn-description {
-    margin: 15px 0;
-    padding: 12px;
-    background: #ffeedd;
-    font-size: 12px;
-    color: #442200;
-    text-align: left;
-    border-left: 4px solid #ffaa44;
-}
-
-.vpn-warning {
-    color: #e74c3c;
-    margin-top: 8px;
-    font-weight: bold;
-}
-
-.vpn-toggle-btn {
-    background: #4caf50;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    margin: 15px 0;
-    font-family: 'Courier New', monospace;
-    width: 100%;
-    clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
-}
-
-.vpn-toggle-btn.on {
-    background: #e74c3c;
-}
-
-.vpn-info {
-    margin-top: 15px;
-    padding: 10px;
-    background: #ffddbb;
-    font-size: 10px;
-    color: #886633;
-    text-align: center;
-}
-/* Убираем баблы */
-.bubble-container {
-    display: none;
-}
-
-/* Перетаскиваемые окна */
-.deepseek-chat,
-.telegram-chat,
-.vpn-app {
-    position: fixed !important;
-    cursor: default;
-}
-
-.deepseek-header,
-.telegram-header,
-.vpn-header {
-    cursor: move;
-    user-select: none;
-}
-
-/* Telegram чат - упрощённая верстка */
+/* ===== TELEGRAM ЧАТ (упрощённая версия) ===== */
 .telegram-chat {
     position: fixed;
     width: 450px;
@@ -2058,6 +682,7 @@ body.main-page {
     clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
     box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.2);
     overflow: hidden;
+    cursor: default;
 }
 
 .telegram-chat.active {
@@ -2073,6 +698,7 @@ body.main-page {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    cursor: move;
     border-bottom: 3px solid #cc8833;
 }
 
@@ -2155,70 +781,7 @@ body.main-page {
     color: #886633;
 }
 
-/* DeepSeek чат */
-.deepseek-chat {
-    position: fixed;
-    width: 350px;
-    height: 450px;
-    background: #1a1a2e;
-    border: 6px solid #ffaa44;
-    display: none;
-    flex-direction: column;
-    z-index: 250;
-    clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
-    box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.2);
-}
-
-.deepseek-chat.active {
-    display: flex;
-}
-
-.deepseek-header {
-    background: #2d2d4a;
-    padding: 12px 16px;
-    color: #ffaa44;
-    font-weight: bold;
-    font-family: 'Courier New', monospace;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 3px solid #ffaa44;
-}
-
-.deepseek-close {
-    background: #ff6644;
-    border: none;
-    color: white;
-    cursor: pointer;
-    font-size: 16px;
-    width: 28px;
-    height: 28px;
-    clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
-}
-
-.deepseek-content {
-    flex: 1;
-    padding: 15px;
-    color: #ccc;
-    font-size: 13px;
-    font-family: 'Courier New', monospace;
-    overflow-y: auto;
-}
-
-.deepseek-message {
-    background: #2d2d4a;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-}
-
-.deepseek-advice {
-    background: #0a0a1a;
-    padding: 12px;
-    border-left: 3px solid #ffaa44;
-}
-
-/* VPN Client */
+/* ===== VPN CLIENT ===== */
 .vpn-app {
     position: fixed;
     width: 350px;
@@ -2229,6 +792,7 @@ body.main-page {
     z-index: 250;
     clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
     box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.2);
+    cursor: default;
 }
 
 .vpn-app.active {
@@ -2244,6 +808,7 @@ body.main-page {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    cursor: move;
     border-bottom: 3px solid #cc8833;
 }
 
@@ -2319,8 +884,16 @@ body.main-page {
     clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
 }
 
+.vpn-toggle-btn.off {
+    background: #4caf50;
+}
+
 .vpn-toggle-btn.on {
     background: #e74c3c;
+}
+
+.vpn-toggle-btn:hover {
+    transform: scale(1.02);
 }
 
 .vpn-info {
@@ -2332,63 +905,7 @@ body.main-page {
     text-align: center;
 }
 
-/* Оверлей */
-.shutdown-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #000;
-    z-index: 2000;
-    display: none;
-    justify-content: center;
-    align-items: center;
-}
-
-.shutdown-overlay.active {
-    display: flex;
-}
-
-.shutdown-text {
-    color: white;
-    font-size: 24px;
-    font-family: monospace;
-    animation: blink 1s infinite;
-}
-
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-}
-/* Telegram error message */
-.telegram-error {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    padding: 40px;
-    text-align: center;
-}
-
-.telegram-error-icon {
-    font-size: 48px;
-    margin-bottom: 20px;
-}
-
-.telegram-error-title {
-    font-size: 20px;
-    font-weight: bold;
-    color: #e74c3c;
-    margin-bottom: 10px;
-}
-
-.telegram-error-text {
-    font-size: 14px;
-    color: #886633;
-}
-/* Блокнот */
+/* ===== БЛОКНОТ (ИНСТРУКЦИЯ) ===== */
 .notepad-app {
     position: fixed;
     width: 550px;
@@ -2477,4 +994,280 @@ body.main-page {
 
 .notepad-text em {
     color: #e74c3c;
+}
+
+/* ===== ЭКРАН ВЫКЛЮЧЕНИЯ ===== */
+.shutdown-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    z-index: 2000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s;
+}
+
+.shutdown-overlay.active {
+    display: flex;
+}
+
+.shutdown-text {
+    color: white;
+    font-size: 24px;
+    font-family: monospace;
+    animation: blink 1s infinite;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* ===== ФИНАЛЬНОЕ ОКНО РАССЛЕДОВАНИЯ ===== */
+.final-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Courier New', monospace;
+}
+
+.final-modal {
+    background: #ffdd99;
+    border: 8px solid #ffaa44;
+    padding: 20px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+    clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px);
+    box-shadow: 12px 12px 0px rgba(0, 0, 0, 0.3);
+}
+
+.final-modal h2 {
+    color: #442200;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.final-clues-box {
+    background: #ffeedd;
+    border: 4px solid #ffaa44;
+    padding: 12px;
+    margin: 15px 0;
+    text-align: left;
+    font-size: 14px;
+    clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
+}
+
+.final-clues-box h4 {
+    color: #442200;
+    margin-bottom: 8px;
+    border-bottom: 2px solid #ffaa44;
+    padding-bottom: 4px;
+}
+
+.final-clues-list {
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.final-clues-list li {
+    margin: 6px 0;
+    padding-left: 16px;
+    color: #553300;
+}
+
+.final-commands-history {
+    background: #1a1a2a;
+    border: 4px solid #ffaa44;
+    padding: 12px;
+    margin: 15px 0;
+    text-align: left;
+    font-size: 13px;
+    font-family: monospace;
+    color: #00ff00;
+    max-height: 150px;
+    overflow-y: auto;
+    clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
+}
+
+.final-commands-history h4 {
+    color: #ffaa44;
+    margin-bottom: 8px;
+}
+
+.final-choice-btn {
+    display: block;
+    width: 100%;
+    margin: 8px 0;
+    padding: 12px;
+    background: #442200;
+    border: 3px solid #271400;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    font-size: 13px;
+    cursor: pointer;
+    color: #ffdd99;
+    transition: all 0.08s linear;
+    clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
+}
+
+.final-choice-btn:hover:not(:disabled) {
+    background: #663300;
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.3);
+}
+
+.final-choice-btn:active:not(:disabled) {
+    transform: translate(2px, 2px);
+}
+
+.final-choice-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.final-feedback {
+    background: #ffcc88;
+    padding: 12px;
+    margin-top: 15px;
+    font-size: 13px;
+    color: #442200;
+    border-left: 5px solid #ff6600;
+    clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
+}
+
+.final-close-btn {
+    margin-top: 15px;
+    padding: 8px 20px;
+    background: #886633;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
+}
+
+/* ===== ЭКРАН ПОБЕДЫ ===== */
+.victory-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.97);
+    z-index: 10001;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Courier New', monospace;
+}
+
+.victory-modal {
+    background: linear-gradient(135deg, #ffdd99 0%, #ffcc77 100%);
+    border: 8px solid #ffaa44;
+    padding: 30px;
+    max-width: 550px;
+    height: 90%;
+    width: 90%;
+    text-align: center;
+    clip-path: polygon(16px 0, calc(100% - 16px) 0, 100% 16px, 100% calc(100% - 16px), calc(100% - 16px) 100%, 16px 100%, 0 calc(100% - 16px), 0 16px);
+    box-shadow: 16px 16px 0px rgba(0, 0, 0, 0.4);
+    animation: victoryPulse 0.5s ease-out;
+}
+
+@keyframes victoryPulse {
+    0% { transform: scale(0.8); opacity: 0; }
+    80% { transform: scale(1.02); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.victory-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+    filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.3));
+}
+
+.victory-modal h1 {
+    color: #2e7d32;
+    font-size: 28px;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 0px #a5d6a5;
+}
+
+.victory-explanation {
+    background: #442200;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: left;
+    color: #ffdd99;
+    border-left: 6px solid #ffaa44;
+    font-size: 12px;
+    line-height: 1.5;
+    clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
+}
+
+.victory-stats {
+    background: #ffcc88;
+    padding: 15px;
+    margin: 15px 0;
+    font-size: 13px;
+    color: #442200;
+    border: 3px solid #ffaa44;
+    clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
+}
+
+.victory-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.victory-btn {
+    padding: 12px 24px;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
+    transition: all 0.08s linear;
+}
+
+.victory-btn-new {
+    background: #2e7d32;
+    color: white;
+    box-shadow: inset -2px -2px 0 #1b5e20, inset 2px 2px 0 #66bb6a;
+}
+
+.victory-btn-reset {
+    background: #e74c3c;
+    color: white;
+    box-shadow: inset -2px -2px 0 #c0392b, inset 2px 2px 0 #ff8a80;
+}
+
+.victory-btn:hover {
+    transform: translate(-2px, -2px);
+}
+
+.victory-btn:active {
+    transform: translate(2px, 2px);
 }

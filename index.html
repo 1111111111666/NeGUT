@@ -8,27 +8,22 @@
 </head>
 <body class="main-page">
     <main class="game-main">
-        <h1 class="game-title">СПБ не ГУТ</h1>
         
         <div class="menu-buttons">
             <button id="newGameBtn" class="menu-btn">
-                <img src="images/start.png" alt="Начать новую игру" class="menu-icon" onerror="this.src='https://placehold.co/80x80/ffaa44/442200?text=🚀'">
+                <img src="images/start.png" alt="Начать новую игру" class="menu-icon">
                 <span>Начать новую игру</span>
             </button>
             <button id="continueBtn" class="menu-btn">
-                <img src="images/cont.png" alt="Продолжить" class="menu-icon" onerror="this.src='https://placehold.co/80x80/ffaa44/442200?text=📁'">
+                <img src="images/cont.png" alt="Продолжить" class="menu-icon">
                 <span>Продолжить</span>
             </button>
             <button id="resetBtn" class="menu-btn">
-                <img src="images/reset.png" alt="Сбросить прогресс" class="menu-icon" onerror="this.src='https://placehold.co/80x80/ffaa44/442200?text=🗑️'">
+                <img src="images/reset.png" alt="Сбросить прогресс" class="menu-icon">
                 <span>Сбросить прогресс</span>
             </button>
         </div>
     </main>
-
-    <footer>
-        <!-- Кнопка выключения удалена -->
-    </footer>
 
     <!-- РАБОЧИЙ СТОЛ -->
     <div id="desktop" class="desktop" style="display: none;">
@@ -36,23 +31,23 @@
         
         <div class="desktop-icons">
             <div class="icon" data-app="browser">
-                <div class="icon-emoji">🌐</div>
+                <img src="images/browser.png" class="icon-img" alt="Браузер">
                 <div class="icon-label">Браузер</div>
             </div>
             <div class="icon" id="deepseekIcon">
-                <div class="icon-emoji">🤖</div>
+                <img src="images/deepseek.png" class="icon-img" alt="DeepSeek">
                 <div class="icon-label">DeepSeek</div>
             </div>
             <div class="icon" id="telegramIcon">
-                <div class="icon-emoji">📨</div>
+                <img src="images/tg.png" class="icon-img" alt="Telegram">
                 <div class="icon-label">Telegram</div>
             </div>
             <div class="icon" id="vpnIcon">
-                <div class="icon-emoji">🌐</div>
+                <img src="images/vpn.png" class="icon-img" alt="VPN Client">
                 <div class="icon-label">VPN Client</div>
             </div>
             <div class="icon" id="notepadIcon">
-                <div class="icon-emoji">📝</div>
+                <img src="images/doc.png" class="icon-img" alt="Инструкция">
                 <div class="icon-label">Инструкция</div>
             </div>
         </div>
@@ -64,16 +59,26 @@
                     <span>Пуск</span>
                 </div>
                 <div class="taskbar-icons">
-                    <div class="taskbar-app-icon" data-app="browser">🌐</div>
-                    <div class="taskbar-app-icon" id="deepseekTaskbarIcon">🤖</div>
-                    <div class="taskbar-app-icon" id="telegramTaskbarIcon">📨</div>
-                    <div class="taskbar-app-icon" id="vpnTaskbarIcon">🌐</div>
-                    <div class="taskbar-app-icon" id="notepadTaskbarIcon">📝</div>
+                    <div class="taskbar-app-icon" data-app="browser">
+                        <img src="images/browser-mini.png" class="taskbar-icon-img">
+                    </div>
+                    <div class="taskbar-app-icon" id="deepseekTaskbarIcon">
+                        <img src="images/deepseek-mini.png" class="taskbar-icon-img">
+                    </div>
+                    <div class="taskbar-app-icon" id="telegramTaskbarIcon">
+                        <img src="images/tg-mini.png" class="taskbar-icon-img">
+                    </div>
+                    <div class="taskbar-app-icon" id="vpnTaskbarIcon">
+                        <img src="images/vpn-mini.png" class="taskbar-icon-img">
+                    </div>
+                    <div class="taskbar-app-icon" id="notepadTaskbarIcon">
+                        <img src="images/doc-mini.png" class="taskbar-icon-img">
+                    </div>
                 </div>
             </div>
             <div class="taskbar-right">
                 <div class="notification-area">
-                    <span>🔔</span>
+                    <span>✉</span>
                     <div class="notification-badge"></div>
                 </div>
                 <div class="taskbar-time">
@@ -85,45 +90,44 @@
 
         <div id="startMenu" class="start-menu">
             <div class="start-menu-header">
-                <div class="start-menu-avatar">👨‍💻</div>
+                <div class="start-menu-avatar">☺</div>
                 <div class="start-menu-user">Коля Иванов</div>
             </div>
-            <div class="start-menu-pinned">Закрепленные</div>
             <div class="start-menu-items">
                 <div class="start-menu-item" data-app="browser">
-                    <div class="start-menu-item-icon">🌐</div>
+                    <img src="images/browser-mini.png" class="start-menu-icon-img">
                     <span>Браузер</span>
                 </div>
                 <div class="start-menu-item" id="startDeepseekBtn">
-                    <div class="start-menu-item-icon">🤖</div>
+                    <img src="images/deepseek-mini.png" class="start-menu-icon-img">
                     <span>DeepSeek</span>
                 </div>
                 <div class="start-menu-item" id="startTelegramBtn">
-                    <div class="start-menu-item-icon">📨</div>
+                    <img src="images/tg-mini.png" class="start-menu-icon-img">
                     <span>Telegram</span>
                 </div>
                 <div class="start-menu-item" id="startVpnBtn">
-                    <div class="start-menu-item-icon">🌐</div>
+                    <img src="images/vpn-mini.png" class="start-menu-icon-img">
                     <span>VPN Client</span>
                 </div>
                 <div class="start-menu-item" id="startNotepadBtn">
-                    <div class="start-menu-item-icon">📝</div>
+                    <img src="images/doc-mini.png" class="start-menu-icon-img">
                     <span>Инструкция</span>
                 </div>
             </div>
             <div class="start-menu-divider"></div>
             <div class="start-menu-power">
                 <div class="power-option" id="startRebootBtn">
-                    <span>🔄</span> Перезагрузка
+                    <span>⟲</span> Перезагрузка
                 </div>
                 <div class="power-option" id="startShutdownBtn">
-                    <span>⏻</span> Выключение
+                    <span>⌽</span> Выключение
                 </div>
             </div>
         </div>
 
         <div id="notificationPanel" class="notification-panel">
-            <div class="notification-header">📋 Уведомления</div>
+            <div class="notification-header">Уведомления</div>
             <div class="notification-list" id="notificationList"></div>
         </div>
 
@@ -135,14 +139,13 @@
                         <button id="closeBrowserBtn">✖</button>
                     </div>
                     <div class="browser-tabs">
-                        <button class="tab-btn active" data-page="user.html">👤 Личный кабинет</button>
-                        <button class="tab-btn" data-page="admin.html">🖥️ Панель администратора</button>
-                        <button class="tab-btn" data-page="archive.html">📚 Архив данных</button>
-                        <button class="tab-btn" data-page="error-log.html">⚠️ Журнал ошибок</button>
+                        <button class="tab-btn active" data-page="user.html">Личный кабинет</button>
+                        <button class="tab-btn" data-page="admin.html">Панель администратора</button>
+                        <button class="tab-btn" data-page="archive.html">Архив данных</button>
+                        <button class="tab-btn" data-page="error-log.html">Журнал ошибок</button>
                     </div>
                 </div>
                 <iframe id="browserIframe" class="browser-iframe" src="user.html"></iframe>
-                <!-- browser-statusbar удалён -->
             </div>
         </div>
 
@@ -190,10 +193,9 @@
             </div>
         </div>
 
-        <!-- Блокнот с инструкцией -->
         <div id="notepadApp" class="notepad-app" style="top: 100px; left: 200px; display: none;">
             <div class="notepad-header">
-                <span>📝 Инструкция_для_чайников.md</span>
+                <span>Инструкция_для_чайников.md</span>
                 <button class="notepad-close">✖</button>
             </div>
             <div class="notepad-content">
@@ -219,8 +221,8 @@
                     </ul>
                     <p><strong>2. Следи за панелью статистики</strong> (в правом верхнем углу):</p>
                     <ul>
-                        <li>❤️ <strong>Доверие</strong> — падает при ошибках, растёт при правильных решениях</li>
-                        <li>🧠 <strong>Интеллект</strong> — повышается за посещение пар в Личном кабинете</li>
+                        <li>♥ <strong>Доверие</strong> — падает при ошибках, растёт при правильных решениях</li>
+                        <li>★ <strong>Интеллект</strong> — повышается за посещение пар в Личном кабинете</li>
                     </ul>
                     <p><strong>3. Используй приложения:</strong></p>
                     <ul>
@@ -242,7 +244,7 @@
                     <h2>💡 Важные правила!</h2>
                     <p>✅ После успешного решения проблемы дня — <strong>ОБЯЗАТЕЛЬНО выключи компьютер</strong> (кнопка "Выключение" в меню Пуск), выйди на главный экран и нажми "Продолжить игру". Без этого следующий день не начнётся!</p>
                     <p>✅ Отмечайся на парах в Личном кабинете — это повышает интеллект.</p>
-                    <p>✅ Читай уведомления (🔔) — там важная информация.</p>
+                    <p>✅ Читай уведомления (✉) — там важная информация.</p>
                     <p>✅ Проверяй Telegram — преподаватели и однгруппники иногда пишут туда.</p>
                     <hr>
                     <p><em>А ещё не забудь задвинуть стул, а то будешь писать реферат иххихи 😜</em></p>
@@ -252,14 +254,14 @@
 
         <div class="stats-panel">
             <div class="stat-item">
-                <span class="stat-label">❤️ Доверие:</span>
+                <span class="stat-label">♥ Доверие:</span>
                 <span class="stat-value" id="trustValue">70</span>
                 <div class="stat-bar">
                     <div class="stat-fill" id="trustFill" style="width: 70%"></div>
                 </div>
             </div>
             <div class="stat-item">
-                <span class="stat-label">🧠 Интеллект:</span>
+                <span class="stat-label">★ Интеллект:</span>
                 <span class="stat-value" id="intellectValue">0</span>
                 <div class="stat-bar">
                     <div class="stat-fill" id="intellectFill" style="width: 0%"></div>
