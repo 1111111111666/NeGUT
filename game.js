@@ -445,10 +445,12 @@ function restoreTerminalHistory() {
 
 // ГЛАВНАЯ ФУНКЦИЯ ВЫПОЛНЕНИЯ КОМАНД
 function executeCommand(command) {
-    console.log("Выполнение команды:", command);
+    console.log("📟 Выполнение команды:", command);
+    // Сохраняем оригинальную команду для отображения
+    const originalCommand = command;
     const cmd = command.toLowerCase().trim();
     
-    addToTerminalFromGame(`> ${command}`, false, false);
+    addToTerminalFromGame(`> ${originalCommand}`, false, false);
     
     if (cmd === "help") {
         addToTerminalFromGame("=== ДОСТУПНЫЕ КОМАНДЫ ===", false, false);
@@ -458,13 +460,28 @@ function executeCommand(command) {
                 addToTerminalFromGame(`${cmdName.padEnd(30)} ${dayInfo.padEnd(10)} - ${terminalCommands[cmdName].description}`, false, false);
             }
         }
-        addToTerminalFromGame(`📅 Текущий день: ${gameData.day} | ♥ Доверие: ${gameData.trust} | ★ Интеллект: ${gameData.intellect}`, false, false);
+        addToTerminalFromGame(`📅 Текущий день: ${gameData.day} | ❤️ Доверие: ${gameData.trust} | 🧠 Интеллект: ${gameData.intellect}`, false, false);
         return;
     }
     
-    const cmdData = terminalCommands[cmd];
+    // Ищем команду в точном соответствии с оригиналом (с учётом регистра пробелов)
+    let cmdData = terminalCommands[originalCommand];
     if (!cmdData) {
-        addToTerminalFromGame(`❌ Команда не найдена: ${command}`, true, false);
+        // Пробуем найти по нижнему регистру
+        cmdData = terminalCommands[cmd];
+    }
+    if (!cmdData) {
+        // Для команд с пробелами пробуем искать по оригиналу без изменений
+        for (let key in terminalCommands) {
+            if (key.toLowerCase() === cmd) {
+                cmdData = terminalCommands[key];
+                break;
+            }
+        }
+    }
+    
+    if (!cmdData) {
+        addToTerminalFromGame(`❌ Команда не найдена: ${originalCommand}`, true, false);
         addToTerminalFromGame(`💡 Введите 'help' для списка команд`, false, false);
         return;
     }
@@ -489,7 +506,7 @@ function executeCommand(command) {
     if (cmdData.intellect) modifyIntellect(cmdData.intellect);
     if (cmdData.clue) addClue(cmdData.clue);
     
-    addToErrorLog(command, cmdData.success ? 'исправлена' : 'не исправлена', cmdData.message, cmdData.day, cmdData.explanation, cmdData.trust || 0, cmdData.intellect || 0);
+    addToErrorLog(originalCommand, cmdData.success ? 'исправлена' : 'не исправлена', cmdData.message, cmdData.day, cmdData.explanation, cmdData.trust || 0, cmdData.intellect || 0);
     
     if (cmdData.success) {
         addToTerminalFromGame(`✅ ${cmdData.message}`, false, true);
