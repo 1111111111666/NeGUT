@@ -7,13 +7,13 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
             font-family: 'Courier New', monospace;
-            background: #1a1a1a;
+            background: #0a0a0a;
             color: #00ff00;
             padding: 20px;
         }
         
         .admin-container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
         }
         
@@ -40,276 +40,233 @@
             font-size: 12px;
         }
         
-        .status-badge.online {
-            color: #00ff00;
-        }
+        .status-badge.online { color: #00ff00; }
+        .status-badge.offline { color: #ff4444; }
+        .status-badge.warning { color: #ffaa44; }
         
-        .status-badge.offline {
-            color: #ff4444;
-        }
-        
-        .status-badge.warning {
-            color: #ffaa44;
-        }
-        
-        .cli-section {
+        .terminal {
             background: #0a0a0a;
-            border: 1px solid #333;
-            padding: 15px;
-            margin: 15px 0;
+            border: 2px solid #00ff00;
+            margin: 20px 0;
         }
         
-        .cli-title {
+        .terminal-header {
             color: #00ff00;
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-        
-        .cli-option {
-            background: #1a1a1a;
-            padding: 12px;
-            margin: 8px 0;
-            cursor: pointer;
-            transition: all 0.1s;
-            border-left: 3px solid #00ff00;
-            border-radius: 4px;
-        }
-        
-        .cli-option:hover {
-            background: #2a2a2a;
-            transform: translateX(5px);
-        }
-        
-        .cli-option:active {
-            background: #3a3a3a;
-        }
-        
-        .cli-option-name {
-            font-weight: bold;
-            margin-bottom: 4px;
-        }
-        
-        .cli-option-desc {
-            font-size: 11px;
-            color: #888;
-        }
-        
-        .error-log {
-            background: #0a0a0a;
-            padding: 15px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        
-        .error-entry {
-            padding: 8px;
+            padding: 10px;
             border-bottom: 1px solid #333;
             font-size: 12px;
         }
         
-        .error-time {
-            color: #888;
-            margin-right: 10px;
+        .terminal-output {
+            height: 500px;
+            overflow-y: auto;
+            font-size: 12px;
+            padding: 10px;
+            background: #0a0a0a;
         }
         
-        .prompt {
+        .terminal-line {
+            padding: 3px 0;
+            font-family: 'Courier New', monospace;
+            border-bottom: 1px solid #1a1a1a;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        .terminal-line.error { color: #ff6666; }
+        .terminal-line.success { color: #44ff44; }
+        .terminal-prompt { color: #00ff00; margin-right: 10px; }
+        
+        .terminal-input-line {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-top: 1px solid #333;
+            padding: 10px;
+        }
+        
+        .terminal-input-line span { color: #00ff00; font-weight: bold; }
+        
+        .terminal-input {
+            flex: 1;
+            background: #1a1a1a;
+            border: 1px solid #00ff00;
             color: #00ff00;
-            margin: 10px 0;
+            padding: 8px;
+            font-family: 'Courier New', monospace;
             font-size: 12px;
         }
         
-        h2 {
-            margin-bottom: 15px;
-            font-size: 18px;
+        .terminal-input:focus {
+            outline: none;
+            border-color: #00ff00;
+            box-shadow: 0 0 5px #00ff00;
         }
         
-        hr {
-            border-color: #333;
+        .terminal-send {
+            background: #00ff00;
+            border: none;
+            color: #0a0a0a;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+        
+        .terminal-send:hover { background: #44ff44; }
+        
+        h2 { margin-bottom: 15px; font-size: 16px; }
+        .status-info { font-size: 11px; color: #888; margin-top: 5px; }
+        
+        .day-info-box {
+            background: #1a1a1a;
+            padding: 10px;
             margin: 10px 0;
+            border-left: 3px solid #00ff00;
+            font-size: 12px;
         }
     </style>
 </head>
 <body>
     <div class="admin-container">
         <div class="dashboard">
-            <h2>🛠️ PANEL: ADMIN CONSOLE v2.0</h2>
+            <h2>ADMIN CONSOLE v3.0</h2>
             <div class="status">
                 <div class="status-badge online" id="apiGatewayStatus">🟢 API Gateway: ONLINE</div>
-                <div class="status-badge" id="queueStatus">📦 Очередь: 0</div>
-                <div class="status-badge" id="cacheStatus">💾 Кеш: OK</div>
-                <div class="status-badge" id="vpnStatus">🌐 VPN check: ON</div>
+                <div class="status-badge" id="queueStatus">Очередь: 0</div>
+                <div class="status-badge" id="cacheStatus">Кеш: OK</div>
+                <div class="status-badge" id="vpnStatus">VPN check: OFF</div>
+            </div>
+            <div class="status-info" id="dayInfo">День 1 | Ожидание решения</div>
+            
+            <div class="terminal">
+                <div class="terminal-header">
+                    SYSTEM TERMINAL | Введите "help" для списка команд
+                </div>
+                <div class="terminal-output" id="terminalOutput">
+                    <div class="terminal-line"><span class="terminal-prompt">$></span> Терминал готов.</div>
+                    <div class="terminal-line"><span class="terminal-prompt">$></span> Введите "help" для списка команд</div>
+                </div>
+                <div class="terminal-input-line">
+                    <span>$></span>
+                    <input type="text" id="terminalInput" class="terminal-input" placeholder="Введите команду..." autocomplete="off">
+                    <button id="terminalSendBtn" class="terminal-send">ВЫПОЛНИТЬ</button>
+                </div>
             </div>
             
-            <div class="cli-section">
-                <div class="cli-title">$> Доступные команды (кликните для выполнения):</div>
-                
-                <!-- День 1: Очередь -->
-                <div class="cli-option" data-action="checkQueue">
-                    <div class="cli-option-name">> system.queue.check()</div>
-                    <div class="cli-option-desc">Проверить очередь загрузки файлов</div>
-                </div>
-                
-                <div class="cli-option" data-action="restartAuth">
-                    <div class="cli-option-name">> auth.service.restart()</div>
-                    <div class="cli-option-desc">Перезапустить сервис аутентификации</div>
-                </div>
-                
-                <div class="cli-option" data-action="checkBackups">
-                    <div class="cli-option-name">> backup.files.list()</div>
-                    <div class="cli-option-desc">Посмотреть бэкапы отправленных файлов</div>
-                </div>
-                
-                <hr>
-                
-                <!-- День 2: API -->
-                <div class="cli-option" data-action="restartGateway">
-                    <div class="cli-option-name">> api.gateway.restart()</div>
-                    <div class="cli-option-desc">Перезапустить API-шлюз /grades</div>
-                </div>
-                
-                <div class="cli-option" data-action="increaseTimeout">
-                    <div class="cli-option-name">> api.timeout.set(60000)</div>
-                    <div class="cli-option-desc">Увеличить таймаут до 60 секунд</div>
-                </div>
-                
-                <div class="cli-option" data-action="checkCurl">
-                    <div class="cli-option-name">> curl -X GET /grades</div>
-                    <div class="cli-option-desc">Проверить эндпоинт /grades вручную</div>
-                </div>
-                
-                <hr>
-                
-                <!-- День 3: Кеш -->
-                <div class="cli-option" data-action="resetCache">
-                    <div class="cli-option-name">> cache.flush()</div>
-                    <div class="cli-option-desc">Сбросить кеш вручную</div>
-                </div>
-                
-                <div class="cli-option" data-action="rebootServer">
-                    <div class="cli-option-name">> system.reboot()</div>
-                    <div class="cli-option-desc">Перезагрузить сервер целиком</div>
-                </div>
-                
-                <div class="cli-option" data-action="configureTTL">
-                    <div class="cli-option-name">> cache.ttl.set(300)</div>
-                    <div class="cli-option-desc">Настроить TTL кеша на 5 минут</div>
-                </div>
-                
-                <hr>
-                
-                <!-- День 4: VPN -->
-                <div class="cli-option" data-action="disableVPN">
-                    <div class="cli-option-name">> vpn.check.disable()</div>
-                    <div class="cli-option-desc">Отключить проверку VPN в конфиге</div>
-                </div>
-                
-                <div class="cli-option" data-action="keepVPN">
-                    <div class="cli-option-name">> vpn.check.keep()</div>
-                    <div class="cli-option-desc">Оставить как есть — пусть проверяет</div>
-                </div>
-                
-                <div class="cli-option" data-action="localFlag">
-                    <div class="cli-option-name">> vpn.check.migrate.local()</div>
-                    <div class="cli-option-desc">Заменить проверку VPN на локальный флаг</div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="error-log">
-            <div class="prompt">$> tail -f /var/log/system.log</div>
-            <div id="actionLog">
-                <div class="error-entry"><span class="error-time">[SYSTEM]</span> Панель администратора загружена</div>
+            <div class="day-info-box" id="dayInfoBox">
+                💡 Введите "help" для списка доступных команд
             </div>
         </div>
     </div>
     
     <script>
-        function getGameData() {
-            return window.parent.getGameData ? window.parent.getGameData() : null;
+        function addToTerminal(text, isError, isSuccess) {
+            const terminal = document.getElementById('terminalOutput');
+            if (!terminal) return;
+            
+            const line = document.createElement('div');
+            if (isError) line.className = 'terminal-line error';
+            else if (isSuccess) line.className = 'terminal-line success';
+            else line.className = 'terminal-line';
+            line.innerHTML = `<span class="terminal-prompt">$></span> ${text}`;
+            terminal.appendChild(line);
+            line.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
         
-        function addToLog(message, isError = false) {
-            const logDiv = document.getElementById('actionLog');
-            if (logDiv) {
-                const entry = document.createElement('div');
-                entry.className = 'error-entry';
-                const time = new Date().toLocaleTimeString();
-                entry.innerHTML = `<span class="error-time">[${time}]</span> ${message}`;
-                if (isError) entry.style.color = '#ff8888';
-                logDiv.insertBefore(entry, logDiv.firstChild);
-                
-                while (logDiv.children.length > 30) {
-                    logDiv.removeChild(logDiv.lastChild);
-                }
+        function executeCommand(command) {
+            addToTerminal(command, false, false);
+            
+            if (window.parent && window.parent.executeCommand) {
+                window.parent.executeCommand(command);
+            } else if (window.parent && window.parent.postMessage) {
+                window.parent.postMessage({
+                    type: 'terminalCommand',
+                    command: command
+                }, '*');
+            } else {
+                addToTerminal('❌ Ошибка: не удалось выполнить команду', true, false);
             }
         }
         
         function updateStatus() {
-            const gameData = getGameData();
-            if (!gameData) return;
-            
-            const apiStatus = document.getElementById('apiGatewayStatus');
-            const queueStatus = document.getElementById('queueStatus');
-            const cacheStatus = document.getElementById('cacheStatus');
-            const vpnStatus = document.getElementById('vpnStatus');
-            
-            const completedDays = gameData.completedDays || [];
-            
-            if (gameData.day === 1 && !completedDays.includes(1)) {
-                if (apiStatus) apiStatus.innerHTML = '🟡 API Gateway: DEGRADED';
-                if (queueStatus) queueStatus.innerHTML = '📦 Очередь: ПЕРЕПОЛНЕНА';
-                if (cacheStatus) cacheStatus.innerHTML = '💾 Кеш: OK';
-            } else if (gameData.day === 2 && !completedDays.includes(2)) {
-                if (apiStatus) apiStatus.innerHTML = '🔴 API Gateway: OFFLINE (502)';
-                if (queueStatus) queueStatus.innerHTML = '📦 Очередь: 12';
-                if (cacheStatus) cacheStatus.innerHTML = '💾 Кеш: OK';
-            } else if (gameData.day === 3 && !completedDays.includes(3)) {
-                if (apiStatus) apiStatus.innerHTML = '🟢 API Gateway: ONLINE';
-                if (queueStatus) queueStatus.innerHTML = '📦 Очередь: 3';
-                if (cacheStatus) cacheStatus.innerHTML = '⚠️ Кеш: УСТАРЕЛ';
-            } else if (gameData.day === 4 && !completedDays.includes(4)) {
-                if (vpnStatus) vpnStatus.innerHTML = '🌐 VPN check: АКТИВЕН (запросы к внешним API)';
-                if (apiStatus) apiStatus.innerHTML = '🟡 API Gateway: НЕСТАБИЛЕН';
-            } else {
-                if (apiStatus) apiStatus.innerHTML = '🟢 API Gateway: ONLINE';
-                if (queueStatus) queueStatus.innerHTML = '📦 Очередь: 0';
-                if (cacheStatus) cacheStatus.innerHTML = '💾 Кеш: OK';
-                if (vpnStatus) vpnStatus.innerHTML = '🌐 VPN check: OFF';
+            if (window.parent && window.parent.getGameData) {
+                const gameData = window.parent.getGameData();
+                if (gameData) {
+                    const dayInfo = document.getElementById('dayInfo');
+                    const apiStatus = document.getElementById('apiGatewayStatus');
+                    const queueStatus = document.getElementById('queueStatus');
+                    const cacheStatus = document.getElementById('cacheStatus');
+                    const vpnStatus = document.getElementById('vpnStatus');
+                    const dayInfoBox = document.getElementById('dayInfoBox');
+                    
+                    const completedDays = gameData.completedDays || [];
+                    
+                    dayInfo.innerHTML = `📅 День ${gameData.day} | Решено: ${completedDays.length}/5 | ♥ Доверие: ${gameData.trust} | ★ Интеллект: ${gameData.intellect}`;
+                    
+                    if (gameData.day === 1 && !completedDays.includes(1)) {
+                        apiStatus.innerHTML = '🟡 API Gateway: DEGRADED';
+                        apiStatus.className = 'status-badge warning';
+                        queueStatus.innerHTML = 'Очередь: ПЕРЕПОЛНЕНА';
+                        queueStatus.className = 'status-badge warning';
+                        dayInfoBox.innerHTML = '💡 День 1: Кажется есть проблемы с отправкой файлов. Может быть проблема в очереди?"';
+                    } else if (gameData.day === 2 && !completedDays.includes(2)) {
+                        apiStatus.innerHTML = '🔴 API Gateway: OFFLINE (502)';
+                        apiStatus.className = 'status-badge offline';
+                        queueStatus.innerHTML = 'Очередь: 15';
+                        dayInfoBox.innerHTML = '💡 День 2: API оценивания не отвечает..."';
+                    } else if (gameData.day === 3 && !completedDays.includes(3)) {
+                        apiStatus.innerHTML = '🟢 API Gateway: ONLINE';
+                        apiStatus.className = 'status-badge online';
+                        cacheStatus.innerHTML = '⚠️ Кеш: УСТАРЕЛ';
+                        cacheStatus.className = 'status-badge warning';
+                        dayInfoBox.innerHTML = '💡 День 3: Сервер отдает устаревшие данные. Может кэш шалит?"';
+                    } else if (gameData.day === 4 && !completedDays.includes(4)) {
+                        apiStatus.innerHTML = '🟡 API Gateway: НЕСТАБИЛЕН';
+                        apiStatus.className = 'status-badge warning';
+                        vpnStatus.innerHTML = 'VPN check: АКТИВЕН';
+                        vpnStatus.className = 'status-badge warning';
+                        dayInfoBox.innerHTML = '💡 День 4: Странные запросы от сервера лк. Неужели и до нас дошло.."';
+                    } else if (gameData.day === 5 && !completedDays.includes(5)) {
+                        dayInfoBox.innerHTML = '💡 День 5: Угроза отчисления! Срочно принять меры!!"';
+                    } else {
+                        apiStatus.innerHTML = '🟢 API Gateway: ONLINE';
+                        apiStatus.className = 'status-badge online';
+                        queueStatus.innerHTML = 'Очередь: 0';
+                        queueStatus.className = 'status-badge online';
+                        cacheStatus.innerHTML = 'Кеш: OK';
+                        cacheStatus.className = 'status-badge online';
+                        vpnStatus.innerHTML = 'VPN check: OFF';
+                        vpnStatus.className = 'status-badge online';
+                    }
+                }
             }
         }
         
-        function executeAction(action) {
-            const gameData = getGameData();
-            if (!gameData) {
-                addToLog('❌ Ошибка: данные игры не загружены', true);
-                return;
-            }
-            
-            addToLog(`🚀 Выполняется: ${action}`);
-            
-            if (window.parent.executeAdminAction) {
-                window.parent.executeAdminAction(action);
-            } else {
-                addToLog('⚠️ Функция executeAdminAction не найдена', true);
-            }
-            
-            setTimeout(updateStatus, 100);
+        function sendManualCommand() {
+            const input = document.getElementById('terminalInput');
+            const command = input.value.trim();
+            if (!command) return;
+            executeCommand(command);
+            input.value = '';
         }
-        
-        document.querySelectorAll('.cli-option').forEach(option => {
-            option.addEventListener('click', () => {
-                const action = option.dataset.action;
-                if (action) executeAction(action);
-            });
-        });
         
         function init() {
             updateStatus();
-            setInterval(updateStatus, 2000);
-            addToLog('💻 Панель администратора готова к работе');
+            setInterval(updateStatus, 1000);
+            
+            const sendBtn = document.getElementById('terminalSendBtn');
+            const input = document.getElementById('terminalInput');
+            
+            if (sendBtn) sendBtn.addEventListener('click', sendManualCommand);
+            if (input) input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendManualCommand();
+            });
         }
         
         init();
+        
+        window.addToTerminal = addToTerminal;
     </script>
 </body>
 </html>

@@ -87,27 +87,15 @@
             font-size: 12px;
         }
         
-        .clear-btn {
-            background: #ff4444;
-            border: none;
-            color: white;
-            padding: 5px 12px;
-            cursor: pointer;
-            font-family: monospace;
-        }
-        
-        .clear-btn:hover {
-            background: #cc0000;
+        h2 {
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
     <div class="log-container">
         <div class="log-header">
-            <h2>⚠️ SYSLOG: ЖУРНАЛ ОШИБОК</h2>
-            <div>
-                <button id="clearLogBtn" class="clear-btn">🗑️ Очистить</button>
-            </div>
+            <h2>SYSLOG: ЖУРНАЛ ОШИБОК</h2>
         </div>
         
         <div class="stats" id="statsPanel"></div>
@@ -129,6 +117,18 @@
             return window.parent.getGameData ? window.parent.getGameData() : null;
         }
         
+        function parseTime(timeStr) {
+            if (!timeStr) return 0;
+            const parts = timeStr.split(':');
+            if (parts.length >= 2) {
+                let hours = parseInt(parts[0]) || 0;
+                let minutes = parseInt(parts[1]) || 0;
+                let seconds = parseInt(parts[2]) || 0;
+                return hours * 3600 + minutes * 60 + seconds;
+            }
+            return 0;
+        }
+        
         function getSystemLogs() {
             const gameData = getGameData();
             const errors = gameData?.errorLog || [];
@@ -136,53 +136,69 @@
             
             const systemLogs = [];
             
+            // День 1 логи
             if (gameData?.day >= 1) {
-                systemLogs.push({ type: 'error', day: 1, time: '14:00:23', message: 'ERR_UPLOAD_404: Файл не найден в очереди загрузки' });
-                systemLogs.push({ type: 'warning', day: 1, time: '14:15:47', message: 'WARN: Сессия пользователя истекла' });
-                
+                systemLogs.push({ type: 'error', day: 1, time: '14:00:23', timestamp: 14*3600 + 0*60 + 23, message: 'ERR_UPLOAD_404: Файл не найден в очереди загрузки' });
                 if (completedDays.includes(1)) {
-                    systemLogs.push({ type: 'info', day: 1, time: '14:30:12', message: 'INFO: Проблема с очередью решена' });
+                    systemLogs.push({ type: 'info', day: 1, time: '14:30:12', timestamp: 14*3600 + 30*60 + 12, message: 'INFO: Проблема с очередью решена' });
                 }
             }
             
+            // День 2 логи
             if (gameData?.day >= 2) {
-                systemLogs.push({ type: 'error', day: 2, time: '09:30:12', message: 'ERR_502: API /grades не отвечает (таймаут 30с)' });
-                systemLogs.push({ type: 'warning', day: 2, time: '09:45:33', message: 'WARN: Шлюз перегружен, очередь запросов 150+' });
-                
+                systemLogs.push({ type: 'error', day: 2, time: '09:30:12', timestamp: 9*3600 + 30*60 + 12, message: 'ERR_502: API /grades не отвечает' });
                 if (completedDays.includes(2)) {
-                    systemLogs.push({ type: 'info', day: 2, time: '10:15:22', message: 'INFO: API шлюз перезапущен, статус OK' });
+                    systemLogs.push({ type: 'info', day: 2, time: '10:15:22', timestamp: 10*3600 + 15*60 + 22, message: 'INFO: API шлюз перезапущен' });
                 }
             }
             
+            // День 3 логи
             if (gameData?.day >= 3) {
-                systemLogs.push({ type: 'error', day: 3, time: '08:20:05', message: 'ERR_CACHE: Инвалидация кеша не удалась' });
-                systemLogs.push({ type: 'warning', day: 3, time: '08:22:18', message: 'WARN: TTL кеша истек некорректно (30 дней)' });
-                
+                systemLogs.push({ type: 'error', day: 3, time: '08:20:05', timestamp: 8*3600 + 20*60 + 5, message: 'ERR_CACHE: Инвалидация кеша не удалась' });
                 if (completedDays.includes(3)) {
-                    systemLogs.push({ type: 'info', day: 3, time: '09:05:33', message: 'INFO: Кеш сброшен, данные обновлены' });
+                    systemLogs.push({ type: 'info', day: 3, time: '09:05:33', timestamp: 9*3600 + 5*60 + 33, message: 'INFO: Кеш сброшен' });
                 }
             }
             
+            // День 4 логи
             if (gameData?.day >= 4) {
-                systemLogs.push({ type: 'warning', day: 4, time: '10:05:42', message: 'WARN: Обнаружены исходящие запросы к Telegram API' });
-                systemLogs.push({ type: 'warning', day: 4, time: '10:05:44', message: 'WARN: Обнаружены исходящие запросы к YouTube API' });
-                
+                systemLogs.push({ type: 'warning', day: 4, time: '10:05:42', timestamp: 10*3600 + 5*60 + 42, message: 'WARN: Запросы к Telegram/YouTube API' });
                 if (completedDays.includes(4)) {
-                    systemLogs.push({ type: 'info', day: 4, time: '11:20:15', message: 'INFO: Проверка VPN отключена, ошибки 403 устранены' });
+                    systemLogs.push({ type: 'info', day: 4, time: '11:20:15', timestamp: 11*3600 + 20*60 + 15, message: 'INFO: Проверка VPN отключена' });
                 }
             }
             
-            if (gameData?.day >= 5) {
-                systemLogs.push({ type: 'warning', day: 5, time: '09:00:00', message: 'WARN: Административный риск - критический' });
-                systemLogs.push({ type: 'alert', day: 5, time: '09:15:30', message: 'ALERT: Требуется отчёт о причине сбоев' });
+            // День 5 логи
+            if (gameData?.day >= 5 && !completedDays.includes(5)) {
+                systemLogs.push({ type: 'warning', day: 5, time: '09:00:00', timestamp: 9*3600, message: 'WARN: Административный риск - критический' });
             }
             
-            return [...systemLogs, ...errors.map(e => ({
-                type: e.result === 'исправлена' ? 'info' : 'error',
-                day: e.day,
-                time: e.timestamp,
-                message: `[${e.action}] ${e.message}`
-            }))];
+            if (completedDays.includes(5)) {
+                systemLogs.push({ type: 'info', day: 5, time: '09:30:00', timestamp: 9*3600 + 30*60, message: 'INFO: Отчёт принят, угроза снята' });
+            }
+            
+            const userLogs = errors.map(e => {
+                let type = e.result === 'исправлена' ? 'info' : 'error';
+                let message = `[${e.action}] ${e.message}`;
+                let timeValue = e.timestamp || '12:00:00';
+                let timestampSec = parseTime(timeValue);
+                return {
+                    type: type,
+                    day: e.day,
+                    time: timeValue,
+                    timestamp: timestampSec,
+                    message: message
+                };
+            });
+            
+            let allLogs = [...systemLogs, ...userLogs];
+    
+            allLogs.sort((a, b) => {
+                if (a.day !== b.day) return a.day - b.day;
+                return a.timestamp - b.timestamp;
+            });
+            
+            return allLogs;
         }
         
         function renderLogs() {
@@ -197,13 +213,13 @@
             const infoCount = logs.filter(l => l.type === 'info').length;
             
             if (statsPanel) {
-                statsPanel.innerHTML = `📊 СТАТИСТИКА | 🔴 Ошибок: ${errorCount} | 🟡 Предупреждений: ${warningCount} | 🟢 Событий: ${infoCount} | 📝 Всего записей: ${logs.length}`;
+                statsPanel.innerHTML = `СТАТИСТИКА | 🔴 Ошибок: ${errorCount} | 🟡 Предупреждений: ${warningCount} | 🟢 Событий: ${infoCount}`;
             }
             
             if (!logDiv) return;
             
             if (filteredLogs.length === 0) {
-                logDiv.innerHTML = '<div class="log-entry">Нет записей, соответствующих фильтру</div>';
+                logDiv.innerHTML = '<div class="log-entry">Нет записей</div>';
                 return;
             }
             
@@ -214,15 +230,6 @@
                     <span>${log.message}</span>
                 </div>
             `).join('');
-        }
-        
-        function clearLogs() {
-            if (confirm('Очистить локальный журнал? (игровой прогресс не пострадает)')) {
-                const container = document.getElementById('logList');
-                if (container) {
-                    container.innerHTML = '<div class="log-entry">Журнал очищен</div>';
-                }
-            }
         }
         
         function init() {
@@ -237,9 +244,7 @@
                 });
             });
             
-            document.getElementById('clearLogBtn')?.addEventListener('click', clearLogs);
-            
-            setInterval(renderLogs, 3000);
+            setInterval(renderLogs, 2000);
         }
         
         init();

@@ -8,60 +8,77 @@
 </head>
 <body class="main-page">
     <main class="game-main">
-        <h1 class="game-title">СПБ не ГУТ</h1>
         
         <div class="menu-buttons">
             <button id="newGameBtn" class="menu-btn">
-                <img src="images/start.png" alt="Начать новую игру" class="menu-icon" onerror="this.src='https://placehold.co/80x80/ffaa44/442200?text=🚀'">
+                <img src="images/start.png" alt="Начать новую игру" class="menu-icon">
                 <span>Начать новую игру</span>
             </button>
             <button id="continueBtn" class="menu-btn">
-                <img src="images/cont.png" alt="Продолжить" class="menu-icon" onerror="this.src='https://placehold.co/80x80/ffaa44/442200?text=📁'">
+                <img src="images/cont.png" alt="Продолжить" class="menu-icon">
                 <span>Продолжить</span>
             </button>
             <button id="resetBtn" class="menu-btn">
-                <img src="images/reset.png" alt="Сбросить прогресс" class="menu-icon" onerror="this.src='https://placehold.co/80x80/ffaa44/442200?text=🗑️'">
+                <img src="images/reset.png" alt="Сбросить прогресс" class="menu-icon">
                 <span>Сбросить прогресс</span>
             </button>
         </div>
     </main>
 
-    <footer>
-        <button id="shutdownBtn" class="shutdown-btn">
-            <img src="images/turn-off.png" alt="Выключить" class="shutdown-icon" onerror="this.src='https://placehold.co/70x70/ff4444/white?text=⏻'">
-        </button>
-    </footer>
-
-    <!-- РАБОЧИЙ СТОЛ (изначально скрыт) -->
+    <!-- РАБОЧИЙ СТОЛ -->
     <div id="desktop" class="desktop" style="display: none;">
         <div class="desktop-wallpaper"></div>
         
-        <!-- Иконки -->
         <div class="desktop-icons">
             <div class="icon" data-app="browser">
-                <div class="icon-emoji">🌐</div>
+                <img src="images/browser.png" class="icon-img" alt="Браузер">
                 <div class="icon-label">Браузер</div>
             </div>
-            <div class="icon" id="deepseekIcon" style="display: none;">
-                <div class="icon-emoji">🤖</div>
+            <div class="icon" id="deepseekIcon">
+                <img src="images/deepseek.png" class="icon-img" alt="DeepSeek">
                 <div class="icon-label">DeepSeek</div>
+            </div>
+            <div class="icon" id="telegramIcon">
+                <img src="images/tg.png" class="icon-img" alt="Telegram">
+                <div class="icon-label">Telegram</div>
+            </div>
+            <div class="icon" id="vpnIcon">
+                <img src="images/vpn.png" class="icon-img" alt="VPN Client">
+                <div class="icon-label">VPN Client</div>
+            </div>
+            <div class="icon" id="notepadIcon">
+                <img src="images/doc.png" class="icon-img" alt="Инструкция">
+                <div class="icon-label">Инструкция</div>
             </div>
         </div>
 
-        <!-- Панель задач Windows 11 -->
         <div class="taskbar">
             <div class="taskbar-left">
                 <div class="start-button">
-                    <span class="start-icon">犯</span>
+                    <span class="start-icon">⊞</span>
                     <span>Пуск</span>
                 </div>
                 <div class="taskbar-icons">
-                    <div class="taskbar-app-icon" data-app="browser">🌐</div>
+                    <div class="taskbar-app-icon" data-app="browser">
+                        <img src="images/browser-mini.png" class="taskbar-icon-img">
+                    </div>
+                    <div class="taskbar-app-icon" id="deepseekTaskbarIcon">
+                        <img src="images/deepseek-mini.png" class="taskbar-icon-img">
+                    </div>
+                    <div class="taskbar-app-icon" id="telegramTaskbarIcon">
+                        <img src="images/tg-mini.png" class="taskbar-icon-img">
+                    </div>
+                    <div class="taskbar-app-icon" id="vpnTaskbarIcon">
+                        <img src="images/vpn-mini.png" class="taskbar-icon-img">
+                    </div>
+                    <div class="taskbar-app-icon" id="notepadTaskbarIcon">
+                        <img src="images/doc-mini.png" class="taskbar-icon-img">
+                    </div>
                 </div>
             </div>
             <div class="taskbar-right">
                 <div class="notification-area">
-                    <span>🔔</span>
+                    <span>✉</span>
                     <div class="notification-badge"></div>
                 </div>
                 <div class="taskbar-time">
@@ -71,42 +88,49 @@
             </div>
         </div>
 
-        <!-- Меню Пуск -->
         <div id="startMenu" class="start-menu">
             <div class="start-menu-header">
-                <div class="start-menu-avatar">👨‍💻</div>
+                <div class="start-menu-avatar">☺</div>
                 <div class="start-menu-user">Коля Иванов</div>
             </div>
-            <input type="text" class="start-menu-search" placeholder="Поиск..." readonly>
-            <div class="start-menu-pinned">Закрепленные</div>
             <div class="start-menu-items">
                 <div class="start-menu-item" data-app="browser">
-                    <div class="start-menu-item-icon">🌐</div>
+                    <img src="images/browser-mini.png" class="start-menu-icon-img">
                     <span>Браузер</span>
                 </div>
-                <div class="start-menu-item" id="startDeepseekBtn" style="display: none;">
-                    <div class="start-menu-item-icon">🤖</div>
+                <div class="start-menu-item" id="startDeepseekBtn">
+                    <img src="images/deepseek-mini.png" class="start-menu-icon-img">
                     <span>DeepSeek</span>
+                </div>
+                <div class="start-menu-item" id="startTelegramBtn">
+                    <img src="images/tg-mini.png" class="start-menu-icon-img">
+                    <span>Telegram</span>
+                </div>
+                <div class="start-menu-item" id="startVpnBtn">
+                    <img src="images/vpn-mini.png" class="start-menu-icon-img">
+                    <span>VPN Client</span>
+                </div>
+                <div class="start-menu-item" id="startNotepadBtn">
+                    <img src="images/doc-mini.png" class="start-menu-icon-img">
+                    <span>Инструкция</span>
                 </div>
             </div>
             <div class="start-menu-divider"></div>
             <div class="start-menu-power">
                 <div class="power-option" id="startRebootBtn">
-                    <span>🔄</span> Перезагрузка
+                    <span>⟲</span> Перезагрузка
                 </div>
                 <div class="power-option" id="startShutdownBtn">
-                    <span>⏻</span> Выключение
+                    <span>⌽</span> Выключение
                 </div>
             </div>
         </div>
 
-        <!-- Панель уведомлений -->
         <div id="notificationPanel" class="notification-panel">
             <div class="notification-header">Уведомления</div>
             <div class="notification-list" id="notificationList"></div>
         </div>
 
-        <!-- Окно браузера -->
         <div id="browserModal" class="window-modal">
             <div class="browser-window">
                 <div class="browser-bar">
@@ -115,21 +139,17 @@
                         <button id="closeBrowserBtn">✖</button>
                     </div>
                     <div class="browser-tabs">
-                        <button class="tab-btn active" data-page="user.html">👤 Личный кабинет</button>
-                        <button class="tab-btn" data-page="admin.html">🛠️ Панель администратора</button>
-                        <button class="tab-btn" data-page="archive.html">📚 Архив данных</button>
-                        <button class="tab-btn" data-page="error-log.html">⚠️ Журнал ошибок</button>
+                        <button class="tab-btn active" data-page="user.html">Личный кабинет</button>
+                        <button class="tab-btn" data-page="admin.html">Панель администратора</button>
+                        <button class="tab-btn" data-page="archive.html">Архив данных</button>
+                        <button class="tab-btn" data-page="error-log.html">Журнал ошибок</button>
                     </div>
                 </div>
                 <iframe id="browserIframe" class="browser-iframe" src="user.html"></iframe>
-                <div class="browser-statusbar">
-                    <span>Готово</span>
-                </div>
             </div>
         </div>
 
-        <!-- DeepSeek чат -->
-        <div id="deepseekChat" class="deepseek-chat">
+        <div id="deepseekChat" class="deepseek-chat" style="top: 100px; left: 50px; display: none;">
             <div class="deepseek-header">
                 <span>🤖 DeepSeek Assistant</span>
                 <button class="deepseek-close">✖</button>
@@ -138,23 +158,110 @@
                 <div class="deepseek-message">
                     Привет! Я помогу тебе разобраться с ошибками в системе.
                 </div>
-                <div class="deepseek-advice" id="deepseekAdvice">
-                    <!-- Подсказки будут здесь -->
+                <div class="deepseek-advice" id="deepseekAdvice"></div>
+            </div>
+        </div>
+
+        <div id="telegramChat" class="telegram-chat" style="top: 100px; left: 420px; display: none;">
+            <div class="telegram-header">
+                <span>📨 Telegram</span>
+                <button class="telegram-close">✖</button>
+            </div>
+            <div class="telegram-messages-container" id="telegramMessagesContainer">
+                <div style="padding: 20px; text-align: center;">Загрузка...</div>
+            </div>
+        </div>
+
+        <div id="vpnApp" class="vpn-app" style="top: 100px; left: 790px; display: none;">
+            <div class="vpn-header">
+                <span>🌐 VPN Client</span>
+                <button class="vpn-close">✖</button>
+            </div>
+            <div class="vpn-content">
+                <div id="vpnStatus" class="vpn-status off">
+                    <div class="vpn-status-icon">🔴</div>
+                    <div class="vpn-status-text">VPN: ВЫКЛЮЧЕН</div>
+                </div>
+                <div class="vpn-description">
+                    <p>VPN-клиент для безопасного доступа к ресурсам колледжа.</p>
+                    <p class="vpn-warning">⚠️ При включении VPN может быть недоступен Личный кабинет!</p>
+                </div>
+                <button id="vpnToggleBtn" class="vpn-toggle-btn off">ВКЛЮЧИТЬ VPN</button>
+                <div class="vpn-info">
+                    <small>Сервер: vpn.spbgut.ru<br>Протокол: WireGuard</small>
                 </div>
             </div>
         </div>
 
-        <!-- Панель статистики -->
+        <div id="notepadApp" class="notepad-app" style="top: 100px; left: 200px; display: none;">
+            <div class="notepad-header">
+                <span>Инструкция_для_чайников.md</span>
+                <button class="notepad-close">✖</button>
+            </div>
+            <div class="notepad-content">
+                <div class="notepad-text">
+                    <h1>🔧 ИНСТРУКЦИЯ ДЛЯ ЧАЙНИКОВ</h1>
+                    
+                    <h2>📌 Кто ты?</h2>
+                    <p>Ты — Коля, первокурсник-программист и по совместительству админ локальной сети колледжа.</p>
+                    
+                    <h2>⚠️ Что случилось?</h2>
+                    <p>Личный кабинет колледжа сломался! Студенты жалуются, что не могут сдать работы, а у тебя в дневнике стоит 2 за лабу, хотя ты её отправлял.</p>
+                    
+                    <h2>🎯 Твоя цель</h2>
+                    <p>Разобраться в причинах сбоя и починить систему за 5 дней. Иначе — отчисление!</p>
+                    
+                    <h2>🖥️ Как играть?</h2>
+                    <p><strong>1. Открой Браузер</strong> — там есть 4 вкладки:</p>
+                    <ul>
+                        <li>👤 <strong>Личный кабинет</strong> — дневник, расписание, отправка работ на проверку</li>
+                        <li>🖥️ <strong>Панель администратора</strong> — здесь нужно вводить команды для решения проблем. Введи "help" чтобы увидеть все команды!</li>
+                        <li>📚 <strong>Архив данных</strong> — улики, таймлайн расследования</li>
+                        <li>⚠️ <strong>Журнал ошибок</strong> — логи системы</li>
+                    </ul>
+                    <p><strong>2. Следи за панелью статистики</strong> (в правом верхнем углу):</p>
+                    <ul>
+                        <li>♥ <strong>Доверие</strong> — падает при ошибках, растёт при правильных решениях</li>
+                        <li>★ <strong>Интеллект</strong> — повышается за посещение пар в Личном кабинете</li>
+                    </ul>
+                    <p><strong>3. Используй приложения:</strong></p>
+                    <ul>
+                        <li>🤖 <strong>DeepSeek</strong> — помощник, даёт подсказки (но доступ к нему сначала нужно заработать)</li>
+                        <li>📨 <strong>Telegram</strong> — сообщения от преподавателей и одногруппников</li>
+                        <li>🌐 <strong>VPN Client</strong> — влияет на доступ к сервисам (таковы наши реалии...)</li>
+                    </ul>
+                    
+                    <h2>📅 Механика дней</h2>
+                    <p>Каждый игровой день нужно решить одну проблему:</p>
+                    <ul>
+                        <li><strong>День 1:</strong> Пропажа отправленного файла → команда: system.queue.check</li>
+                        <li><strong>День 2:</strong> API оценивания не работает → команда: api.gateway.restart</li>
+                        <li><strong>День 3:</strong> Интерфейс показывает старые данные → команда: cache.flush</li>
+                        <li><strong>День 4:</strong> Проверка VPN через API → команда: vpn.check.disable</li>
+                        <li><strong>День 5:</strong> Угроза отчисления → команда: report.generate</li>
+                    </ul>
+                    
+                    <h2>💡 Важные правила!</h2>
+                    <p>✅ После успешного решения проблемы дня — <strong>ОБЯЗАТЕЛЬНО выключи компьютер</strong> (кнопка "Выключение" в меню Пуск), выйди на главный экран и нажми "Продолжить игру". Без этого следующий день не начнётся!</p>
+                    <p>✅ Отмечайся на парах в Личном кабинете — это повышает интеллект.</p>
+                    <p>✅ Читай уведомления (✉) — там важная информация.</p>
+                    <p>✅ Проверяй Telegram — преподаватели и однгруппники иногда пишут туда.</p>
+                    <hr>
+                    <p><em>А ещё не забудь задвинуть стул, а то будешь писать реферат иххихи 😜</em></p>
+                </div>
+            </div>
+        </div>
+
         <div class="stats-panel">
             <div class="stat-item">
-                <span class="stat-label">❤️ Доверие:</span>
+                <span class="stat-label">♥ Доверие:</span>
                 <span class="stat-value" id="trustValue">70</span>
                 <div class="stat-bar">
                     <div class="stat-fill" id="trustFill" style="width: 70%"></div>
                 </div>
             </div>
             <div class="stat-item">
-                <span class="stat-label">🧠 Интеллект:</span>
+                <span class="stat-label">★ Интеллект:</span>
                 <span class="stat-value" id="intellectValue">0</span>
                 <div class="stat-bar">
                     <div class="stat-fill" id="intellectFill" style="width: 0%"></div>
@@ -162,10 +269,6 @@
             </div>
         </div>
 
-        <!-- Контейнер для уведомлений-баблов -->
-        <div id="bubbleContainer" class="bubble-container"></div>
-        
-        <!-- Оверлей выключения -->
         <div id="shutdownOverlay" class="shutdown-overlay">
             <div class="shutdown-text">Выключение...</div>
         </div>
