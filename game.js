@@ -17,7 +17,9 @@ let gameData = {
     terminalHistory: [],
     gameLost: false,
     finalShown: false,
-    victoryShown: false
+    victoryShown: false,
+    finalAttempts: 0,
+    historyRestored: false
 };
 
 let scheduleByDay = {};
@@ -33,10 +35,10 @@ const terminalCommands = {
     "curl -X GET /grades": { description: "Проверить эндпоинт", day: 2, success: false, trust: 0, intellect: 10, clue: "Эндпоинт возвращает пустой массив", message: "🔍 Диагностика найдена, но не исправлена.", explanation: "Эндпоинт /grades возвращает пустой массив — это подтверждает проблему, но не решает её. Нужно перезапустить шлюз." },
     "cache.flush": { description: "Сбросить кеш", day: 3, success: true, trust: 10, clue: "Кеш-ключи не обновлялись 7 дней", message: "✅ Данные обновились!", explanation: "Кеш не обновлялся неделю, поэтому пользователи видели старые данные. После сброса кеша всё актуально." },
     "system.reboot": { description: "Перезагрузить сервер", day: 3, success: false, trust: -15, clue: null, message: "❌ Кеш сбросился временно.", explanation: "Полная перезагрузка сервера — слишком радикальная мера. Кеш сбросился, но скоро вернётся к старым данным." },
-    "cache.ttl.set(300)": { description: "Настроить TTL", day: 3, success: true, trust: 5, intellect: 5, clue: "TTL был 30 дней", message: "✅ Проблема решена!", explanation: "TTL был установлен на 30 дней — слишком много. Установка 5 минут решит проблему устаревших данных." },
+    "cache.ttl.set(300)": { description: "Настроить TTL", day: 3, success: false, trust: 5, intellect: 5, clue: "TTL был 30 дней", message: "🔍 Настройки кеша изменены, но не основная проблема.", explanation: "TTL был установлен на 30 дней — слишком много. Это полезная настройка, но основная проблема была в том, что кеш не сбрасывался вовсе." },
     "vpn.check.disable": { description: "Отключить проверку VPN", day: 4, success: true, trust: 10, intellect: 5, clue: "Проверка VPN вызывала задержки", message: "✅ Ошибки 403 исчезли!", explanation: "Система проверяла VPN через внешние API, что вызывало задержки и ошибки 403. Отключение проверки решило проблему." },
     "vpn.check.keep": { description: "Оставить проверку VPN", day: 4, success: false, trust: -10, clue: null, message: "❌ Ошибки 403 остались.", explanation: "Оставление проверки VPN не решает проблему — внешние API продолжают блокировать запросы." },
-    "vpn.check.migrate.local": { description: "Локальная проверка", day: 4, success: true, trust: 5, intellect: 10, clue: "Локальный флаг быстрее", message: "✅ Проблема решена!", explanation: "Замена внешней проверки на локальный флаг — хорошее решение, но требует миграции данных." },
+    "vpn.check.migrate.local": { description: "Локальная проверка", day: 4, success: false, trust: 5, intellect: 10, clue: "Локальный флаг быстрее", message: "🔍 Альтернативное решение, но не основное.", explanation: "Замена внешней проверки на локальный флаг — хорошее решение, но требует миграции данных и не решает проблему мгновенно." },
     "report.generate": { description: "Сгенерировать отчёт", day: 5, success: true, trust: 20, intellect: 10, message: "✅ Отчёт готов! Угроза отчисления снята.", explanation: "Отчёт принят. Преподаватель доволен вашим расследованием." }
 };
 
@@ -435,20 +437,32 @@ function addToTerminalFromGame(text, isError, isSuccess) {
 
 // Восстановление истории терминала
 function restoreTerminalHistory() {
+    if (gameData.historyRestored) return;
     const adminIframe = document.getElementById('browserIframe');
     if (adminIframe && adminIframe.contentWindow && adminIframe.contentWindow.addToTerminal && gameData.terminalHistory) {
         gameData.terminalHistory.forEach(entry => {
             adminIframe.contentWindow.addToTerminal(entry.text, entry.isError, entry.isSuccess);
         });
+        gameData.historyRestored = true;
+        saveGame();
     }
 }
 
 // ГЛАВНАЯ ФУНКЦИЯ ВЫПОЛНЕНИЯ КОМАНД
 function executeCommand(command) {
     console.log("Выполнение команды:", command);
-    const cmd = command.toLowerCase().trim();
+    let cmd = command.toLowerCase().trim();
+    let originalCmd = command; 
     
-    addToTerminalFromGame(`> ${command}`, false, false);
+    if (cmd === "curl -x get /grades" || 
+        cmd === "curl -xget /grades" || 
+        cmd === "curl /grades" ||
+        cmd === "curl grades" ||
+        (cmd.includes("curl") && cmd.includes("grades"))) {
+        cmd = "curl -X GET /grades"; 
+    }
+    
+    addToTerminalFromGame(`> ${originalCmd}`, false, false);
     
     if (cmd === "help") {
         addToTerminalFromGame("=== ДОСТУПНЫЕ КОМАНДЫ ===", false, false);
@@ -458,18 +472,16 @@ function executeCommand(command) {
                 addToTerminalFromGame(`${cmdName.padEnd(30)} ${dayInfo.padEnd(10)} - ${terminalCommands[cmdName].description}`, false, false);
             }
         }
-        addToTerminalFromGame(`📅 Текущий день: ${gameData.day} | ♥ Доверие: ${gameData.trust} | ★ Интеллект: ${gameData.intellect}`, false, false);
         return;
     }
     
     const cmdData = terminalCommands[cmd];
     if (!cmdData) {
-        addToTerminalFromGame(`❌ Команда не найдена: ${command}`, true, false);
+        addToTerminalFromGame(`❌ Команда не найдена: ${originalCmd}`, true, false);
         addToTerminalFromGame(`💡 Введите 'help' для списка команд`, false, false);
         return;
     }
     
-    // Проверка дня
     if (cmdData.day && cmdData.day !== gameData.day) {
         if (gameData.day > cmdData.day && gameData.completedDays.includes(cmdData.day)) {
             addToTerminalFromGame(`⚠️ Эта проблема уже решена в день ${cmdData.day}`, true, false);
@@ -484,12 +496,11 @@ function executeCommand(command) {
         return;
     }
     
-    // Выполнение команды
     if (cmdData.trust) modifyTrust(cmdData.trust);
     if (cmdData.intellect) modifyIntellect(cmdData.intellect);
     if (cmdData.clue) addClue(cmdData.clue);
     
-    addToErrorLog(command, cmdData.success ? 'исправлена' : 'не исправлена', cmdData.message, cmdData.day, cmdData.explanation, cmdData.trust || 0, cmdData.intellect || 0);
+    addToErrorLog(originalCmd, cmdData.success ? 'исправлена' : 'не исправлена', cmdData.message, cmdData.day, cmdData.explanation, cmdData.trust || 0, cmdData.intellect || 0);
     
     if (cmdData.success) {
         addToTerminalFromGame(`✅ ${cmdData.message}`, false, true);
@@ -499,7 +510,6 @@ function executeCommand(command) {
         addToTerminalFromGame(`📝 Пояснение: ${cmdData.explanation}`, false, false);
     }
     
-    // Если команда успешна и соответствует дню
     if (cmdData.success && cmdData.day && cmdData.day === gameData.day) {
         if (!gameData.completedDays.includes(cmdData.day)) {
             gameData.completedDays.push(cmdData.day);
@@ -696,6 +706,7 @@ function showFinalChoice() {
     
     if (gameData.finalShown) return;
     gameData.finalShown = true;
+    gameData.finalAttempts = 0;
     saveGame();
     
     addNotification("🏆 ВСЕ ПРОБЛЕМЫ РЕШЕНЫ! Теперь нужно объяснить причину сбоя...", "system");
@@ -703,17 +714,16 @@ function showFinalChoice() {
     const cluesList = gameData.clues || [];
     
     const commandHistory = (gameData.errorLog || [])
-        .filter(log => log.action && log.action !== 'help')
+        .filter(log => log.action && log.action !== 'help' && log.result === 'исправлена')
         .slice(0, 12)
         .map(log => {
             const day = log.day || '?';
-            const status = log.result === 'исправлена' ? '✅' : (log.result === 'не исправлена' ? '❌' : '🔍');
-            return `[День ${day}] ${status} ${log.action}`;
+            return `[День ${day}] ✅ ${log.action}`;
         });
     
     const cluesHtml = cluesList.length > 0 
         ? `<div class="final-clues-box">
-               <h4>🔍 СОБРАННЫЕ УЛИКИ</h4>
+               <h4>🔍 СОБРАННЫЕ УЛИКИ (${cluesList.length} шт.)</h4>
                <div class="final-clues-list">
                    <ul style="margin-left: 20px;">${cluesList.map(c => `<li>${c}</li>`).join('')}</ul>
                </div>
@@ -725,8 +735,8 @@ function showFinalChoice() {
     
     const commandsHtml = commandHistory.length > 0
         ? `<div class="final-commands-history">
-               <h4>ИСТОРИЯ ВАШИХ КОМАНД</h4>
-               <div style="max-height: 120px; overflow-y: auto;">
+               <h4>ИСТОРИЯ ВАШИХ КОМАНД (успешные)</h4>
+               <div style="overflow-y: auto;">
                    ${commandHistory.map(cmd => `<div style="font-family: monospace; font-size: 10px; margin: 3px 0;">${cmd}</div>`).join('')}
                </div>
            </div>`
@@ -781,6 +791,7 @@ function showFinalChoice() {
             ${commandsHtml}
             <hr style="margin: 15px 0; border: 2px solid #ffaa44;">
             <p style="font-weight: bold; margin-bottom: 15px; color: #442200;">📌 Выберите правильную причину сбоя:</p>
+            <p id="attemptsLeft" style="font-size: 12px; color: #886633; margin-bottom: 10px;">Осталось попыток: 3</p>
             <div id="finalOptionsContainer">
                 ${optionsHtml}
             </div>
@@ -790,9 +801,20 @@ function showFinalChoice() {
     
     document.body.appendChild(modal);
     
+    function updateAttemptsDisplay() {
+        const attemptsSpan = document.getElementById('attemptsLeft');
+        if (attemptsSpan) {
+            attemptsSpan.textContent = `Осталось попыток: ${3 - gameData.finalAttempts}`;
+        }
+    }
+    
+    let gameOverTriggered = false;
+    
     // Обработка выбора
     document.querySelectorAll('.final-choice-btn').forEach(btn => {
         btn.addEventListener('click', () => {
+            if (gameOverTriggered) return;
+            
             const isCorrect = btn.dataset.correct === 'true';
             const feedback = btn.dataset.feedback;
             const feedbackDiv = document.getElementById('finalFeedback');
@@ -818,16 +840,34 @@ function showFinalChoice() {
                         showVictoryScreen();
                     }, 2000);
                 } else {
-                    feedbackDiv.style.background = '#ffcdd2';
-                    feedbackDiv.style.borderLeftColor = '#c62828';
-                    modifyTrust(-15);
-                    addNotification("❌ Неправильный ответ! Доверие снижено.", "alert");
+                    gameData.finalAttempts = (gameData.finalAttempts || 0) + 1;
+                    saveGame();
+                    updateAttemptsDisplay();
                     
-                    if (gameData.trust <= 0) {
+                    if (gameData.finalAttempts >= 3) {
+                        gameOverTriggered = true;
+                        feedbackDiv.style.background = '#ffcdd2';
+                        feedbackDiv.style.borderLeftColor = '#c62828';
+                        feedbackDiv.innerHTML += '<br><br><strong>❌ У вас закончились попытки! Комиссия не утвердила ваше расследование.</strong>';
+                        
+                        document.querySelectorAll('.final-choice-btn').forEach(b => {
+                            b.disabled = true;
+                            b.style.opacity = '0.5';
+                        });
+                        
+                        // Показываем экран проигрыша с правильным текстом
                         setTimeout(() => {
                             modal.remove();
-                            showGameOver();
+                            showFinalGameOver();
                         }, 2000);
+                    } else {
+                        feedbackDiv.style.background = '#ffcdd2';
+                        feedbackDiv.style.borderLeftColor = '#c62828';
+                        modifyTrust(-15);
+                        addNotification(`❌ Неправильный ответ! Осталось попыток: ${3 - gameData.finalAttempts}`, "alert");
+                        btn.disabled = true;
+                        btn.style.opacity = '0.4';
+                        btn.style.cursor = 'not-allowed';
                     }
                 }
             }
@@ -836,13 +876,64 @@ function showFinalChoice() {
     
     document.getElementById('closeFinalModalBtn')?.addEventListener('click', () => {
         modal.remove();
-        if (gameData.trust > 0 && !gameData.gameLost && gameData.completedDays.includes(5)) {
+        if (gameData.trust > 0 && !gameData.gameLost && gameData.completedDays.includes(5) && gameData.finalAttempts < 3 && gameData.finalAttempts > 0) {
             addNotification("💡 Комиссия ждёт вашего ответа! Вернитесь в Архив данных и подумайте.", "system");
         }
     });
+    
+    updateAttemptsDisplay();
 }
 
-// Экран проигрыша (отчисление)
+// Экран проигрыша для финала
+function showFinalGameOver() {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.95);
+        z-index: 10000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Courier New', monospace;
+    `;
+    
+    modal.innerHTML = `
+        <div style="background: #2a1a1a; border: 8px solid #ff4444; padding: 30px; max-width: 500px; text-align: center;">
+            <div style="font-size: 64px; margin-bottom: 20px;">❌</div>
+            <h2 style="color: #ffaaaa; margin-bottom: 20px;">ВЫ НЕ СДАЛИ ЭКЗАМЕН!</h2>
+            <p style="margin-bottom: 20px; color: #ffaaaa;">Хоть вы и решили все проблемы, вы не смогли убедить комиссию. Видимо, вы писали команды наугад, не вникая в суть проблемы...</p>
+            <div style="background: #ffffff; padding: 15px; margin-bottom: 20px;">
+                <p>📊 ИТОГИ:</p>
+                <p>♥ Доверие: ${gameData.trust}% | ★ Интеллект: ${gameData.intellect}</p>
+                <p>📅 Пройдено дней: ${gameData.completedDays.length}/5</p>
+                <p>🔍 Собрано улик: ${gameData.clues.length}</p>
+            </div>
+            <button id="finalGameOverRestartBtn" style="margin: 5px; padding: 10px 30px; background: #ff4444; color: white; border: none; cursor: pointer;">▶ Начать заново</button>
+            <button id="finalGameOverMenuBtn" style="margin: 5px; padding: 10px 30px; background: #2d2d4a; color: white; border: none; cursor: pointer;">В главное меню</button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    document.getElementById('finalGameOverRestartBtn')?.addEventListener('click', () => {
+        modal.remove();
+        resetProgress();
+        powerOnDesktop();
+    });
+    
+    document.getElementById('finalGameOverMenuBtn')?.addEventListener('click', () => {
+        modal.remove();
+        const desktopElem = document.getElementById('desktop');
+        if (desktopElem) desktopElem.style.display = 'none';
+        resetProgress();
+    });
+}
+
+// Экран проигрыша
 function showGameOver() {
     const modal = document.createElement('div');
     modal.style.cssText = `
@@ -891,180 +982,64 @@ function showGameOver() {
     });
 }
 
-// Финальная катсцена
-function showFinalChoice() {
-    if (gameData.completedDays.length < 5) {
-        addNotification("❌ Сначала решите все проблемы дней 1-5!", "alert");
-        return;
-    }
-    
-    if (gameData.finalShown) return;
-    gameData.finalShown = true;
+//Экран победы
+function showVictoryScreen() {
+    if (gameData.victoryShown) return;
+    gameData.victoryShown = true;
     saveGame();
     
-    addNotification("🏆 ВСЕ ПРОБЛЕМЫ РЕШЕНЫ! Теперь нужно объяснить причину сбоя...", "system");
-    
-    const cluesList = gameData.clues || [];
-    
-    const commandHistory = (gameData.errorLog || [])
-        .filter(log => log.action && log.action !== 'help')
-        .slice(0, 12)
-        .map(log => {
-            const day = log.day || '?';
-            const status = log.result === 'исправлена' ? '✅' : (log.result === 'не исправлена' ? '❌' : '🔍');
-            return `[День ${day}] ${status} ${log.action}`;
-        });
-    
-    let cluesMessage = '';
-    if (cluesList.length >= 7) {
-        cluesMessage = 'Отлично! Вы собрали почти все улики. Это поможет убедить комиссию.';
-    } else if (cluesList.length >= 4) {
-        cluesMessage = 'Неплохо, вы собрали несколько важных улик.';
-    } else if (cluesList.length >= 1) {
-        cluesMessage = 'Вы собрали немного улик, но этого может быть недостаточно...';
-    } else {
-        cluesMessage = 'Вы не собрали ни одной дополнительной улики! Комиссия будет скептична.';
-    }
-    
-    const cluesHtml = cluesList.length > 0 
-        ? `<div class="final-clues-box">
-               <h4>🔍 СОБРАННЫЕ УЛИКИ (${cluesList.length} шт.)</h4>
-               <div class="final-clues-list">
-                   <ul style="margin-left: 20px;">${cluesList.map(c => `<li>${c}</li>`).join('')}</ul>
-               </div>
-               <p style="margin-top: 8px; font-size: 11px; color: #886633;">${cluesMessage}</p>
-           </div>`
-        : `<div class="final-clues-box">
-               <h4>⚠️ УЛИКИ НЕ СОБРАНЫ</h4>
-               <p>Вы не обращали внимание на диагностические команды. Комиссия будет сомневаться в ваших выводах.</p>
-           </div>`;
-    
-    const commandsHtml = commandHistory.length > 0
-        ? `<div class="final-commands-history">
-               <h4>ИСТОРИЯ ВАШИХ КОМАНД</h4>
-               <div style="max-height: 120px; overflow-y: auto;">
-                   ${commandHistory.map(cmd => `<div style="font-family: monospace; font-size: 10px; margin: 3px 0;">${cmd}</div>`).join('')}
-               </div>
-           </div>`
-        : '';
-    
-    // Варианты ответов (правильный только один)
-    const options = [
-        { 
-            text: "🔌 Проблемы с электропитанием сервера", 
-            isCorrect: false,
-            feedback: "❌ Неверно. Сервер не выключался, логи это подтверждают (uptime сервера был в норме)."
-        },
-        { 
-            text: "💾 Сбой в системе хранения данных (диски переполнены)", 
-            isCorrect: false,
-            feedback: "❌ Неверно. Диски были в порядке, проблема не в хранилище. Ошибки были связаны с обработкой запросов."
-        },
-        { 
-            text: "🌐 DDoS-атака извне", 
-            isCorrect: false,
-            feedback: "❌ Неверно. Атаки не было, трафик был в норме. Был один компонент, который отказывал во всех сервисах."
-        },
-        { 
-            text: "🔧 Неисправность API-шлюза (API Gateway)", 
-            isCorrect: true,
-            feedback: "✅ АБСОЛЮТНО ВЕРНО! API-шлюз работал нестабильно: он не передавал файлы в очередь, зависал при запросе оценок, кешировал старые данные и создавал ложные проверки VPN. Комиссия впечатлена!"
-        },
-        { 
-            text: "🐛 Вирус в коде личного кабинета", 
-            isCorrect: false,
-            feedback: "❌ Неверно. Вируса не было, код ЛК не менялся. Проблема была на уровне инфраструктуры."
-        }
-    ];
-    
     const modal = document.createElement('div');
-    modal.className = 'final-modal-overlay';
+    modal.className = 'victory-overlay';
     
-    let optionsHtml = '';
-    options.forEach((opt, idx) => {
-        optionsHtml += `
-            <button class="final-choice-btn" data-correct="${opt.isCorrect}" data-feedback="${opt.feedback.replace(/"/g, '&quot;')}" data-disabled="false">
-                ${opt.text}
-            </button>
-        `;
-    });
+    const successCommands = gameData.errorLog.filter(log => log.result === 'исправлена').length;
+    const cluesCount = gameData.clues.length;
     
     modal.innerHTML = `
-        <div class="final-modal">
-            <h2>🔍 ЗАСЕДАНИЕ КОМИССИИ</h2>
-            <p style="margin-bottom: 10px; color: #442200;">Преподаватель: <em>"Итак, Коля. Все проблемы ты починил. Но главный вопрос: <strong>ПОЧЕМУ</strong> это случилось? Что было первопричиной?"</em></p>
-            ${cluesHtml}
-            ${commandsHtml}
-            <hr style="margin: 15px 0; border: 2px solid #ffaa44;">
-            <p style="font-weight: bold; margin-bottom: 15px; color: #442200;">📌 Выберите правильную причину сбоя:</p>
-            <div id="finalOptionsContainer">
-                ${optionsHtml}
+        <div class="victory-modal">
+            <h1>ПОЗДРАВЛЯЕМ!</h1>
+            <p style="font-size: 14px; margin-bottom: 15px;">Вы успешно завершили расследование и спасли свою стипендию!</p>
+            
+            <div class="victory-stats">
+                <p><strong>📊 ВАША СТАТИСТИКА:</strong></p>
+                <p>♥ Доверие: ${gameData.trust}%</p>
+                <p>★ Интеллект: ${gameData.intellect}</p>
+                <p>✅ Успешных действий: ${successCommands}</p>
+                <p>🔍 Собрано улик: ${cluesCount}</p>
+                <p>📅 Дней расследования: ${gameData.completedDays.length}/5</p>
             </div>
-            <div id="finalFeedback" class="final-feedback" style="display: none;"></div>
-            <button id="closeFinalModalBtn" class="final-close-btn">✖ Закрыть</button>
+            
+            <div class="victory-explanation">
+                <p><strong>🔧 Что на самом деле случилось?</strong></p>
+                <p>API-шлюз работал нестабильно из-за накопившихся проблем:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>Очередь загрузки переполнилась из-за сбоя в маршрутизации</li>
+                    <li>Шлюз зависал при запросе оценок</li>
+                    <li>Кеш не обновлялся из-за неправильных настроек TTL</li>
+                    <li>Внешние проверки VPN блокировали легитимные запросы</li>
+                </ul>
+                <p style="margin-top: 15px;">После вашего вмешательства всё заработало как часы!</p>
+            </div>
+            
+            <div class="victory-buttons">
+                <button class="victory-btn victory-btn-new" id="victoryNewGameBtn">▶ Начать заново</button>
+                <button class="victory-btn victory-btn-reset" id="victoryMenuBtn">В главное меню</button>
+            </div>
         </div>
     `;
     
     document.body.appendChild(modal);
     
-    let correctAnswerChosen = false;
-    
-    // Обработка выбора
-    document.querySelectorAll('.final-choice-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (correctAnswerChosen) return;
-            
-            const isCorrect = btn.dataset.correct === 'true';
-            const feedback = btn.dataset.feedback;
-            const feedbackDiv = document.getElementById('finalFeedback');
-            
-            if (feedbackDiv) {
-                feedbackDiv.style.display = 'block';
-                feedbackDiv.innerHTML = feedback;
-                
-                if (isCorrect) {
-                    correctAnswerChosen = true;
-                    feedbackDiv.style.background = '#a5d6a5';
-                    feedbackDiv.style.borderLeftColor = '#2e7d32';
-                    modifyTrust(30);
-                    modifyIntellect(20);
-                    addNotification("🎉 Комиссия одобрила ваше расследование! Переход к финалу...", "success");
-                    
-                    document.querySelectorAll('.final-choice-btn').forEach(b => {
-                        b.disabled = true;
-                        b.style.opacity = '0.5';
-                    });
-                    
-                    setTimeout(() => {
-                        modal.remove();
-                        showVictoryScreen();
-                    }, 2000);
-                } else {
-                    btn.disabled = true;
-                    btn.style.opacity = '0.4';
-                    btn.style.cursor = 'not-allowed';
-                    
-                    feedbackDiv.style.background = '#ffcdd2';
-                    feedbackDiv.style.borderLeftColor = '#c62828';
-                    modifyTrust(-15);
-                    addNotification("❌ Неправильный ответ! Доверие снижено. Попробуйте другой вариант.", "alert");
-                    
-                    if (gameData.trust <= 0) {
-                        setTimeout(() => {
-                            modal.remove();
-                            showGameOver();
-                        }, 2000);
-                    }
-                }
-            }
-        });
+    document.getElementById('victoryNewGameBtn')?.addEventListener('click', () => {
+        modal.remove();
+        resetProgress();
+        powerOnDesktop();
     });
     
-    document.getElementById('closeFinalModalBtn')?.addEventListener('click', () => {
+    document.getElementById('victoryMenuBtn')?.addEventListener('click', () => {
         modal.remove();
-        if (gameData.trust > 0 && !gameData.gameLost && gameData.completedDays.includes(5) && !correctAnswerChosen) {
-            addNotification("💡 Комиссия ждёт вашего ответа! Вернитесь в Архив данных и подумайте.", "system");
-        }
+        const desktopElem = document.getElementById('desktop');
+        if (desktopElem) desktopElem.style.display = 'none';
+        resetProgress();
     });
 }
 

@@ -1083,7 +1083,6 @@ body.main-page {
 }
 
 .final-clues-list {
-    max-height: 150px;
     overflow-y: auto;
 }
 
@@ -1102,7 +1101,6 @@ body.main-page {
     font-size: 13px;
     font-family: monospace;
     color: #00ff00;
-    max-height: 150px;
     overflow-y: auto;
     clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
 }
@@ -1197,12 +1195,6 @@ body.main-page {
     0% { transform: scale(0.8); opacity: 0; }
     80% { transform: scale(1.02); }
     100% { transform: scale(1); opacity: 1; }
-}
-
-.victory-icon {
-    font-size: 80px;
-    margin-bottom: 20px;
-    filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.3));
 }
 
 .victory-modal h1 {

@@ -161,7 +161,6 @@
         <h3>🔍 Журнал ошибок и улики</h3>
         <div id="errorLogList"></div>
         
-        <button id="prepareReportBtn" class="report-btn">📄 Подготовить отчёт для преподавателя</button>
     </div>
     
     <script>
@@ -280,39 +279,10 @@
             logDiv.innerHTML = html;
         }
         
-        function prepareReport() {
-            const gameData = getGameData();
-            if (!gameData) return;
-            
-            if (gameData.day < 5 && !gameData.completedDays.includes(4)) {
-                showBubble('❌ Сначала решите все проблемы дней 1-4!', 'system');
-                return;
-            }
-            
-            if (!gameData.completedDays.includes(4)) {
-                showBubble('❌ Сначала решите проблему дня 4!', 'system');
-                return;
-            }
-            
-            if (gameData.completedDays.includes(5)) {
-                showBubble('📋 Отчёт уже подготовлен!', 'system');
-                return;
-            }
-            
-            if (window.parent.executeCommand) {
-                window.parent.executeCommand('report.generate');
-            }
-        }
-        
         function init() {
             renderStats();
             renderTimeline();
             renderErrorLog();
-            
-            const reportBtn = document.getElementById('prepareReportBtn');
-            if (reportBtn) {
-                reportBtn.addEventListener('click', prepareReport);
-            }
             
             setInterval(() => {
                 renderStats();
