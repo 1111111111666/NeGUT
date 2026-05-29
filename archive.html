@@ -237,7 +237,7 @@
             
             errors.slice(0, 20).forEach(err => {
                 const resultClass = err.result === 'исправлена' ? 'success' : (err.result === 'не исправлена' ? 'failure' : 'clue');
-                const resultText = err.result === 'исправлена' ? '✅ ' + err.result : (err.result === 'не исправлена' ? '❌ ' + err.result : '🔍 ' + err.result);
+                const resultText = err.result === 'исправлена' ? '✅ ' + err.result : (err.result === 'не исправлена' ? '✖ ' + err.result : '🔍 ' + err.result);
                 
                 html += `
                     <div class="log-card">

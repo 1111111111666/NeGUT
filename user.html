@@ -312,19 +312,34 @@
         }
         
         function isLessonMarked(lessonName) {
-            const savedKey = `marked_${currentDay}_${lessonName}`;
-            return localStorage.getItem(savedKey) === 'true';
+            const gameData = getGameData();
+            if (!gameData) return false;
+            
+            if (!gameData.markedLessons) {
+                gameData.markedLessons = {};
+            }
+            
+            const key = `${currentDay}_${lessonName}`;
+            return gameData.markedLessons[key] === true;
         }
         
         function markAttendance(lessonName, reward, buttonElement) {
-            const savedKey = `marked_${currentDay}_${lessonName}`;
+            const gameData = getGameData();
+            if (!gameData) return false;
             
-            if (localStorage.getItem(savedKey) === 'true') {
+            if (!gameData.markedLessons) {
+                gameData.markedLessons = {};
+            }
+            
+            const key = `${currentDay}_${lessonName}`;
+            
+            if (gameData.markedLessons[key] === true) {
                 showBubble("❌ Вы уже отметились на этой паре!", "system");
                 return false;
             }
             
-            localStorage.setItem(savedKey, 'true');
+            gameData.markedLessons[key] = true;
+            updateGameData(gameData);
             
             if (buttonElement) {
                 buttonElement.textContent = '✓ Отмечено';
@@ -405,14 +420,22 @@
             const filesStatus = document.getElementById('filesStatus');
             const warningBanner = document.getElementById('warningBanner');
             
-            if (gameData.day === 1 && !gameData.completedDays?.includes(1)) {
-                if (gradeSpan) gradeSpan.textContent = '2';
-                if (filesStatus) filesStatus.textContent = 'пусто (ошибка загрузки)';
-                if (warningBanner) warningBanner.innerHTML = '⚠️ ОШИБКА: Файл не найден в очереди загрузки!';
-            } else if (gameData.day >= 2 && gameData.completedDays?.includes(1)) {
-                if (gradeSpan) gradeSpan.innerHTML = '2 <span style="font-size:10px">(ожидает API)</span>';
-                if (filesStatus) filesStatus.innerHTML = '✅ Курсовая_работа.pdf (отправлено)';
-                if (warningBanner) warningBanner.innerHTML = '⚠️ API ОЦЕНИВАНИЯ НЕ ОТВЕЧАЕТ (502)';
+            if (gradeSpan) {
+                if (gameData.completedDays?.includes(2)) {
+                    gradeSpan.innerHTML = '5';
+                    if (filesStatus) filesStatus.innerHTML = '✅ Курсовая_работа.pdf (проверено, зачтено)';
+                    if (warningBanner) warningBanner.innerHTML = '✅ Система стабильна. Ожидается финальное решение.';
+                }
+                else if (gameData.day === 1 && !gameData.completedDays?.includes(1)) {
+                    gradeSpan.textContent = '2';
+                    if (filesStatus) filesStatus.innerHTML = 'пусто (ошибка загрузки)';
+                    if (warningBanner) warningBanner.innerHTML = '⚠️ ОШИБКА: Файл не найден в очереди загрузки!';
+                }
+                else if (gameData.day >= 2 && !gameData.completedDays?.includes(2)) {
+                    gradeSpan.innerHTML = '2 <span style="font-size:10px">(ожидает API)</span>';
+                    if (filesStatus) filesStatus.innerHTML = '✅ Курсовая_работа.pdf (отправлено)';
+                    if (warningBanner) warningBanner.innerHTML = '⚠️ API ОЦЕНИВАНИЯ НЕ ОТВЕЧАЕТ (502)';
+                }
             }
             
             if (gameData.day >= 3 && gameData.completedDays?.includes(2)) {
@@ -521,6 +544,18 @@
         }
         
         init();
+
+        window.addEventListener('message', (e) => {
+            if (e.data.type === 'updateGrade') {
+                const gradeSpan = document.getElementById('lastWorkGrade');
+                const filesStatus = document.getElementById('filesStatus');
+                if (gradeSpan) {
+                    gradeSpan.innerHTML = e.data.grade;
+                    if (filesStatus) filesStatus.innerHTML = '✅ Курсовая_работа.pdf (проверено, зачтено)';
+                    showBubble(`📝 Оценка обновлена! Теперь у вас ${e.data.grade} за курсовую!`, 'character');
+                }
+            }
+        });
     </script>
 </body>
 </html>

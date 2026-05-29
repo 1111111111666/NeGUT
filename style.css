@@ -1207,11 +1207,11 @@ body.main-page {
 .victory-explanation {
     background: #442200;
     padding: 20px;
-    margin: 20px 0;
+    margin: 20px 0 40px;
     text-align: left;
     color: #ffdd99;
     border-left: 6px solid #ffaa44;
-    font-size: 12px;
+    font-size: 14px;
     line-height: 1.5;
     clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
 }
@@ -1220,7 +1220,7 @@ body.main-page {
     background: #ffcc88;
     padding: 15px;
     margin: 15px 0;
-    font-size: 13px;
+    font-size: 14px;
     color: #442200;
     border: 3px solid #ffaa44;
     clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);

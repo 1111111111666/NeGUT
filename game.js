@@ -19,7 +19,8 @@ let gameData = {
     finalShown: false,
     victoryShown: false,
     finalAttempts: 0,
-    historyRestored: false
+    historyRestored: false,
+    courseworkGrade: 2
 };
 
 let scheduleByDay = {};
@@ -151,6 +152,9 @@ function loadGame() {
     if (saved) {
         try {
             const parsed = JSON.parse(saved);
+            if (parsed.courseworkGrade === undefined) {
+                gameData.courseworkGrade = 2;
+            }
             gameData = { ...gameData, ...parsed };
             if (!gameData.terminalHistory) gameData.terminalHistory = [];
             for (let day in scheduleByDay) {
@@ -465,7 +469,7 @@ function executeCommand(command) {
                 addToTerminalFromGame(`${cmdName.padEnd(30)} ${dayInfo.padEnd(10)} - ${terminalCommands[cmdName].description}`, false, false);
             }
         }
-        addToTerminalFromGame(`📅 Текущий день: ${gameData.day} | ❤️ Доверие: ${gameData.trust} | 🧠 Интеллект: ${gameData.intellect}`, false, false);
+        addToTerminalFromGame(`📅 Текущий день: ${gameData.day} | ♥ Доверие: ${gameData.trust} | ★ Интеллект: ${gameData.intellect}`, false, false);
         return;
     }
     
@@ -510,6 +514,16 @@ function executeCommand(command) {
     if (cmdData.trust) modifyTrust(cmdData.trust);
     if (cmdData.intellect) modifyIntellect(cmdData.intellect);
     if (cmdData.clue) addClue(cmdData.clue);
+    if (originalCommand === "api.gateway.restart" && cmdData.success && cmdData.day === 2) {
+        gameData.courseworkGrade = 5;
+        saveGame();
+        const iframe = document.getElementById('browserIframe');
+        if (iframe && iframe.contentWindow) {
+            iframe.contentWindow.postMessage({ type: 'updateGrade', grade: 5 }, '*');
+        }
+        
+        addToTerminalFromGame("📝 Курсовая работа обновлена: оценка 5!", false, true);
+    }
     
     addToErrorLog(originalCommand, cmdData.success ? 'исправлена' : 'не исправлена', cmdData.message, cmdData.day, cmdData.explanation, cmdData.trust || 0, cmdData.intellect || 0);
     
@@ -616,10 +630,15 @@ function rebootComputer() {
         overlay.classList.add('active');
         overlay.querySelector('.shutdown-text').textContent = 'Перезагрузка...';
         setTimeout(() => {
+            const lastRebootDay = localStorage.getItem('lastRebootDay');
+            if (lastRebootDay != gameData.day) {
+                modifyTrust(1);
+                localStorage.setItem('lastRebootDay', gameData.day);
+                addNotification("⟲ Перезагрузка помогла! +1 к доверию (система стала стабильнее)", "info");
+            } else {
+                addNotification("⟲ Компьютер перезагружен. Сегодня вы уже получали бонус.", "info");
+            }
             overlay.classList.remove('active');
-            overlay.querySelector('.shutdown-text').textContent = 'Выключение...';
-            addNotification("🔄 Компьютер перезагружен.", "info");
-            modifyTrust(5);
         }, 2000);
     }
 }
@@ -1008,7 +1027,7 @@ function showVictoryScreen() {
     modal.innerHTML = `
         <div class="victory-modal">
             <h1>ПОЗДРАВЛЯЕМ!</h1>
-            <p style="font-size: 14px; margin-bottom: 15px;">Вы успешно завершили расследование и спасли свою стипендию!</p>
+            <p style="font-size: 16px; margin-bottom: 15px;">Вы успешно завершили расследование и спасли свою стипендию!</p>
             
             <div class="victory-stats">
                 <p><strong>📊 ВАША СТАТИСТИКА:</strong></p>
