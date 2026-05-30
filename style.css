@@ -519,7 +519,6 @@ body.main-page {
     display: flex;
     gap: 6px;
     flex: 1;
-    overflow-x: auto;
 }
 
 .tab-btn {
@@ -780,6 +779,7 @@ body.main-page {
     font-size: 14px;
     color: #886633;
 }
+
 
 /* ===== VPN CLIENT ===== */
 .vpn-app {

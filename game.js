@@ -20,7 +20,8 @@ let gameData = {
     victoryShown: false,
     finalAttempts: 0,
     historyRestored: false,
-    courseworkGrade: 2
+    courseworkGrade: 2,
+    lastRebootBonusDay: 0,
 };
 
 let scheduleByDay = {};
@@ -102,11 +103,11 @@ function initSchedule() {
             { name: "Математика", time: "15:00-16:30", reward: 8, taken: false }
         ],
         5: [
-            { name: "Дипломное проектирование", time: "10:00-11:30", reward: 15, taken: false },
+            { name: "Разговоры о важном", time: "10:00-11:30", reward: 15, taken: false },
             { name: "Карьера в IT", time: "12:00-13:30", reward: 10, taken: false }
         ],
         6: [
-            { name: "Защита курсовой", time: "10:00-12:00", reward: 20, taken: false }
+            { name: "Защита лабораторной", time: "10:00-12:00", reward: 20, taken: false }
         ]
     };
 }
@@ -522,7 +523,7 @@ function executeCommand(command) {
             iframe.contentWindow.postMessage({ type: 'updateGrade', grade: 5 }, '*');
         }
         
-        addToTerminalFromGame("📝 Курсовая работа обновлена: оценка 5!", false, true);
+        addToTerminalFromGame("📝 Лабораторная работа обновлена: оценка 5!", false, true);
     }
     
     addToErrorLog(originalCommand, cmdData.success ? 'исправлена' : 'не исправлена', cmdData.message, cmdData.day, cmdData.explanation, cmdData.trust || 0, cmdData.intellect || 0);
@@ -623,23 +624,43 @@ function toggleVPN() {
     }
 }
 
+
 // Перезагрузка компьютера
 function rebootComputer() {
     const overlay = document.getElementById('shutdownOverlay');
     if (overlay) {
+        const textElement = overlay.querySelector('.shutdown-text');
+        if (textElement) textElement.textContent = 'Перезагрузка...';
         overlay.classList.add('active');
-        overlay.querySelector('.shutdown-text').textContent = 'Перезагрузка...';
         setTimeout(() => {
-            const lastRebootDay = localStorage.getItem('lastRebootDay');
-            if (lastRebootDay != gameData.day) {
+            if (gameData.lastRebootBonusDay !== gameData.day) {
                 modifyTrust(1);
-                localStorage.setItem('lastRebootDay', gameData.day);
+                gameData.lastRebootBonusDay = gameData.day;
+                saveGame();
                 addNotification("⟲ Перезагрузка помогла! +1 к доверию (система стала стабильнее)", "info");
             } else {
                 addNotification("⟲ Компьютер перезагружен. Сегодня вы уже получали бонус.", "info");
             }
             overlay.classList.remove('active');
+            if (textElement) textElement.textContent = 'Выключение...';
         }, 2000);
+    }
+}
+
+// Выключение компьютера
+function shutdownComputer() {
+    const overlay = document.getElementById('shutdownOverlay');
+    if (overlay) {
+        const textElement = overlay.querySelector('.shutdown-text');
+        if (textElement) textElement.textContent = 'Выключение...';  // ← ДОБАВЛЯЕМ ЭТУ СТРОКУ
+        overlay.classList.add('active');
+        setTimeout(() => {
+            const desktopElem = document.getElementById('desktop');
+            if (desktopElem) desktopElem.style.display = 'none';
+            overlay.classList.remove('active');
+            // Сбрасываем текст на стандартный
+            if (textElement) textElement.textContent = 'Выключение...';
+        }, 1500);
     }
 }
 
@@ -659,6 +680,22 @@ function shutdownComputer() {
 
 // Включение рабочего стола
 function powerOnDesktop() {
+    if (!localStorage.getItem('notificationHintShown')) {
+        setTimeout(() => {
+            const notifArea = document.querySelector('.notification-area');
+            if (notifArea) {
+                notifArea.style.transition = 'all 0.2s ease';
+                notifArea.style.boxShadow = '0 0 0 3px #ffaa44, inset 0 0 0 2px #ffeedd';
+                notifArea.style.transform = 'scale(1.05)';
+                setTimeout(() => {
+                    notifArea.style.boxShadow = '';
+                    notifArea.style.transform = '';
+                }, 1500);
+            }
+            localStorage.setItem('notificationHintShown', 'true');
+        }, 500);
+    }
+
     const desktopElem = document.getElementById('desktop');
     if (desktopElem) {
         desktopElem.style.display = 'block';
@@ -949,17 +986,21 @@ function showFinalGameOver() {
     
     document.body.appendChild(modal);
     
+    function performResetAndClose(modalElement) {
+        if (confirm("⚠ ВЫ УВЕРЕНЫ? Весь прогресс будет потерян!")) {
+            modalElement.remove();
+            resetProgress();
+            const desktopElem = document.getElementById('desktop');
+            if (desktopElem) desktopElem.style.display = 'none';
+        }
+    }
+    
     document.getElementById('finalGameOverRestartBtn')?.addEventListener('click', () => {
-        modal.remove();
-        resetProgress();
-        powerOnDesktop();
+        performResetAndClose(modal);
     });
     
     document.getElementById('finalGameOverMenuBtn')?.addEventListener('click', () => {
-        modal.remove();
-        const desktopElem = document.getElementById('desktop');
-        if (desktopElem) desktopElem.style.display = 'none';
-        resetProgress();
+        performResetAndClose(modal);
     });
 }
 
@@ -998,17 +1039,21 @@ function showGameOver() {
     
     document.body.appendChild(modal);
     
+    function performResetAndClose(modalElement) {
+        if (confirm("⚠ ВЫ УВЕРЕНЫ? Весь прогресс будет потерян!")) {
+            modalElement.remove();
+            resetProgress();
+            const desktopElem = document.getElementById('desktop');
+            if (desktopElem) desktopElem.style.display = 'none';
+        }
+    }
+    
     document.getElementById('gameOverRestartBtn')?.addEventListener('click', () => {
-        modal.remove();
-        resetProgress();
-        powerOnDesktop();
+        performResetAndClose(modal);
     });
     
     document.getElementById('gameOverMenuBtn')?.addEventListener('click', () => {
-        modal.remove();
-        const desktopElem = document.getElementById('desktop');
-        if (desktopElem) desktopElem.style.display = 'none';
-        resetProgress();
+        performResetAndClose(modal);
     });
 }
 
@@ -1215,9 +1260,6 @@ document.addEventListener('DOMContentLoaded', () => {
         browserModal?.classList.remove('active');
     });
     
-    document.getElementById('browserMinBtn')?.addEventListener('click', () => {
-        browserModal?.classList.remove('active');
-    });
     
     browserModal?.addEventListener('click', (e) => {
         if (e.target === browserModal) browserModal.classList.remove('active');
