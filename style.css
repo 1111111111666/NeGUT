@@ -1263,3 +1263,32 @@ body.main-page {
 .victory-btn:active {
     transform: translate(2px, 2px);
 }
+
+/* PWA установочный баннер */
+#pwa-install-banner {
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Стили для PWA в standalone-режиме */
+@media (display-mode: standalone) {
+    body {
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Скрываем адресную строку при запуске как приложение */
+    .desktop {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+}

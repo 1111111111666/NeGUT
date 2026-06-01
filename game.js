@@ -1347,6 +1347,20 @@ document.addEventListener('DOMContentLoaded', () => {
             restoreTerminalHistory();
         }, 1000);
     }
+    // PWA: Проверка обновлений
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.ready.then((registration) => {
+        registration.update();
+    });
+    
+    // Отслеживание обновлений
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return;
+        refreshing = true;
+        window.location.reload();
+    });
+}
 });
 
 // Экспорт глобальных функций
