@@ -5,6 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>СПБ не ГУТ — Главный экран</title>
     <link rel="stylesheet" href="style.css">
+<!-- PWA Meta -->
+<link rel="manifest" href="./manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Log Entropy">
+<meta name="theme-color" content="#ffaa44">
+<link rel="apple-touch-icon" href="./images/icon-192.png">
+
+<!-- PWA Script -->
+<script>
+// Регистрация Service Worker 
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+            .then((registration) => {
+                console.log('Service Worker зарегистрирован:', registration.scope);
+            })
+            .catch((error) => {
+                console.log('Ошибка регистрации Service Worker:', error);
+            });
+    });
+}
+</script>
 </head>
 <body class="main-page">
     <main class="game-main">
@@ -135,7 +158,6 @@
             <div class="browser-window">
                 <div class="browser-bar">
                     <div class="window-controls">
-                        <button id="browserMinBtn">—</button>
                         <button id="closeBrowserBtn">✖</button>
                     </div>
                     <div class="browser-tabs">
@@ -229,16 +251,6 @@
                         <li>🤖 <strong>DeepSeek</strong> — помощник, даёт подсказки (но доступ к нему сначала нужно заработать)</li>
                         <li>📨 <strong>Telegram</strong> — сообщения от преподавателей и одногруппников</li>
                         <li>🌐 <strong>VPN Client</strong> — влияет на доступ к сервисам (таковы наши реалии...)</li>
-                    </ul>
-                    
-                    <h2>📅 Механика дней</h2>
-                    <p>Каждый игровой день нужно решить одну проблему:</p>
-                    <ul>
-                        <li><strong>День 1:</strong> Пропажа отправленного файла → команда: system.queue.check</li>
-                        <li><strong>День 2:</strong> API оценивания не работает → команда: api.gateway.restart</li>
-                        <li><strong>День 3:</strong> Интерфейс показывает старые данные → команда: cache.flush</li>
-                        <li><strong>День 4:</strong> Проверка VPN через API → команда: vpn.check.disable</li>
-                        <li><strong>День 5:</strong> Угроза отчисления → команда: report.generate</li>
                     </ul>
                     
                     <h2>💡 Важные правила!</h2>

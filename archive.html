@@ -158,10 +158,9 @@
         
         <hr>
         
-        <h3>🔍 Журнал ошибок и улики</h3>
+        <h3>🔍 Решения ошибок</h3>
         <div id="errorLogList"></div>
         
-        <button id="prepareReportBtn" class="report-btn">📄 Подготовить отчёт для преподавателя</button>
     </div>
     
     <script>
@@ -238,7 +237,7 @@
             
             errors.slice(0, 20).forEach(err => {
                 const resultClass = err.result === 'исправлена' ? 'success' : (err.result === 'не исправлена' ? 'failure' : 'clue');
-                const resultText = err.result === 'исправлена' ? '✅ ' + err.result : (err.result === 'не исправлена' ? '❌ ' + err.result : '🔍 ' + err.result);
+                const resultText = err.result === 'исправлена' ? '✅ ' + err.result : (err.result === 'не исправлена' ? '✖ ' + err.result : '🔍 ' + err.result);
                 
                 html += `
                     <div class="log-card">
@@ -261,58 +260,38 @@
             
             if (clues.length > 0) {
                 html += `<h3 style="margin-top: 20px;">🔍 Собранные улики</h3>`;
-                clues.forEach(clue => {
+                clues.forEach((clue, index) => {
                     html += `
                         <div class="log-card">
                             <h4>
-                                Улика
+                                Улика ${index + 1}
                                 <span class="result-badge clue">НАЙДЕНО</span>
                             </h4>
                             <p>${clue}</p>
-                            <div class="explanation">
-                                💡 Эта улика поможет в финальном расследовании!
-                            </div>
                         </div>
                     `;
                 });
+                html += `
+                    <div class="intellect-tip" style="    background: #ffeedd;
+                        padding: 10px;
+                        margin-top: 15px;
+                        font-size: 12px;
+                        color: #442200;
+                        font-weight: bold;
+                        border: 2px solid #ffaa44;
+                        clip-path: polygon(3px 0, calc(100% - 3px) 0, 100% 3px, 100% calc(100% - 3px), calc(100% - 3px) 100%, 3px 100%, 0 calc(100% - 3px), 0 3px);">
+                        💡 Улики помогут в финальном расследовании! Собирайте их, выполняя диагностические команды.
+                    </div>
+                `;
             }
             
             logDiv.innerHTML = html;
-        }
-        
-        function prepareReport() {
-            const gameData = getGameData();
-            if (!gameData) return;
-            
-            if (gameData.day < 5 && !gameData.completedDays.includes(4)) {
-                showBubble('❌ Сначала решите все проблемы дней 1-4!', 'system');
-                return;
-            }
-            
-            if (!gameData.completedDays.includes(4)) {
-                showBubble('❌ Сначала решите проблему дня 4!', 'system');
-                return;
-            }
-            
-            if (gameData.completedDays.includes(5)) {
-                showBubble('📋 Отчёт уже подготовлен!', 'system');
-                return;
-            }
-            
-            if (window.parent.executeCommand) {
-                window.parent.executeCommand('report.generate');
-            }
         }
         
         function init() {
             renderStats();
             renderTimeline();
             renderErrorLog();
-            
-            const reportBtn = document.getElementById('prepareReportBtn');
-            if (reportBtn) {
-                reportBtn.addEventListener('click', prepareReport);
-            }
             
             setInterval(() => {
                 renderStats();

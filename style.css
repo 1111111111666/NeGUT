@@ -519,7 +519,6 @@ body.main-page {
     display: flex;
     gap: 6px;
     flex: 1;
-    overflow-x: auto;
 }
 
 .tab-btn {
@@ -780,6 +779,7 @@ body.main-page {
     font-size: 14px;
     color: #886633;
 }
+
 
 /* ===== VPN CLIENT ===== */
 .vpn-app {
@@ -1083,7 +1083,6 @@ body.main-page {
 }
 
 .final-clues-list {
-    max-height: 150px;
     overflow-y: auto;
 }
 
@@ -1102,7 +1101,6 @@ body.main-page {
     font-size: 13px;
     font-family: monospace;
     color: #00ff00;
-    max-height: 150px;
     overflow-y: auto;
     clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
 }
@@ -1199,12 +1197,6 @@ body.main-page {
     100% { transform: scale(1); opacity: 1; }
 }
 
-.victory-icon {
-    font-size: 80px;
-    margin-bottom: 20px;
-    filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.3));
-}
-
 .victory-modal h1 {
     color: #2e7d32;
     font-size: 28px;
@@ -1215,11 +1207,11 @@ body.main-page {
 .victory-explanation {
     background: #442200;
     padding: 20px;
-    margin: 20px 0;
+    margin: 20px 0 40px;
     text-align: left;
     color: #ffdd99;
     border-left: 6px solid #ffaa44;
-    font-size: 12px;
+    font-size: 14px;
     line-height: 1.5;
     clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
 }
@@ -1228,7 +1220,7 @@ body.main-page {
     background: #ffcc88;
     padding: 15px;
     margin: 15px 0;
-    font-size: 13px;
+    font-size: 14px;
     color: #442200;
     border: 3px solid #ffaa44;
     clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
@@ -1270,4 +1262,33 @@ body.main-page {
 
 .victory-btn:active {
     transform: translate(2px, 2px);
+}
+
+/* PWA установочный баннер */
+#pwa-install-banner {
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Стили для PWA в standalone-режиме */
+@media (display-mode: standalone) {
+    body {
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Скрываем адресную строку при запуске как приложение */
+    .desktop {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
 }
